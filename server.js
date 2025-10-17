@@ -646,6 +646,12 @@ app.get('*', (req, res) => {
 	}
 });
 
+// Global error handler
+app.use((err, req, res, next) => {
+	console.error('Error:', err);
+	res.status(500).json({ error: 'internal server error', message: err.message });
+});
+
 async function startServer(preferredPort, maxAttempts = 10) {
 	let port = preferredPort;
 	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
