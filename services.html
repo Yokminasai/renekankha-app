@@ -576,17 +576,10 @@
 				</ul>
 			</div>
 
-			<!-- Scam Reporting -->
-			<div class="service-card" data-service="scam-reporting">
+			<div class="service-card" data-service="scammed">
 				<div class="service-icon">⚠️</div>
-				<h3 class="service-title">รายงานไอดีถูกโกง</h3>
-				<p class="service-description">รายงานไอดีที่ถูกโกงหรือละเมิดกฎหมายทางอิเล็กทรอนิกส์</p>
-				<ul class="service-features">
-					<li>รายงานไอดีที่ถูกโกง</li>
-					<li>รายงานการละเมิดกฎหมาย</li>
-					<li>คำแนะนำและวิธีการรายงาน</li>
-					<li>ติดตามสถานะการตรวจสอบ</li>
-				</ul>
+				<h3 class="service-title">แจ้งไอดีโดนโกง</h3>
+				<p class="service-description">แจ้งรายงานและติดตามบัญชีที่ถูกโกง</p>
 			</div>
 		</div>
 	</main>
@@ -650,8 +643,8 @@
 					case 'private-id':
 						window.location.href = 'services-private-id-check.html';
 						break;
-					case 'scam-reporting':
-						window.location.href = 'services-scam-reporting.html';
+					case 'scammed':
+						window.location.href = 'services-scammed-account.html';
 						break;
 					default:
 						setStatus('ไม่พบบริการที่เลือก', 'error');

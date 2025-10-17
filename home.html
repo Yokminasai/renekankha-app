@@ -83,7 +83,7 @@
 			position: relative;
 			z-index: 10;
 			text-align: center;
-			max-width: 600px;
+			max-width: 700px;
 			animation: fadeInUp 1s ease-out;
 		}
 
@@ -98,13 +98,14 @@
 			}
 		}
 
-		/* Logo SVG */
+		/* Logo SVG - Centered properly */
 		.logo-wrapper {
 			margin-bottom: 32px;
+			animation: scaleIn 0.8s ease-out 0.15s both;
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			animation: scaleIn 0.8s ease-out 0.15s both;
+			width: 100%;
 		}
 
 		@keyframes scaleIn {
@@ -119,25 +120,27 @@
 		}
 
 		.logo-svg {
-			width: 140px;
-			height: 140px;
-			filter: drop-shadow(0 10px 30px rgba(255,107,107,.2));
+			width: 160px;
+			height: 160px;
+			filter: drop-shadow(0 15px 40px rgba(255,107,107,.25));
 			animation: pulse 3s infinite;
+			flex-shrink: 0;
 		}
 
 		@keyframes pulse {
 			0%, 100% {
-				filter: drop-shadow(0 10px 30px rgba(255,107,107,.2));
+				filter: drop-shadow(0 15px 40px rgba(255,107,107,.25));
 			}
 			50% {
-				filter: drop-shadow(0 15px 40px rgba(255,107,107,.4));
+				filter: drop-shadow(0 20px 50px rgba(255,107,107,.4));
 			}
 		}
 
 		h1 {
-			font-size: 54px;
+			font-size: 56px;
 			font-weight: 800;
 			margin-bottom: 12px;
+			margin-top: 0;
 			background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
@@ -363,8 +366,8 @@
 			}
 
 			.logo-svg {
-				width: 110px;
-				height: 110px;
+				width: 120px;
+				height: 120px;
 			}
 
 			.stat-number {
@@ -384,41 +387,24 @@
 		<!-- Logo -->
 		<div class="logo-wrapper">
 			<svg class="logo-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<!-- Outer Circle Border -->
-				<circle cx="100" cy="100" r="92" stroke="url(#gradBorder)" stroke-width="2.5" opacity="0.8"/>
-				<!-- Background Circle -->
-				<circle cx="100" cy="100" r="85" fill="url(#gradBg)" opacity="0.12"/>
-				<!-- Inner Decorative Circle -->
-				<circle cx="100" cy="100" r="70" stroke="url(#gradAccent)" stroke-width="1.5" opacity="0.5"/>
-				<!-- Shield Main Body -->
-				<path d="M100 45 C100 45 135 60 135 90 C135 115 100 145 100 145 C100 145 65 115 65 90 C65 60 100 45 100 45 Z" fill="url(#gradShield)" stroke="url(#gradBorder)" stroke-width="2.5" stroke-linejoin="round"/>
-				<!-- Checkmark inside shield -->
-				<g transform="translate(100, 95)">
-					<path d="M-12 0 L-2 12 L15 -8" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-				</g>
-				<!-- Glow effect circle -->
-				<circle cx="100" cy="100" r="90" fill="none" stroke="url(#gradGlow)" stroke-width="1" opacity="0.3"/>
+				<!-- Outer Circle -->
+				<circle cx="100" cy="100" r="95" stroke="url(#gradient1)" stroke-width="3"/>
+				<!-- Inner Circle -->
+				<circle cx="100" cy="100" r="65" fill="url(#gradient2)" opacity="0.2"/>
+				<!-- Shield -->
+				<path d="M100 50 L130 65 L130 95 C130 120 100 140 100 140 C100 140 70 120 70 95 L70 65 Z" fill="url(#gradient1)" stroke="url(#gradient2)" stroke-width="2.5"/>
+				<!-- Lock Icon -->
+				<path d="M95 105 L95 115 M100 110 L100 115 M105 105 L105 115" stroke="white" stroke-width="2" stroke-linecap="round"/>
+				<circle cx="100" cy="100" r="8" fill="none" stroke="white" stroke-width="2"/>
+				
 				<defs>
-					<linearGradient id="gradShield" x1="0%" y1="0%" x2="100%" y2="100%">
-						<stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
-						<stop offset="50%" style="stop-color:#ff8787;stop-opacity:0.9" />
-						<stop offset="100%" style="stop-color:#ee5a24;stop-opacity:0.95" />
-					</linearGradient>
-					<linearGradient id="gradBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+					<linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
 						<stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
 						<stop offset="100%" style="stop-color:#ee5a24;stop-opacity:1" />
 					</linearGradient>
-					<linearGradient id="gradAccent" x1="100%" y1="0%" x2="0%" y2="100%">
+					<linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
 						<stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:1" />
 						<stop offset="100%" style="stop-color:#45b7d1;stop-opacity:1" />
-					</linearGradient>
-					<linearGradient id="gradBg" x1="0%" y1="0%" x2="100%" y2="100%">
-						<stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.15" />
-						<stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:0.1" />
-					</linearGradient>
-					<linearGradient id="gradGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-						<stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:0.6" />
-						<stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:0.6" />
 					</linearGradient>
 				</defs>
 			</svg>
@@ -474,19 +460,17 @@
 			window.location.href = 'index.html';
 		}
 
+		// Attach event listeners
 		document.addEventListener('DOMContentLoaded', () => {
-			// Attach event listener to button
 			const enterBtn = document.getElementById('enterBtn');
 			if (enterBtn) {
 				enterBtn.addEventListener('click', enterApp);
 			}
 
-			// Allow Enter key to proceed
 			document.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') enterApp();
 			});
 
-			// Initialize visitor tracking
 			initVisitorTracking();
 		});
 

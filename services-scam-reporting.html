@@ -24,6 +24,7 @@
 			padding: 20px;
 		}
 
+		/* Header */
 		.header {
 			margin-bottom: 40px;
 			text-align: center;
@@ -62,6 +63,7 @@
 			font-size: 14px;
 		}
 
+		/* Form Section */
 		.form-section {
 			background: rgba(255,255,255,.02);
 			border: 1px solid rgba(255,255,255,.08);
@@ -102,12 +104,14 @@
 			color: white;
 			font-family: inherit;
 			font-size: 14px;
+			transition: all 0.3s ease;
 		}
 
 		input:focus, textarea:focus, select:focus {
 			outline: none;
 			background: rgba(255,255,255,.08);
 			border-color: rgba(255,107,107,.4);
+			box-shadow: 0 0 0 3px rgba(255,107,107,.1);
 		}
 
 		textarea {
@@ -115,18 +119,25 @@
 			min-height: 120px;
 		}
 
+		/* Form Row */
 		.form-row {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			gap: 16px;
 		}
 
+		.form-row.full {
+			grid-template-columns: 1fr;
+		}
+
+		/* Help Text */
 		.help-text {
 			font-size: 12px;
 			color: rgba(255,255,255,.5);
 			margin-top: 6px;
 		}
 
+		/* Info Box */
 		.info-box {
 			background: rgba(78,205,196,.1);
 			border-left: 4px solid #4ecdc4;
@@ -136,6 +147,11 @@
 			font-size: 14px;
 		}
 
+		.info-box strong {
+			color: #4ecdc4;
+		}
+
+		/* Buttons */
 		.button-group {
 			display: flex;
 			gap: 12px;
@@ -150,6 +166,7 @@
 			border: none;
 			border-radius: 8px;
 			cursor: pointer;
+			transition: all 0.3s ease;
 			font-family: inherit;
 		}
 
@@ -158,6 +175,12 @@
 			color: white;
 			flex: 1;
 			max-width: 300px;
+			box-shadow: 0 4px 15px rgba(255,107,107,.3);
+		}
+
+		.btn-submit:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 20px rgba(255,107,107,.4);
 		}
 
 		.btn-reset {
@@ -166,6 +189,12 @@
 			border: 1px solid rgba(255,255,255,.1);
 		}
 
+		.btn-reset:hover {
+			background: rgba(255,255,255,.08);
+			border-color: rgba(255,255,255,.2);
+		}
+
+		/* Success Message */
 		.success-message {
 			display: none;
 			background: rgba(34,197,94,.1);
@@ -179,8 +208,21 @@
 
 		.success-message.show {
 			display: block;
+			animation: slideDown 0.3s ease-out;
 		}
 
+		@keyframes slideDown {
+			from {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		/* Guidelines */
 		.guidelines {
 			background: rgba(255,255,255,.02);
 			border: 1px solid rgba(255,255,255,.08);
@@ -197,10 +239,12 @@
 
 		.guidelines ul {
 			list-style: none;
+			padding-left: 0;
 		}
 
 		.guidelines li {
-			padding: 8px 0 8px 24px;
+			padding: 8px 0;
+			padding-left: 24px;
 			position: relative;
 			font-size: 14px;
 			color: rgba(255,255,255,.7);
@@ -211,9 +255,19 @@
 			position: absolute;
 			left: 0;
 			color: #4ecdc4;
+			font-weight: bold;
 		}
 
+		/* Responsive */
 		@media (max-width: 768px) {
+			.container {
+				padding: 16px;
+			}
+
+			.form-section {
+				padding: 20px;
+			}
+
 			.form-row {
 				grid-template-columns: 1fr;
 			}
@@ -234,116 +288,146 @@
 </head>
 <body>
 	<div class="container">
+		<!-- Header -->
 		<div class="header">
 			<a href="services.html">← กลับไปเลือกบริการ</a>
 			<h1>รายงานไอดีถูกโกง</h1>
-			<p>แจ้งเรื่องไอดีของคุณที่ถูกโกง</p>
+			<p>แจ้งเรื่องไอดีของคุณที่ถูกโกงไปแก้ไขปัญหา</p>
 		</div>
 
+		<!-- Success Message -->
 		<div class="success-message" id="successMsg">
-			✓ ส่งรายงานเรียบร้อย! เราจะตรวจสอบและติดต่อคุณ
+			✓ ส่งรายงานเรียบร้อยแล้ว! เราจะตรวจสอบและติดต่อคุณในเร็วๆ นี้
 		</div>
 
+		<!-- Form -->
 		<form id="scamReportForm" class="form-section">
 			<h2>ข้อมูลไอดีที่ถูกโกง</h2>
 
 			<div class="info-box">
-				<strong>⚠️ ข้อมูลสำคัญ:</strong> กรอกข้อมูลให้ครบถ้วน
+				<strong>⚠️ ข้อมูลสำคัญ:</strong> โปรดกรอกข้อมูลให้ครบถ้วนและถูกต้องเพื่อให้เราสามารถช่วยเหลือได้อย่างรวดเร็ว
 			</div>
 
+			<!-- Username -->
 			<div class="form-group">
 				<label for="username">
 					ชื่อบัญชี / Username <span class="required">*</span>
 				</label>
-				<input type="text" id="username" required placeholder="เช่น MyAccount_01">
-				<div class="help-text">ชื่อบัญชี Garena ที่ถูกโกง</div>
+				<input type="text" id="username" name="username" required placeholder="เช่น MyAccount_01">
+				<div class="help-text">กรอกชื่อบัญชี Garena ที่ถูกโกงของคุณ</div>
 			</div>
 
+			<!-- OpenID -->
 			<div class="form-group">
 				<label for="openid">
 					OpenID <span class="required">*</span>
 				</label>
-				<input type="text" id="openid" required placeholder="เช่น 123456789">
-				<div class="help-text">เลขไอดี 9-10 หลัก</div>
+				<input type="text" id="openid" name="openid" required placeholder="เช่น 123456789">
+				<div class="help-text">ระบุ OpenID (เลขไอดี 9-10 หลัก) ของบัญชีที่ถูกโกง</div>
 			</div>
 
+			<!-- Email -->
 			<div class="form-group">
 				<label for="email">
 					อีเมลติดต่อ <span class="required">*</span>
 				</label>
-				<input type="email" id="email" required placeholder="your@email.com">
-				<div class="help-text">ผลการตรวจสอบจะส่งไปที่อีเมลนี้</div>
+				<input type="email" id="email" name="email" required placeholder="your@email.com">
+				<div class="help-text">เราจะใช้อีเมลนี้ส่งผลการตรวจสอบให้คุณ</div>
 			</div>
 
+			<!-- Phone -->
 			<div class="form-group">
-				<label for="phone">เบอร์โทรศัพท์</label>
-				<input type="tel" id="phone" placeholder="08X-XXXX-XXXX">
-				<div class="help-text">ไม่บังคับ</div>
+				<label for="phone">
+					เบอร์โทรศัพท์
+				</label>
+				<input type="tel" id="phone" name="phone" placeholder="08X-XXXX-XXXX">
+				<div class="help-text">ไม่บังคับ แต่จะช่วยให้ติดต่อได้เร็วขึ้น</div>
 			</div>
 
 			<h2 style="margin-top: 32px;">รายละเอียดการโกง</h2>
 
+			<!-- Scam Date -->
 			<div class="form-row">
 				<div class="form-group">
-					<label for="scamDate">วันที่โดนโกง <span class="required">*</span></label>
-					<input type="date" id="scamDate" required>
+					<label for="scamDate">
+						วันที่โดนโกง <span class="required">*</span>
+					</label>
+					<input type="date" id="scamDate" name="scamDate" required>
+					<div class="help-text">วันที่คุณค้นพบว่าไอดีถูกโกง</div>
 				</div>
 
 				<div class="form-group">
-					<label for="scamMethod">วิธีการโกง <span class="required">*</span></label>
-					<select id="scamMethod" required>
-						<option value="">-- เลือก --</option>
+					<label for="scamMethod">
+						วิธีการโกง <span class="required">*</span>
+					</label>
+					<select id="scamMethod" name="scamMethod" required>
+						<option value="">-- เลือกวิธีการโกง --</option>
 						<option value="phishing">Phishing (เว็บปลอม)</option>
-						<option value="password">ขโมยรหัสผ่าน</option>
-						<option value="malware">โปรแกรมร้าย</option>
-						<option value="social">Social Engineering</option>
-						<option value="hijack">Account Hijacking</option>
+						<option value="password_steal">ขโมยรหัสผ่าน</option>
+						<option value="malware">โปรแกรมร้าย / Malware</option>
+						<option value="social_engineering">Social Engineering (หลอกลวง)</option>
+						<option value="account_hijacking">Account Hijacking (ยึดควบคุม)</option>
 						<option value="other">อื่นๆ</option>
 					</select>
+					<div class="help-text">เลือกวิธีที่คิดว่าไอดีของคุณถูกโกง</div>
 				</div>
 			</div>
 
+			<!-- Scam Details -->
 			<div class="form-group">
-				<label for="details">รายละเอียดเพิ่มเติม <span class="required">*</span></label>
-				<textarea id="details" required placeholder="อธิบายสถานการณ์"></textarea>
+				<label for="scamDetails">
+					รายละเอียดเพิ่มเติม <span class="required">*</span>
+				</label>
+				<textarea id="scamDetails" name="scamDetails" required placeholder="โปรดอธิบายรายละเอียดว่า:&#10;- เกิดอะไรขึ้น&#10;- คุณสูญเสียอะไรไป&#10;- มีหลักฐานหรือ screenshot ไหม&#10;- ขอให้อธิบายให้ชัดเจนที่สุด"></textarea>
+				<div class="help-text">อธิบายรายละเอียดให้ชัดเจน เพื่อให้เราสามารถช่วยเหลือได้ดีขึ้น</div>
 			</div>
 
+			<!-- What Was Lost -->
 			<div class="form-group">
-				<label for="lost">สิ่งของที่สูญเสีย <span class="required">*</span></label>
-				<textarea id="lost" required placeholder="ระบุสิ่งที่สูญเสีย"></textarea>
+				<label for="lostItems">
+					สิ่งของที่สูญเสียไป <span class="required">*</span>
+				</label>
+				<textarea id="lostItems" name="lostItems" required placeholder="เช่น:&#10;- ตัวละครชั้น 100 ของเกม Garena&#10;- ไอเทมมูลค่า 50,000 บาท&#10;- ข้อมูลส่วนตัว: ชื่อ เลขประชาชน&#10;- เบอร์โทรที่ลงทะเบียน"></textarea>
+				<div class="help-text">ระบุสิ่งของ ตัวละคร หรือข้อมูลทั้งหมดที่สูญเสียไป</div>
 			</div>
 
+			<!-- Additional Evidence -->
 			<div class="form-group">
-				<label for="evidence">หลักฐานเพิ่มเติม</label>
-				<textarea id="evidence" placeholder="Link, Screenshot, หรือข้อมูลอื่นๆ"></textarea>
+				<label for="evidence">
+					หลักฐานเพิ่มเติม (URL, Screenshot, เป็นต้น)
+				</label>
+				<textarea id="evidence" name="evidence" placeholder="หากคุณมี:&#10;- Link ของเว็บปลอม&#10;- Filename ของโปรแกรมร้าย&#10;- Conversation screenshots&#10;- ID ของคนที่โกง&#10;โปรดระบุที่นี่"></textarea>
+				<div class="help-text">ไม่บังคับ แต่จะช่วยให้การสืบสวนเร็วขึ้น</div>
 			</div>
 
+			<!-- Buttons -->
 			<div class="button-group">
 				<button type="reset" class="btn-reset">ล้างข้อมูล</button>
 				<button type="submit" class="btn-submit">ส่งรายงาน</button>
 			</div>
 		</form>
 
+		<!-- Guidelines -->
 		<div class="guidelines">
-			<h3>ข้อมูลที่เราต้องการ</h3>
+			<h3>📋 ข้อมูลที่เราต้องการ:</h3>
 			<ul>
-				<li>ชื่อบัญชี (Username) และ OpenID</li>
-				<li>วันที่โดนโกง</li>
-				<li>วิธีการโกง</li>
-				<li>สิ่งที่สูญเสีย</li>
-				<li>หลักฐานช่วยสืบสวน</li>
-				<li>ข้อมูลติดต่อ</li>
+				<li>ชื่อบัญชี (Username) และ OpenID ที่ถูกโกง</li>
+				<li>วันที่และเวลาที่โดนโกง (ถ้าจำได้)</li>
+				<li>รายละเอียดวิธีการโกงที่เกิดขึ้น</li>
+				<li>สิ่งของหรือข้อมูลที่สูญเสียไปทั้งหมด</li>
+				<li>หลักฐานใดๆ ที่อาจช่วยในการสืบสวน</li>
+				<li>ข้อมูลติดต่อที่ถูกต้อง (อีเมล และ/หรือ เบอร์โทร)</li>
 			</ul>
 		</div>
 
 		<div class="guidelines" style="margin-top: 24px; background: rgba(255,107,107,.05); border-left-color: #ff6b6b;">
-			<h3 style="color: #ff6b6b;">เราสามารถช่วยได้</h3>
+			<h3 style="color: #ff6b6b;">⚠️ สิ่งที่เราสามารถทำได้:</h3>
 			<ul>
-				<li>ตรวจสอบสถานะบัญชี</li>
-				<li>ติดต่อ Garena เพื่อฟื้นฟู</li>
-				<li>สืบหาผู้โกง</li>
-				<li>ให้คำแนะนำป้องกัน</li>
-				<li>ช่วยกู้คืนไอดี</li>
+				<li>ตรวจสอบสถานะของบัญชีที่โดนโกง</li>
+				<li>ช่วยติดต่อ Garena เพื่อการฟื้นฟูบัญชี</li>
+				<li>สืบหาข้อมูลผู้โกง (หากเป็นไปได้)</li>
+				<li>ให้คำแนะนำในการป้องกันการโกงครั้งต่อไป</li>
+				<li>ช่วยฟื้นฟูไอดีและเนื้อหา</li>
 			</ul>
 		</div>
 	</div>
@@ -355,31 +439,36 @@
 		form.addEventListener('submit', (e) => {
 			e.preventDefault();
 
-			const data = {
+			// Get form data
+			const formData = {
 				username: document.getElementById('username').value,
 				openid: document.getElementById('openid').value,
 				email: document.getElementById('email').value,
 				phone: document.getElementById('phone').value || 'ไม่ระบุ',
 				scamDate: document.getElementById('scamDate').value,
 				scamMethod: document.getElementById('scamMethod').value,
-				details: document.getElementById('details').value,
-				lost: document.getElementById('lost').value,
+				scamDetails: document.getElementById('scamDetails').value,
+				lostItems: document.getElementById('lostItems').value,
 				evidence: document.getElementById('evidence').value || 'ไม่มี',
 				submittedAt: new Date().toLocaleString('th-TH')
 			};
 
+			// Save to localStorage
 			let reports = JSON.parse(localStorage.getItem('scamReports') || '[]');
-			reports.push(data);
+			reports.push(formData);
 			localStorage.setItem('scamReports', JSON.stringify(reports));
 
+			// Show success message
 			successMsg.classList.add('show');
 			form.reset();
 
+			// Hide success message after 5 seconds
 			setTimeout(() => {
 				successMsg.classList.remove('show');
 			}, 5000);
 
-			console.log('Report:', data);
+			// Log for debugging
+			console.log('Scam Report Submitted:', formData);
 		});
 	</script>
 </body>

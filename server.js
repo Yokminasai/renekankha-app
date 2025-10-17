@@ -270,7 +270,7 @@ app.use(express.static(__dirname));
 
 // Serve index.html on root
 app.get('/', (_req, res) => {
-	res.sendFile(path.join(__dirname, 'index.html'));
+	res.sendFile(path.join(__dirname, 'home.html'));
 });
 
 // Catch-all route to serve HTML files for frontend routing
