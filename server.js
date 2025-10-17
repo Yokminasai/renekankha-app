@@ -265,149 +265,6 @@ app.delete('/api/2fa/keys/:keyId', (req, res) => {
 	res.json({ ok: true });
 });
 
-// Serve static frontend
-app.use(express.static(__dirname));
-
-// Serve index.html on root
-app.get('/', (_req, res) => {
-	res.sendFile(path.join(__dirname, 'home.html'));
-});
-
-// Catch-all: serve requested HTML file or index.html
-app.get(/\.(html?)$/i, (req, res) => {
-	const filePath = path.join(__dirname, req.path);
-	res.sendFile(filePath, (err) => {
-		if (err) {
-			// If file not found, serve index.html
-			res.sendFile(path.join(__dirname, 'home.html'));
-		}
-	});
-});
-
-// Fallback: For any other path without .html, serve index.html
-app.get('*', (req, res) => {
-	res.sendFile(path.join(__dirname, 'home.html'));
-});
-
-// Health check
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
-
-// 2FA Live Proxy API
-app.get('/api/2fa/:secret', async (req, res) => {
-	try {
-		const { secret } = req.params;
-		const cleanSecret = secret.replace(/\s/g, '').toUpperCase();
-		
-		const response = await fetch(`https://2fa.live/tok/${cleanSecret}`, {
-			method: 'GET',
-			headers: {
-				'Accept': 'application/json',
-				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-			}
-		});
-		
-		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-		}
-		
-		const data = await response.json();
-		
-		if (data.error) {
-			throw new Error(data.error);
-		}
-		
-		res.json({
-			success: true,
-			token: data.token || data.otp || data.code,
-			timeLeft: data.timeLeft || 30,
-			source: '2fa.live'
-		});
-	} catch (error) {
-		console.error('2FA Live API error:', error);
-		res.status(500).json({
-			success: false,
-			error: error.message
-		});
-	}
-});
-
-// Server-side IP info with fast parallel race and timeouts
-app.get('/api/ip', async (_req, res) => {
-	res.set('Cache-Control', 'no-store');
-
-	function withTimeout(ms, fetcher) {
-		const controller = new AbortController();
-		const t = setTimeout(() => controller.abort(), ms);
-		return fetcher(controller.signal)
-			.finally(() => clearTimeout(t));
-	}
-
-	async function tryIpApi(signal) {
-		const r = await _fetch('https://ipapi.co/json/', { signal });
-		if (!r.ok) throw new Error('ipapi');
-		const j = await r.json();
-		return { source: 'ipapi', data: j };
-	}
-	async function tryIpInfo(signal) {
-		const token = '';
-		const r = await _fetch(`https://ipinfo.io/json${token ? `?token=${token}` : ''}`, { signal });
-		if (!r.ok) throw new Error('ipinfo');
-		const j = await r.json();
-		return { source: 'ipinfo', data: j };
-	}
-	async function tryIpify(signal) {
-		const r = await _fetch('https://api64.ipify.org?format=json', { signal });
-		if (!r.ok) throw new Error('ipify');
-		const j = await r.json();
-		return { source: 'ipify', data: j };
-	}
-	async function ipapiByIp(ip, signal) {
-		const r = await _fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, { signal });
-		if (!r.ok) throw new Error('ipapiByIp');
-		return r.json();
-	}
-
-	try {
-		// Race providers (3s timeout each). Whichever responds first wins.
-		const winner = await Promise.any([
-			withTimeout(3000, (s) => tryIpApi(s)),
-			withTimeout(3000, (s) => tryIpInfo(s)),
-			withTimeout(3000, (s) => tryIpify(s))
-		]);
-
-		let { source, data: payload } = winner;
-		let ip = payload.ip || payload.query || '';
-		let isp = payload.org || payload.org_name || payload.isp || '';
-		let country = payload.country_name || payload.country || '';
-		let region = payload.region || payload.regionName || '';
-		let city = payload.city || '';
-		let latitude = null;
-		let longitude = null;
-
-		if (source === 'ipapi') {
-			latitude = Number(payload.latitude);
-			longitude = Number(payload.longitude);
-		} else if (source === 'ipinfo' && typeof payload.loc === 'string') {
-			const parts = payload.loc.split(',').map(Number);
-			if (parts.length === 2) { latitude = parts[0]; longitude = parts[1]; }
-		} else if (source === 'ipify' && ip) {
-			try {
-				const extra = await withTimeout(3000, (s) => ipapiByIp(ip, s));
-				isp = isp || extra.org || extra.org_name || extra.isp || '';
-				country = country || extra.country_name || extra.country || '';
-				region = region || extra.region || extra.regionName || '';
-				city = city || extra.city || '';
-				latitude = Number(extra.latitude);
-				longitude = Number(extra.longitude);
-			} catch {}
-		}
-
-		return res.json({ ok: true, source, ip, isp, country, region, city, latitude, longitude });
-	} catch (e) {
-		return res.status(504).json({ ok: false, error: 'ip_lookup_timeout' });
-	}
-});
-
 // Blacklist APIs
 app.get('/api/blacklist/:ip', (req, res) => {
 	const db = readJSON(blacklistFile) || { ips: [] };
@@ -592,6 +449,132 @@ app.post('/api/pay/checkout', async (req, res) => {
 	} catch (e) {
 		return res.status(500).json({ error: 'stripe_error' });
 	}
+});
+
+// 2FA Live Proxy API
+app.get('/api/2fa/:secret', async (req, res) => {
+	try {
+		const { secret } = req.params;
+		const cleanSecret = secret.replace(/\s/g, '').toUpperCase();
+		
+		const response = await fetch(`https://2fa.live/tok/${cleanSecret}`, {
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+			}
+		});
+		
+		if (!response.ok) {
+			throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+		}
+		
+		const data = await response.json();
+		
+		if (data.error) {
+			throw new Error(data.error);
+		}
+		
+		res.json({
+			success: true,
+			token: data.token || data.otp || data.code,
+			timeLeft: data.timeLeft || 30,
+			source: '2fa.live'
+		});
+	} catch (error) {
+		console.error('2FA Live API error:', error);
+		res.status(500).json({
+			success: false,
+			error: error.message
+		});
+	}
+});
+
+// Server-side IP info with fast parallel race and timeouts
+app.get('/api/ip', async (_req, res) => {
+	res.set('Cache-Control', 'no-store');
+
+	function withTimeout(ms, fetcher) {
+		const controller = new AbortController();
+		const t = setTimeout(() => controller.abort(), ms);
+		return fetcher(controller.signal)
+			.finally(() => clearTimeout(t));
+	}
+
+	async function tryIpApi(signal) {
+		const r = await _fetch('https://ipapi.co/json/', { signal });
+		if (!r.ok) throw new Error('ipapi');
+		const j = await r.json();
+		return { source: 'ipapi', data: j };
+	}
+	async function tryIpInfo(signal) {
+		const token = '';
+		const r = await _fetch(`https://ipinfo.io/json${token ? `?token=${token}` : ''}`, { signal });
+		if (!r.ok) throw new Error('ipinfo');
+		const j = await r.json();
+		return { source: 'ipinfo', data: j };
+	}
+	async function tryIpify(signal) {
+		const r = await _fetch('https://api64.ipify.org?format=json', { signal });
+		if (!r.ok) throw new Error('ipify');
+		const j = await r.json();
+		return { source: 'ipify', data: j };
+	}
+	async function ipapiByIp(ip, signal) {
+		const r = await _fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, { signal });
+		if (!r.ok) throw new Error('ipapiByIp');
+		return r.json();
+	}
+
+	try {
+		// Race providers (3s timeout each). Whichever responds first wins.
+		const winner = await Promise.any([
+			withTimeout(3000, (s) => tryIpApi(s)),
+			withTimeout(3000, (s) => tryIpInfo(s)),
+			withTimeout(3000, (s) => tryIpify(s))
+		]);
+
+		let { source, data: payload } = winner;
+		let ip = payload.ip || payload.query || '';
+		let isp = payload.org || payload.org_name || payload.isp || '';
+		let country = payload.country_name || payload.country || '';
+		let region = payload.region || payload.regionName || '';
+		let city = payload.city || '';
+		let latitude = null;
+		let longitude = null;
+
+		if (source === 'ipapi') {
+			latitude = Number(payload.latitude);
+			longitude = Number(payload.longitude);
+		} else if (source === 'ipinfo' && typeof payload.loc === 'string') {
+			const parts = payload.loc.split(',').map(Number);
+			if (parts.length === 2) { latitude = parts[0]; longitude = parts[1]; }
+		} else if (source === 'ipify' && ip) {
+			try {
+				const extra = await withTimeout(3000, (s) => ipapiByIp(ip, s));
+				isp = isp || extra.org || extra.org_name || extra.isp || '';
+				country = country || extra.country_name || extra.country || '';
+				region = region || extra.region || extra.regionName || '';
+				city = city || extra.city || '';
+				latitude = Number(extra.latitude);
+				longitude = Number(extra.longitude);
+			} catch {}
+		}
+
+		return res.json({ ok: true, source, ip, isp, country, region, city, latitude, longitude });
+	} catch (e) {
+		return res.status(504).json({ ok: false, error: 'ip_lookup_timeout' });
+	}
+});
+
+// Serve index.html on root
+app.get('/', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'home.html'));
+});
+
+// Fallback: For any other path, serve home.html (for SPA routing)
+app.get('*', (req, res) => {
+	res.sendFile(path.join(__dirname, 'home.html'));
 });
 
 async function startServer(preferredPort, maxAttempts = 10) {
