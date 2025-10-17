@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "renekankha-32b97"
+    "default": "renekankha-app"
   },
   "emulators": {
     "hosting": {

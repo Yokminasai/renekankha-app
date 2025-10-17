@@ -5,15 +5,15 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// Firebase configuration
+// Firebase configuration for renekankha-app
 const firebaseConfig = {
-  apiKey: "AIzaSyC3j0kphQ0pWCQp2g-1fa-URukc7le84Vc",
-  authDomain: "renekankha-32b97.firebaseapp.com",
-  projectId: "renekankha-32b97",
-  storageBucket: "renekankha-32b97.firebasestorage.app",
-  messagingSenderId: "269353750433",
-  appId: "1:269353750433:web:102a75e451c5901f0705e0",
-  measurementId: "G-MBHR4Y7WFD"
+  apiKey: "AIzaSyCEp_Fu_zdvwUSj3SRJzV2TMKb-6GlOi4g",
+  authDomain: "renekankha-app.firebaseapp.com",
+  projectId: "renekankha-app",
+  storageBucket: "renekankha-app.firebasestorage.app",
+  messagingSenderId: "892966611411",
+  appId: "1:892966611411:web:bfa9e68661ced6c71b6726",
+  measurementId: "G-C0QYCM285E"
 };
 
 // Initialize Firebase

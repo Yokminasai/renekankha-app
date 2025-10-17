@@ -611,7 +611,13 @@ async function startServer(preferredPort, maxAttempts = 10) {
 	throw new Error('Unable to bind to a port');
 }
 
-startServer(DEFAULT_PORT).catch((e) => {
-	console.error('Failed to start server:', e);
-	process.exit(1);
-});
+// Export app for Vercel
+export default app;
+
+// Only start server in local development
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+	startServer(DEFAULT_PORT).catch((e) => {
+		console.error('Failed to start server:', e);
+		process.exit(1);
+	});
+}
