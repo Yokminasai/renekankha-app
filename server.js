@@ -567,12 +567,10 @@ app.get('/api/ip', async (_req, res) => {
 	}
 });
 
-// Serve index.html on root
-app.get('/', (_req, res) => {
-	res.sendFile(path.join(__dirname, 'home.html'));
-});
+// Serve static frontend (must be after all API routes)
+app.use(express.static(__dirname));
 
-// Fallback: For any other path, serve home.html (for SPA routing)
+// Fallback: serve home.html for SPA routing on undefined routes
 app.get('*', (req, res) => {
 	res.sendFile(path.join(__dirname, 'home.html'));
 });
