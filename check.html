@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>ยืนยัน IP สำหรับเช่าไอดี</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root{ --bg:#0b1020; --text:#e7ecff; --muted:#b8c0e0; --accent:#5b8cff; }
+		body{ margin:0; font-family:'Noto Sans Thai',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif; background:radial-gradient(800px 480px at 20% 0%, #0e1533 0%, var(--bg) 60%, #060913 100%); color:var(--text); line-height:1.6; padding:20px }
+		.container{ max-width:760px; margin:0 auto }
+		.card{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:18px }
+		.h{ display:flex; justify-content:space-between; align-items:center }
+		.small{ color:var(--muted); font-size:13px }
+		.btn{ appearance:none; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06); color:var(--text); border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer }
+		.kv{ display:grid; grid-template-columns:150px 1fr; gap:10px 16px }
+		.value{ font-weight:600 }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="card">
+			<div class="h">
+				<div><strong>ยืนยันหมายเลข IP</strong><div class="small">สำหรับการเช่าไอดีเกม RoV</div></div>
+				<button id="refresh" class="btn">รีเฟรช</button>
+			</div>
+			<div class="kv" style="margin-top:10px;">
+				<div class="small">หมายเลข IP</div><div class="value" id="ip">-</div>
+				<div class="small">ผู้ให้บริการ (ISP)</div><div class="value" id="isp">-</div>
+				<div class="small">ประเทศ</div><div class="value" id="country">-</div>
+				<div class="small">เมือง/ภูมิภาค</div><div class="value" id="regionCity">-</div>
+			</div>
+			<div class="small" id="status" style="margin-top:10px;">กำลังดึงข้อมูล...</div>
+		</div>
+	</div>
+	<script>
+		const $=(id)=>document.getElementById(id);
+		function getParam(name){ const u=new URL(location.href); return u.searchParams.get(name)||''; }
+		function setStatus(t){ $('status').textContent=t; }
+		async function fetchFromBackend(){ const res=await fetch('/api/ip'); if(!res.ok) throw new Error('fail'); return res.json(); }
+		async function postCheck(oid, payload){ await fetch(`/api/orders/${encodeURIComponent(oid)}/check`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) }); }
+		async function run(){
+			setStatus('กำลังดึงข้อมูล...');
+			const oid=getParam('oid');
+			if(!oid){ setStatus('ลิงก์ไม่ถูกต้อง (ไม่มีรหัสคำสั่งซื้อ)'); return; }
+			try{
+				const r=await fetchFromBackend();
+				if(!r.ok) throw new Error('no ok');
+				$('ip').textContent=r.ip||'-';
+				$('isp').textContent=r.isp||'-';
+				$('country').textContent=r.country||'-';
+				$('regionCity').textContent=[r.region||'', r.city||''].filter(Boolean).join(' / ')||'-';
+				await postCheck(oid,{ ip:r.ip, isp:r.isp, country:r.country, region:r.region, city:r.city });
+				setStatus('ยืนยันเรียบร้อย ขอบคุณครับ');
+			}catch(e){ setStatus('ดึงข้อมูลไม่สำเร็จ โปรดลองใหม่'); }
+		}
+		document.getElementById('refresh').addEventListener('click', run);
+		document.addEventListener('DOMContentLoaded', run);
+	</script>
+</body>
+</html>
+
+

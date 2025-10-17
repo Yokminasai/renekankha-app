@@ -1,0 +1,53 @@
+{
+  "users": [
+    {
+      "id": "HIPyxUXQZ6",
+      "name": "Yokminasai",
+      "seedPhraseHash": "625c92e4935fc045af47cc80ae7ecd45bb440d9ae6dcbbf407bde0dc04cb6119",
+      "role": "user",
+      "anonymous": true,
+      "createdAt": "2025-10-17T09:17:55.120Z"
+    },
+    {
+      "id": "50Pv4I3QUF",
+      "name": "Yokminasai",
+      "seedPhraseHash": "7b096a99e179e5b535e14b1e3911dd6afaa55e96dbe1f1a440759517793ccead",
+      "role": "user",
+      "anonymous": true,
+      "createdAt": "2025-10-17T09:29:14.143Z"
+    },
+    {
+      "id": "JzBQ-1NHfF",
+      "name": "",
+      "seedPhraseHash": "9fc8795f0111204360254061416579167b2cf458f71e6fa7c02ac7e96a033ab3",
+      "role": "user",
+      "anonymous": true,
+      "createdAt": "2025-10-17T12:20:46.868Z"
+    },
+    {
+      "id": "mAZhM1tzZT",
+      "name": "Thiraya",
+      "seedPhraseHash": "000000000000000000000000000000000000000000000000000000007661799e",
+      "role": "user",
+      "anonymous": true,
+      "createdAt": "2025-10-17T12:25:15.468Z"
+    },
+    {
+      "id": "Kj0943Rl5d",
+      "name": "",
+      "seedPhraseHash": "240140fcaf54e2b7519a976db5bd45478bf9f763353d54aa7c30841fa529bdaa",
+      "role": "user",
+      "anonymous": true,
+      "createdAt": "2025-10-17T12:37:50.981Z"
+    },
+    {
+      "id": "a43xkVRUdD",
+      "name": "Admin",
+      "seedPhraseHash": "3e6e877177ee16ace50020081aca76ebfaf2594f5b8ea373eef07c87150bc3bc",
+      "role": "user",
+      "anonymous": true,
+      "createdAt": "2025-10-17T13:19:45.726Z"
+    }
+  ],
+  "updatedAt": "2025-10-17T13:19:45.726Z"
+}

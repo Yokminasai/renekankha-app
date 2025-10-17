@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>ตรวจสอบผู้เข้าใช้งาน | IP • ISP • อุปกรณ์</title>
+	<meta name="description" content="เช็คหมายเลข IP, ผู้ให้บริการอินเทอร์เน็ต (ISP), ที่ตั้งโดยประมาณ และข้อมูลอุปกรณ์ พร้อมระบบแบล็กลิสต์และรายงานผู้ใช้">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1020'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%235b8cff' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='12' fill='%235b8cff'/%3E%3Cpath d='M20 20l8 8M36 20l-8 8' stroke='%2322c55e' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+	<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230b1020'/%3E%3Ccircle cx='90' cy='90' r='50' fill='none' stroke='%235b8cff' stroke-width='8'/%3E%3Ccircle cx='90' cy='90' r='30' fill='%235b8cff'/%3E%3Cpath d='M60 60l20 20M120 60l-20 20' stroke='%2322c55e' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+	<style>
+		:root { 
+			/* RENEKANKHA Divine Color Palette */
+			--bg-primary: #0c0c0c;
+			--bg-secondary: #141414;
+			--bg-tertiary: #1a1a1a;
+			--surface-primary: #1f1f1f;
+			--surface-secondary: #262626;
+			--surface-tertiary: #2d2d2d;
+			
+			--text-primary: #ffffff;
+			--text-secondary: #e0e0e0;
+			--text-tertiary: #a0a0a0;
+			--text-muted: #707070;
+			
+			/* Premium Accent Colors */
+			--accent-primary: #ff6b6b;
+			--accent-secondary: #4ecdc4;
+			--accent-tertiary: #45b7d1;
+			--accent-quaternary: #96ceb4;
+			--accent-quinary: #feca57;
+			
+			--success: #00d4aa;
+			--warning: #ffa726;
+			--error: #ff5722;
+			--info: #29b6f6;
+			
+			--border-primary: rgba(255,255,255,.06);
+			--border-secondary: rgba(255,255,255,.1);
+			--border-tertiary: rgba(255,255,255,.15);
+			--border-accent: rgba(255,107,107,.3);
+			
+			/* Premium Shadows with Depth */
+			--shadow-xs: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24);
+			--shadow-sm: 0 3px 6px rgba(0,0,0,.16), 0 3px 6px rgba(0,0,0,.23);
+			--shadow-md: 0 10px 20px rgba(0,0,0,.19), 0 6px 6px rgba(0,0,0,.23);
+			--shadow-lg: 0 14px 28px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.22);
+			--shadow-xl: 0 19px 38px rgba(0,0,0,.30), 0 15px 12px rgba(0,0,0,.22);
+			--shadow-glow: 0 0 20px rgba(255,107,107,.3);
+			
+			/* Premium Gradients */
+			--gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			--gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+			--gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+			--gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+			--gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+			--gradient-error: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+			--gradient-surface: linear-gradient(145deg, #1f1f1f 0%, #262626 100%);
+			--gradient-text: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+			
+			/* Glass Effect */
+			--glass-bg: rgba(255,255,255,.05);
+			--glass-border: rgba(255,255,255,.1);
+			--glass-shadow: 0 8px 32px rgba(0,0,0,.1);
+		}
+		*{ box-sizing:border-box }
+		html,body{ height:100%; margin:0; padding:0 }
+		body{ 
+			font-family:'Inter', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+			background: 
+				radial-gradient(circle at 20% 80%, rgba(255,107,107,.15) 0%, transparent 50%),
+				radial-gradient(circle at 80% 20%, rgba(78,205,196,.1) 0%, transparent 50%),
+				radial-gradient(circle at 40% 40%, rgba(69,183,209,.08) 0%, transparent 50%),
+				linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+			color: var(--text-primary); 
+			line-height: 1.6; 
+			padding: 24px; 
+			min-height: 100vh;
+			font-weight: 400;
+			letter-spacing: 0.01em;
+			position: relative;
+			overflow-x: hidden;
+		}
+		body::before {
+			content: '';
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: 
+				radial-gradient(circle at 10% 20%, rgba(255,107,107,.05) 0%, transparent 30%),
+				radial-gradient(circle at 90% 80%, rgba(78,205,196,.05) 0%, transparent 30%),
+				radial-gradient(circle at 50% 50%, rgba(69,183,209,.03) 0%, transparent 40%);
+			pointer-events: none;
+			z-index: -1;
+			animation: backgroundShift 20s ease-in-out infinite;
+		}
+		.container{ 
+			max-width:1200px; 
+			margin:0 auto; 
+			padding:0 16px;
+			position: relative;
+			z-index: 1;
+		}
+		
+		/* Mobile-first Navigation */
+		.topbar{ 
+			display:flex; 
+			align-items:center; 
+			justify-content:space-between; 
+			gap:24px; 
+			margin-bottom:48px; 
+			position:relative; 
+			z-index:100;
+			padding: 0;
+		}
+		.brand{ 
+			display:flex; 
+			align-items:center; 
+			gap:16px; 
+			font-weight:700; 
+			font-size:28px; 
+			color:var(--text-primary);
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+			letter-spacing: -0.02em;
+			background: var(--gradient-text);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			position: relative;
+		}
+		.brand::before {
+			content: '';
+			position: absolute;
+			top: -2px;
+			left: -2px;
+			right: -2px;
+			bottom: -2px;
+			background: var(--gradient-primary);
+			border-radius: 12px;
+			opacity: 0.1;
+			z-index: -1;
+		}
+		.brand-icon{ 
+			width:12px; 
+			height:12px; 
+			background: var(--gradient-primary);
+			border-radius:50%; 
+			display:inline-block;
+			box-shadow: var(--shadow-glow);
+			position: relative;
+		}
+		.brand-icon::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 6px;
+			height: 6px;
+			background: white;
+			border-radius: 50%;
+			box-shadow: 0 0 8px rgba(255,255,255,.8);
+		}
+		
+		/* Mobile Navigation */
+		.mobile-nav-toggle{ 
+			display:none; background:none; border:none; color:var(--text); 
+			font-size:24px; cursor:pointer; padding:8px;
+		}
+		.nav{ 
+			display:flex; gap:4px; align-items:center; flex-wrap:wrap;
+			transition:all 0.2s ease;
+		}
+		.nav a{ 
+			text-decoration:none; color:var(--text-secondary); 
+			padding:8px 16px; border-radius:8px; border:none;
+			font-weight:500; font-size:14px; transition:all 0.2s ease;
+			background:transparent;
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+		}
+		.nav a:hover{ 
+			color:var(--text-primary); background:var(--surface-primary);
+		}
+		.nav a.active{ 
+			color:var(--text-primary); background:var(--surface-secondary);
+		}
+		
+		/* Mobile Navigation Overlay */
+		.mobile-nav-overlay{ 
+			display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+			background:rgba(0,0,0,.8); backdrop-filter:blur(8px); z-index:1000;
+		}
+		.mobile-nav-menu{ 
+			position:absolute; top:0; right:0; width:280px; height:100vh;
+			background:var(--card); border-left:1px solid var(--border);
+			padding:80px 24px 24px; transform:translateX(100%);
+			transition:transform 0.3s ease;
+		}
+		.mobile-nav-menu.active{ transform:translateX(0); }
+		.mobile-nav-menu a{ 
+			display:block; padding:16px 20px; margin-bottom:8px;
+			border-radius:12px; background:rgba(255,255,255,.05);
+			border:1px solid var(--border); text-decoration:none;
+			color:var(--text); font-weight:500; transition:all 0.2s ease;
+		}
+		.mobile-nav-menu a:hover{ 
+			background:rgba(91,140,255,.1); border-color:rgba(91,140,255,.3);
+		}
+		.mobile-nav-menu a.active{ 
+			background:rgba(91,140,255,.15); border-color:rgba(91,140,255,.4);
+		}
+		
+		/* Cards and Layout */
+		.card{ 
+			background: var(--glass-bg); 
+			border:1px solid var(--glass-border); 
+			border-radius:16px; 
+			padding:32px; 
+			box-shadow: var(--glass-shadow); 
+			margin-bottom:32px;
+			transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			backdrop-filter: blur(20px);
+			position: relative;
+			overflow: hidden;
+		}
+		.card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 2px;
+			background: var(--gradient-primary);
+			opacity: 0.8;
+		}
+		.card:hover{ 
+			transform:translateY(-8px); 
+			box-shadow: var(--shadow-xl);
+			border-color: var(--border-accent);
+		}
+		
+		#map{ 
+			width:100%; height:500px; border-radius:12px; 
+			background:var(--surface); border:1px solid var(--border);
+		}
+		
+		.sectionTitle{ 
+			display:flex; align-items:center; justify-content:space-between; 
+			margin-bottom:16px; flex-wrap:wrap; gap:8px;
+		}
+		.badge{ 
+			display:inline-flex; align-items:center; gap:8px; 
+			background: var(--gradient-primary); 
+			border:1px solid var(--border-accent); 
+			color:white; border-radius:20px; padding:8px 16px; 
+			font-size:12px; font-weight:600; letter-spacing:.5px;
+			box-shadow: var(--shadow-sm);
+			backdrop-filter: blur(10px);
+			position: relative;
+			overflow: hidden;
+		}
+		.badge::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+			transition: left 0.6s ease;
+		}
+		.badge:hover::before {
+			left: 100%;
+		}
+		.small{ font-size:14px; color:var(--muted); line-height:1.5 }
+		
+		/* Buttons */
+		.btn{ 
+			appearance:none; border:1px solid var(--glass-border); 
+			background:var(--glass-bg); color:var(--text-primary); 
+			border-radius:12px; padding:12px 20px; font-weight:600; 
+			cursor:pointer; font-size:14px; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			display:inline-flex; align-items:center; gap:8px;
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+			letter-spacing: 0.01em;
+			backdrop-filter: blur(20px);
+			position: relative;
+			overflow: hidden;
+		}
+		.btn::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: var(--gradient-primary);
+			opacity: 0.1;
+			transition: left 0.3s ease;
+		}
+		.btn:hover::before {
+			left: 0;
+		}
+		.btn:hover{ 
+			background:var(--surface-secondary);
+			border-color: var(--border-accent);
+			transform:translateY(-2px);
+			box-shadow: var(--shadow-md);
+		}
+		.btn:active{ transform:translateY(0) }
+		.btn-small{ 
+			padding:8px 16px; font-size:12px; border-radius:8px;
+		}
+		.btn-primary{ 
+			background: var(--gradient-primary); 
+			border-color: var(--border-accent); 
+			color:white;
+			box-shadow: var(--shadow-sm);
+		}
+		.btn-primary:hover{ 
+			background: var(--gradient-secondary);
+			box-shadow: var(--shadow-md);
+			transform: translateY(-3px);
+		}
+		
+		/* Layout Grids */
+		.row{ 
+			display:flex; gap:12px; align-items:center; flex-wrap:wrap; 
+			margin-bottom:16px;
+		}
+		.hero{ 
+			display:grid; grid-template-columns:1.3fr 1fr; gap:20px; 
+			align-items:stretch; margin-bottom:20px;
+		}
+		.kv{ 
+			display:grid; grid-template-columns:140px 1fr; gap:12px 20px; 
+			align-items:start; margin-top:16px;
+		}
+		.kv .label{ 
+			color:var(--muted); font-size:14px; font-weight:500;
+		}
+		.value{ 
+			font-weight:600; font-size:16px; color:var(--text);
+			word-break:break-word;
+		}
+		.mono{ 
+			font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+		}
+		
+		/* IP Status and Location Display */
+		.ip-status{ 
+			background:rgba(91,140,255,.05); border:1px solid rgba(91,140,255,.15); 
+			border-radius:12px; padding:16px; margin-top:12px;
+		}
+		.ip-indicator{ 
+			display:flex; align-items:center; justify-content:space-between; 
+			margin-bottom:16px; padding:16px; background:rgba(91,140,255,.08);
+			border-radius:12px; border:1px solid rgba(91,140,255,.2);
+			backdrop-filter:blur(10px);
+		}
+		.ip-label{ 
+			font-weight:600; color:var(--accent); font-size:13px;
+			text-transform:uppercase; letter-spacing:0.5px;
+		}
+		.ip-value{ 
+			font-size:18px; font-weight:700; color:var(--text);
+			background:rgba(91,140,255,.15); padding:8px 12px; border-radius:8px;
+			border:1px solid rgba(91,140,255,.3);
+		}
+		.location-info{ 
+			display:grid; grid-template-columns:1fr 1fr; gap:12px;
+			background:rgba(11,16,32,.95); backdrop-filter:blur(20px);
+			border:1px solid rgba(91,140,255,.2); border-radius:16px;
+			padding:16px; margin-top:16px; box-shadow:0 8px 32px rgba(0,0,0,.3);
+		}
+		.location-item{ 
+			display:flex; flex-direction:column; gap:6px;
+			text-align:center; padding:12px; 
+			background:rgba(91,140,255,.05); border-radius:12px;
+			border:1px solid rgba(91,140,255,.1);
+		}
+		.location-label{ 
+			font-size:11px; color:var(--accent); font-weight:600;
+			text-transform:uppercase; letter-spacing:0.5px;
+		}
+		.location-value{ 
+			font-size:15px; color:var(--text); font-weight:700;
+			line-height:1.3;
+		}
+		
+		/* Enhanced Map Display */
+		.map-container{ 
+			position:relative; border-radius:16px; overflow:hidden;
+			border:1px solid var(--border); background:rgba(0,0,0,.2);
+		}
+		.map-overlay{ 
+			position:absolute; top:12px; left:12px; right:12px;
+			background:rgba(0,0,0,.8); backdrop-filter:blur(8px);
+			border-radius:8px; padding:8px 12px; z-index:1000;
+		}
+		.map-title{ 
+			font-size:12px; color:var(--accent); font-weight:600;
+			margin-bottom:4px;
+		}
+		.map-subtitle{ 
+			font-size:11px; color:var(--muted);
+		}
+		
+		/* Form Elements */
+		.input,textarea{ 
+			background:var(--glass-bg); border:1px solid var(--glass-border); 
+			color:var(--text-primary); border-radius:12px; padding:16px 20px; 
+			width:100%; font-family:'Inter', 'Noto Sans Thai', sans-serif; font-size:16px;
+			transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			backdrop-filter: blur(20px);
+			letter-spacing: 0.01em;
+		}
+		.input:focus,textarea:focus{ 
+			outline:none; border-color:var(--accent-primary); 
+			box-shadow:var(--shadow-glow);
+			background:var(--surface-secondary);
+			transform: translateY(-2px);
+		}
+		
+		/* Trust Bar */
+		.trustbar{ 
+			display:grid; grid-template-columns:repeat(auto-fit,minmax(400px,1fr)); 
+			gap:32px; margin:48px 0;
+		}
+		.trustItem{ 
+			display:flex; gap:24px; align-items:flex-start; padding:40px; 
+			border-radius:20px; background:var(--glass-bg); 
+			border:1px solid var(--glass-border); transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			backdrop-filter: blur(20px);
+			position: relative;
+			overflow: hidden;
+		}
+		.trustItem::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 3px;
+			background: var(--gradient-primary);
+			opacity: 0.9;
+		}
+		.trustItem:hover{ 
+			transform:translateY(-8px); box-shadow: var(--shadow-xl);
+			border-color: var(--border-accent);
+		}
+		.trustIcon{ 
+			width:64px; height:64px; border-radius:20px; 
+			display:grid; place-items:center; background:var(--gradient-primary); 
+			border:1px solid var(--border-accent); flex-shrink:0;
+			box-shadow: var(--shadow-md);
+		}
+		.trustIcon svg {
+			filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+			transition: all 0.3s ease;
+		}
+		.trustIcon:hover svg {
+			transform: scale(1.1);
+			filter: drop-shadow(0 4px 8px rgba(0,0,0,.4));
+		}
+		.trustTitle{ font-weight:600; font-size:22px; margin-bottom:12px; color: var(--text-primary); font-family: 'Inter', 'Noto Sans Thai', sans-serif; }
+		.trustDesc{ color:var(--text-secondary); font-size:15px; line-height:1.6; margin-bottom: 20px; }
+		.trustBadge{ 
+			display:inline-block; font-size:13px; 
+			padding:8px 16px; border-radius:16px; 
+			border:1px solid var(--success); 
+			background:rgba(0,212,170,.15); color:var(--success);
+			font-weight: 600;
+			letter-spacing: 0.5px;
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+		}
+		
+		/* Search Bar */
+		.searchBar{ 
+			display:grid; grid-template-columns:1fr auto; gap:12px; 
+			align-items:center; margin-top:16px;
+		}
+		
+		/* Status Colors */
+		.loading{ color:var(--muted) }
+		.error{ color:var(--err) }
+		.success{ color:var(--ok) }
+		.warning{ color:var(--warn) }
+		
+		/* Footer */
+		.footer{ 
+			color:var(--muted); margin-top:32px; font-size:14px; 
+			text-align:center; padding:20px 0; border-top:1px solid var(--border);
+		}
+		
+		/* Logout Button Styles */
+		.logout-btn {
+			color: var(--accent-primary) !important;
+			font-weight: 600;
+			text-decoration: none;
+			padding: 8px 16px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+		}
+		
+		.logout-btn:hover {
+			color: var(--error) !important;
+			background: rgba(255,87,34,.1) !important;
+			transform: translateY(-2px);
+		}
+		
+		.user-info {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			font-size: 12px;
+		}
+		
+		.logout-text {
+			font-size: 10px;
+			opacity: 0.8;
+			margin-top: 2px;
+		}
+		
+		/* Custom Leaflet Icon */
+		.custom-div-icon {
+			background: transparent !important;
+			border: none !important;
+		}
+		
+		/* Responsive Design */
+		@media(max-width:768px){
+			body{ padding:20px }
+			.container{ padding:0 16px }
+			.topbar{ margin-bottom:32px; padding: 20px 0; }
+			.brand{ font-size:24px }
+			.mobile-nav-toggle{ display:block }
+			.nav{ display:none }
+			.hero{ grid-template-columns:1fr; gap:24px }
+			.kv{ grid-template-columns:1fr; gap:16px }
+			.kv .label{ font-size:14px; margin-bottom:8px }
+			.value{ font-size:16px }
+			.trustbar{ grid-template-columns:1fr; gap:20px }
+			.trustItem{ padding:24px; gap:16px }
+			.trustIcon{ width:48px; height:48px }
+			.card{ padding:28px; border-radius:20px }
+			.searchBar{ grid-template-columns:1fr; gap:16px }
+			.btn{ padding:12px 20px; font-size:14px }
+			#map{ width:100%; height:400px }
+			.location-info{ 
+				grid-template-columns:1fr 1fr; gap:16px; 
+				padding:20px; margin-top:20px;
+			}
+			.location-item{ padding:16px; }
+			.ip-indicator{ 
+				flex-direction:column; align-items:flex-start; gap:16px;
+				padding:20px; margin-bottom:20px;
+			}
+			.ip-value{ font-size:20px; padding:12px 16px; }
+		}
+		
+		@media(max-width:480px){
+			body{ padding:16px }
+			.brand{ font-size:20px; gap:12px }
+			.card{ padding:24px; margin-bottom:20px }
+			.trustItem{ padding:20px; gap:16px }
+			.trustTitle{ font-size:18px }
+			.trustDesc{ font-size:13px }
+			.btn{ padding:10px 16px; font-size:13px }
+			#map{ width:100%; height:300px }
+			.location-info{ 
+				grid-template-columns:1fr 1fr; gap:12px; 
+				padding:16px; 
+			}
+			.location-item{ padding:12px; }
+			.ip-indicator{ padding:16px; }
+			.ip-value{ font-size:18px; padding:8px 12px; }
+		}
+		
+		/* Enhanced Animations */
+		@keyframes fadeInUp{
+			from{ opacity:0; transform:translateY(40px) }
+			to{ opacity:1; transform:translateY(0) }
+		}
+		@keyframes slideInLeft{
+			from{ opacity:0; transform:translateX(-40px) }
+			to{ opacity:1; transform:translateX(0) }
+		}
+		@keyframes slideInRight{
+			from{ opacity:0; transform:translateX(40px) }
+			to{ opacity:1; transform:translateX(0) }
+		}
+		@keyframes pulse{
+			0%, 100%{ transform: scale(1) }
+			50%{ transform: scale(1.05) }
+		}
+		@keyframes glow{
+			0%, 100%{ box-shadow: var(--shadow-glow) }
+			50%{ box-shadow: 0 0 30px rgba(255,107,107,.5) }
+		}
+		@keyframes float{
+			0%, 100%{ transform: translateY(0px) }
+			50%{ transform: translateY(-10px) }
+		}
+		@keyframes shimmer{
+			0%{ transform: translateX(-100%) }
+			100%{ transform: translateX(100%) }
+		}
+		@keyframes backgroundShift{
+			0%, 100%{ transform: translateX(0) translateY(0) }
+			25%{ transform: translateX(10px) translateY(-5px) }
+			50%{ transform: translateX(-5px) translateY(10px) }
+			75%{ transform: translateX(-10px) translateY(-5px) }
+		}
+		@keyframes rotate{
+			from{ transform: rotate(0deg) }
+			to{ transform: rotate(360deg) }
+		}
+		@keyframes bounce{
+			0%, 20%, 50%, 80%, 100%{ transform: translateY(0) }
+			40%{ transform: translateY(-10px) }
+			60%{ transform: translateY(-5px) }
+		}
+		@keyframes fadeInScale{
+			from{ opacity:0; transform: scale(0.8) }
+			to{ opacity:1; transform: scale(1) }
+		}
+		.card{ 
+			animation:fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+			animation-fill-mode: both;
+		}
+		.trustItem{ 
+			animation:fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+			animation-fill-mode: both;
+		}
+		.trustItem:nth-child(1) .trustIcon {
+			background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+		}
+		.trustItem:nth-child(2) .trustIcon {
+			background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+		}
+		.trustItem:nth-child(3) .trustIcon {
+			background: linear-gradient(135deg, #45b7d1 0%, #96c93d 100%);
+		}
+		.trustItem:nth-child(1){ animation-delay:0.1s }
+		.trustItem:nth-child(2){ animation-delay:0.2s }
+		.trustItem:nth-child(3){ animation-delay:0.3s }
+		.brand{ animation: slideInLeft 1s cubic-bezier(0.4, 0, 0.2, 1) }
+		.brand-icon{ animation: pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite }
+		.badge{ animation: glow 3s ease-in-out infinite }
+		.trustIcon{ animation: float 3s ease-in-out infinite }
+		.btn-primary{ animation: bounce 2s ease-in-out infinite }
+		.card::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+			animation: shimmer 3s ease-in-out infinite;
+		}
+		.card::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+			animation: shimmer 2s infinite;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="topbar">
+			<div class="brand">
+				<span class="brand-icon"></span>
+				<span>RENEKANKHA</span>
+			</div>
+			<button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
+			<div class="nav">
+				<a href="index.html" class="active">หน้าหลัก</a>
+				<a href="authenticator.html">2FA Generator</a>
+				<a href="reports.html">รายงาน</a>
+				<a href="dashboard.html">📊 Dashboard</a>
+				<a href="services.html">บริการ</a>
+				<a href="login.html">เข้าสู่ระบบ</a>
+				<button id="refreshBtn" class="btn btn-primary">รีเฟรช</button>
+			</div>
+		</div>
+
+		<!-- Mobile Navigation Overlay -->
+		<div class="mobile-nav-overlay" id="mobileNavOverlay">
+			<div class="mobile-nav-menu" id="mobileNavMenu">
+				<a href="index.html" class="active">หน้าหลัก</a>
+				<a href="authenticator.html">2FA Generator</a>
+				<a href="reports.html">รายงาน</a>
+				<a href="dashboard.html">📊 Dashboard</a>
+				<a href="services.html">บริการ</a>
+				<a href="login.html">เข้าสู่ระบบ</a>
+				<a href="register.html">สมัครสมาชิก</a>
+				<button id="mobileRefreshBtn" class="btn btn-primary" style="width:100%; margin-top:16px;">รีเฟรชข้อมูล</button>
+			</div>
+		</div>
+
+		<div class="trustbar">
+			<div class="trustItem">
+				<div class="trustIcon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 4v5c0 5-3.5 9-7 9s-7-4-7-9V7l7-4z" stroke="#ff6b6b" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#4ecdc4" stroke-width="1.8" stroke-linecap="round"/></svg>
+				</div>
+				<div>
+					<div class="trustTitle">การเชื่อมต่อปลอดภัย</div>
+					<div class="trustDesc">รองรับ HTTPS เมื่อเผยแพร่จริง พร้อมนโยบาย CSP</div>
+					<span class="trustBadge">TLS Ready</span>
+				</div>
+			</div>
+			<div class="trustItem">
+				<div class="trustIcon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#4ecdc4" stroke-width="1.5"/><path d="M8 10a4 4 0 018 0v2H8v-2z" stroke="#45b7d1" stroke-width="1.5"/></svg>
+				</div>
+				<div>
+					<div class="trustTitle">ความเป็นส่วนตัว</div>
+					<div class="trustDesc">ไม่เก็บข้อมูลส่วนบุคคลบนไคลเอนต์ และจำกัดการเชื่อมต่อ</div>
+					<span class="trustBadge">Privacy-first</span>
+				</div>
+			</div>
+			<div class="trustItem">
+				<div class="trustIcon">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="#45b7d1" stroke-width="1.5"/><path d="M6 5l2 3 3-5" stroke="#96ceb4" stroke-width="1.5"/></svg>
+				</div>
+				<div>
+					<div class="trustTitle">ความโปร่งใส</div>
+					<div class="trustDesc">เปิดเผยแหล่งข้อมูลจากผู้ให้บริการสาธารณะ (ipapi/ipinfo/ipify)</div>
+					<span class="trustBadge">Transparent Sources</span>
+				</div>
+			</div>
+		</div>
+
+		<section class="card" style="margin-bottom:12px;">
+			<div class="sectionTitle">
+				<div class="badge">ค้นหา IP</div>
+				<div class="small">กรอก IPv4/IPv6 เพื่อดูข้อมูลและตรวจบัญชีดำ</div>
+			</div>
+			<div class="searchBar" style="margin-top:10px;">
+				<input id="searchIp" class="input mono" placeholder="เช่น 1.1.1.1 หรือ 2404:6800:4003::200e" />
+				<button id="searchBtn" class="btn btn-primary">ค้นหา</button>
+			</div>
+		</section>
+
+		<section class="card" style="margin-bottom:12px;">
+			<div class="sectionTitle">
+				<div class="badge">📍 IP ของคุณ</div>
+				<div class="small">ข้อมูล IP และตำแหน่งปัจจุบันของคุณ</div>
+			</div>
+			<div class="ip-status" style="margin-top:12px;">
+				<div class="ip-indicator" id="ipIndicator">
+					<span class="ip-label">กำลังตรวจสอบ...</span>
+					<span class="ip-value mono" id="currentIp">-</span>
+					<button class="btn btn-small" id="backToUserIP" style="display:none; margin-left:8px;">
+						กลับไป IP ของคุณ
+					</button>
+				</div>
+				<div class="location-info" id="locationInfo" style="display:none;">
+					<div class="location-item">
+						<span class="location-label">ตำแหน่ง</span>
+						<span class="location-value" id="currentLocation">-</span>
+					</div>
+					<div class="location-item">
+						<span class="location-label">ISP</span>
+						<span class="location-value" id="currentISP">-</span>
+					</div>
+					<div class="location-item">
+						<span class="location-label">ประเทศ</span>
+						<span class="location-value" id="currentCountry">-</span>
+					</div>
+					<div class="location-item">
+						<span class="location-label">ASN</span>
+						<span class="location-value" id="currentASN">-</span>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<div class="hero">
+			<section class="card">
+				<div class="sectionTitle">
+					<div class="badge">ข้อมูลเครือข่าย</div>
+					<div id="status" class="small loading">กำลังดึงข้อมูล...</div>
+				</div>
+				<div class="kv" style="margin-top: 14px;">
+					<div class="label">หมายเลข IP</div>
+					<div class="value mono" id="ip">-</div>
+
+					<div class="label">ชนิด IP</div>
+					<div class="value" id="ipType">-</div>
+
+					<div class="label">ผู้ให้บริการ (ISP)</div>
+					<div class="value" id="isp">-</div>
+
+					<div class="label">ประเทศ</div>
+					<div class="value" id="country">-</div>
+
+					<div class="label">เมือง/ภูมิภาค</div>
+					<div class="value" id="regionCity">-</div>
+
+					<div class="label">MAC Address</div>
+					<div class="value" id="mac">ไม่สามารถเข้าถึงจากเว็บเบราว์เซอร์</div>
+				</div>
+				<div style="margin-top:16px;">
+					<div class="map-container">
+						<div class="map-overlay">
+							<div class="map-title">📍 ตำแหน่งโดยประมาณ</div>
+							<div class="map-subtitle" id="mapSubtitle">กำลังโหลดแผนที่...</div>
+						</div>
+					<div id="map" aria-label="แผนที่ที่ตั้งโดยประมาณ"></div>
+					</div>
+					<div class="small" style="margin-top:8px; text-align:center;">
+						⚠️ ตำแหน่งเป็นการประมาณจากผู้ให้บริการ IP เท่านั้น • ความแม่นยำขึ้นอยู่กับ ISP
+					</div>
+				</div>
+			</section>
+
+			<section class="card">
+				<div class="sectionTitle">
+					<div class="badge">ข้อมูลอุปกรณ์</div>
+					<div class="small">ไม่ส่งค่าระบุตัวตนส่วนตัว</div>
+				</div>
+				<div class="kv" style="margin-top: 14px;">
+					<div class="label">อุปกรณ์</div>
+					<div class="value" id="device">-</div>
+
+					<div class="label">ระบบปฏิบัติการ</div>
+					<div class="value" id="os">-</div>
+
+					<div class="label">เบราว์เซอร์</div>
+					<div class="value" id="browser">-</div>
+
+					<div class="label">ภาษา</div>
+					<div class="value" id="lang">-</div>
+				</div>
+			</section>
+		</div>
+
+
+		<div class="footer small">© IP Trust Checker • ใช้ Leaflet + OpenStreetMap • โปรดใช้งานอย่างมีความรับผิดชอบ</div>
+	</div>
+
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+	<script>
+		const $ = (id) => document.getElementById(id);
+		let map, mapMarker;
+		
+		// Configure Leaflet to use custom icons to avoid CSP issues
+		const customIcon = L.divIcon({
+			html: '<div style="background: #5b8cff; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+			className: 'custom-div-icon',
+			iconSize: [20, 20],
+			iconAnchor: [10, 10]
+		});
+		
+		// Override default icon
+		L.Marker.prototype.options.icon = customIcon;
+		
+		// Mobile Navigation
+		function initMobileNav() {
+			const toggle = $('mobileNavToggle');
+			const overlay = $('mobileNavOverlay');
+			const menu = $('mobileNavMenu');
+			
+			toggle.addEventListener('click', () => {
+				overlay.style.display = 'block';
+				setTimeout(() => menu.classList.add('active'), 10);
+			});
+			
+			overlay.addEventListener('click', (e) => {
+				if (e.target === overlay) {
+					menu.classList.remove('active');
+					setTimeout(() => overlay.style.display = 'none', 300);
+				}
+			});
+			
+			// Mobile refresh button
+			$('mobileRefreshBtn').addEventListener('click', () => {
+				fetchIPData().then(()=>ensureMapVisible()).catch(()=>setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error'));
+				menu.classList.remove('active');
+				setTimeout(() => overlay.style.display = 'none', 300);
+			});
+		}
+		
+		function initMap(){ if(map) return; map = L.map('map',{ zoomControl:true, attributionControl:true }); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ maxZoom:19, attribution:'&copy; OpenStreetMap contributors' }).addTo(map); }
+		function ensureMapVisible(){ if(!map) return; setTimeout(()=>map.invalidateSize(),50); setTimeout(()=>map.invalidateSize(),300); }
+		function updateMap(lat,lon,label){ 
+			initMap(); 
+			if(typeof lat!=='number'||typeof lon!=='number'||Number.isNaN(lat)||Number.isNaN(lon)){ 
+				ensureMapVisible(); 
+				$('mapSubtitle').textContent = label || 'ไม่สามารถระบุตำแหน่งได้';
+				return; 
+			} 
+			const pos=[lat,lon]; 
+			map.setView(pos,11); 
+			if(mapMarker){ map.removeLayer(mapMarker); } 
+			mapMarker=L.marker(pos, {icon: customIcon}).addTo(map); 
+			if(label) {
+				mapMarker.bindPopup(label).openPopup(); 
+				$('mapSubtitle').textContent = label;
+			}
+			ensureMapVisible(); 
+		}
+		function setStatus(text,cls='loading'){ const el=$('status'); el.className='small '+cls; el.textContent=text; }
+		
+		// Update current IP display
+		function updateCurrentIPDisplay(ipData) {
+			const currentIpEl = $('currentIp');
+			const ipLabelEl = $('ipIndicator')?.querySelector('.ip-label');
+			const locationInfoEl = $('locationInfo');
+			const currentLocationEl = $('currentLocation');
+			const currentISPEl = $('currentISP');
+			const currentCountryEl = $('currentCountry');
+			const currentASNEl = $('currentASN');
+			
+			if (ipData && ipData.ip) {
+				if (currentIpEl) currentIpEl.textContent = ipData.ip;
+				if (ipLabelEl) {
+					// Check if this is the user's actual IP or a searched IP
+					const isUserIP = isCurrentUserIP(ipData.ip);
+					const backButton = $('backToUserIP');
+					
+					if (isUserIP) {
+						ipLabelEl.textContent = '🌐 IP ของคุณ';
+						ipLabelEl.style.color = 'var(--ok)';
+						if (backButton) backButton.style.display = 'none';
+					} else {
+						ipLabelEl.textContent = '🔍 IP ที่ค้นหา';
+						ipLabelEl.style.color = 'var(--accent)';
+						if (backButton) backButton.style.display = 'inline-flex';
+					}
+				}
+				
+				// Show location info
+				const location = [ipData.region, ipData.city].filter(Boolean).join(', ') || 'ไม่ระบุ';
+				const isp = translateISPName(ipData.isp) || 'ไม่ระบุ';
+				const country = ipData.country || 'ไม่ระบุ';
+				const asn = ipData.asn || 'ไม่ระบุ';
+				
+				if (currentLocationEl) currentLocationEl.textContent = location;
+				if (currentISPEl) currentISPEl.textContent = isp;
+				if (currentCountryEl) currentCountryEl.textContent = country;
+				// ไม่ต้องอัปเดต ASN เพราะใช้แสดงข้อมูลอุปกรณ์แทน
+				if (locationInfoEl) {
+					locationInfoEl.style.display = 'grid';
+				}
+			} else {
+				if (currentIpEl) currentIpEl.textContent = 'ไม่สามารถระบุได้';
+				if (ipLabelEl) {
+					ipLabelEl.textContent = '❌ ไม่สามารถระบุ IP';
+					ipLabelEl.style.color = 'var(--err)';
+				}
+				if (locationInfoEl) locationInfoEl.style.display = 'none';
+			}
+		}
+		
+		// Store the user's actual IP
+		let userActualIP = null;
+
+		// ระบบแปลงชื่อ ISP เป็นภาษาไทย (ครอบคลุม ASN ทั้งหมดของไทย)
+		function translateISPName(ispName) {
+			if (!ispName || ispName === '-') return '-';
+			
+			const isp = ispName.toLowerCase();
+			
+			// AIS (เอไอเอส) - AS45458, AS132698
+			if (isp.includes('ais') || isp.includes('advanced wireless network') || 
+				isp.includes('super broadband network') || isp.includes('as45458') || 
+				isp.includes('as132698') || isp.includes('ais fibre')) {
+				return 'AIS (เอไอเอส)';
+			}
+			
+			// TRUE (ทรู) - AS17552, AS132061, AS7470, AS132618
+			if (isp.includes('true') || isp.includes('trueonline') || 
+				isp.includes('true internet corporation') || isp.includes('realmove') ||
+				isp.includes('true internet data center') || isp.includes('truemove') ||
+				isp.includes('real future company') || isp.includes('truemove h') ||
+				isp.includes('as17552') || isp.includes('as132061') || isp.includes('as7470') || 
+				isp.includes('as132618')) {
+				return 'TRUE (ทรู)';
+			}
+			
+			// DTAC (ดีแทค) - AS24378
+			if (isp.includes('dtac') || isp.includes('total access communication') || 
+				isp.includes('as24378')) {
+				return 'DTAC (ดีแทค)';
+			}
+			
+			// 3BB (ทรีบีบี) - AS45758, AS4651
+			if (isp.includes('3bb') || isp.includes('triple t internet') || 
+				isp.includes('jasmine internet') || isp.includes('as45758') || 
+				isp.includes('as4651') || isp.includes('jasmine group')) {
+				return '3BB (ทรีบีบี)';
+			}
+			
+			// TOT (ทีโอที) - AS23969, AS38044
+			if (isp.includes('tot') || isp.includes('tot public company') || 
+				isp.includes('as23969') || isp.includes('as38044')) {
+				return 'TOT (ทีโอที)';
+			}
+			
+			// CAT (แคท) - AS4658, AS9931, AS23969
+			if (isp.includes('cat telecom') || isp.includes('cat public company') || 
+				isp.includes('as4658') || isp.includes('as9931')) {
+				return 'CAT (แคท)';
+			}
+			
+			// NT (เอ็นที) - AS140163, AS140164
+			if (isp.includes('national telecom') || isp.includes('nt ') || 
+				isp.includes('as140163') || isp.includes('as140164')) {
+				return 'NT (เอ็นที)';
+			}
+			
+			// CSL / CS Loxinfo - AS9931, AS45247
+			if (isp.includes('cs loxinfo') || isp.includes('cs loxinfo public company') || 
+				isp.includes('as45247') || isp.includes('csl')) {
+				return 'CS Loxinfo';
+			}
+			
+			// INET - AS4618
+			if (isp.includes('internet thailand') || isp.includes('as4618') || 
+				isp.includes('inet')) {
+				return 'INET';
+			}
+			
+			// SYMPHONY - AS132280
+			if (isp.includes('symphony communication') || isp.includes('as132280') || 
+				isp.includes('symphony')) {
+				return 'SYMPHONY';
+			}
+			
+			// SPACETH.CO / UIH - AS9931, AS38444
+			if (isp.includes('united information highway') || isp.includes('as38444') || 
+				isp.includes('spaceth') || isp.includes('uih')) {
+				return 'UIH (SPACETH.CO)';
+			}
+			
+			// ETTH / SKYNet - AS137595
+			if (isp.includes('skynet broadband') || isp.includes('as137595') || 
+				isp.includes('skynet') || isp.includes('etth')) {
+				return 'SKYNet (ETTH)';
+			}
+			
+			// UniNet Thailand - AS45142
+			if (isp.includes('uninet thailand') || isp.includes('as45142') || 
+				isp.includes('king mongkut') || isp.includes('uninet')) {
+				return 'UniNet Thailand';
+			}
+			
+			// Google Cloud/Amazon AWS
+			if (isp.includes('google') || isp.includes('google cloud')) {
+				return 'Google Cloud';
+			}
+			if (isp.includes('amazon') || isp.includes('aws')) {
+				return 'Amazon AWS';
+			}
+			
+			// Cloudflare
+			if (isp.includes('cloudflare')) {
+				return 'Cloudflare';
+			}
+			
+			// Microsoft Azure
+			if (isp.includes('microsoft') || isp.includes('azure')) {
+				return 'Microsoft Azure';
+			}
+			
+			// ถ้าไม่ตรงกับเงื่อนไขใดๆ ให้แสดงชื่อเดิม
+			return ispName;
+		}
+		
+		// Check if IP is current user's IP
+		function isCurrentUserIP(ip) {
+			return ip === userActualIP && userActualIP !== null;
+		}
+		
+		// Function to go back to user's actual IP
+		async function backToUserIP() {
+			if (userActualIP) {
+				setStatus('กำลังโหลด IP ของคุณ...', 'loading');
+				try {
+					const data = await ipinfoLookupByIP(userActualIP);
+					const via = {
+						ip: userActualIP,
+						isp: translateISPName(data.org || '-'),
+						country: data.country || '-',
+						region: data.region || '-',
+						city: data.city || '-',
+						latitude: data.loc ? Number(data.loc.split(',')[0]) : null,
+						longitude: data.loc ? Number(data.loc.split(',')[1]) : null,
+						asn: data.asn || '-'
+					};
+					await applyData(via);
+					setStatus('โหลด IP ของคุณสำเร็จ', 'success');
+				} catch (e) {
+					console.error('Error loading user IP:', e);
+					setStatus('ไม่สามารถโหลด IP ของคุณได้', 'error');
+				}
+			}
+		}
+		
+		// Function to toggle device info visibility
+		function toggleDeviceInfo(show) {
+			const deviceCard = document.querySelector('.card:nth-child(3)'); // Device info card
+			if (deviceCard) {
+				deviceCard.style.display = show ? 'block' : 'none';
+			}
+		}
+		
+		// Update IP display with user indicator
+		function updateIPDisplayWithIndicator(ipData) {
+			const ipEl = $('ip');
+			const ipTypeEl = $('ipType');
+			const ispEl = $('isp');
+			const countryEl = $('country');
+			const regionCityEl = $('regionCity');
+			
+			if (ipData && ipData.ip) {
+				const isCurrentUser = isCurrentUserIP(ipData.ip);
+				const userIndicator = isCurrentUser ? ' (คุณ)' : ' (คนอื่น)';
+				const indicatorColor = isCurrentUser ? 'var(--ok)' : 'var(--warn)';
+				
+				ipEl.innerHTML = `${ipData.ip}<span style="color:${indicatorColor}; font-size:12px; margin-left:8px;">${userIndicator}</span>`;
+				ipTypeEl.textContent = ipData.ip.includes(':') ? 'IPv6' : 'IPv4';
+				ispEl.textContent = ipData.isp || '-';
+				countryEl.textContent = ipData.country || '-';
+				regionCityEl.textContent = [ipData.region, ipData.city].filter(Boolean).join(' / ') || '-';
+			} else {
+				ipEl.textContent = '-';
+				ipTypeEl.textContent = '-';
+				ispEl.textContent = '-';
+				countryEl.textContent = '-';
+				regionCityEl.textContent = '-';
+			}
+		}
+
+		function parseUA(uaString){ 
+			const ua = uaString || navigator.userAgent || '';
+			let device = 'ไม่ทราบอุปกรณ์';
+			let os = 'ไม่ทราบ';
+			let browser = 'ไม่ทราบ';
+			let lang = navigator.language || (navigator.languages && navigator.languages[0]) || '-';
+			
+			// Detect specific mobile device models
+			if (/iPhone/.test(ua)) {
+				// iPhone detection - more specific based on OS version
+				if (/iPhone OS 18/.test(ua)) {
+					device = 'iPhone 16 Pro Max (iOS 18)';
+				}
+				else if (/iPhone OS 17/.test(ua)) {
+					device = 'iPhone 15 Pro Max (iOS 17)';
+				}
+				else if (/iPhone OS 16/.test(ua)) device = 'iPhone 14 Pro (iOS 16)';
+				else if (/iPhone OS 15/.test(ua)) device = 'iPhone 13 Pro (iOS 15)';
+				else if (/iPhone OS 14/.test(ua)) device = 'iPhone 12 Pro (iOS 14)';
+				else if (/iPhone OS 13/.test(ua)) device = 'iPhone 11 Pro (iOS 13)';
+				else device = 'iPhone';
+				os = 'iOS';
+			} else if (/iPad/.test(ua)) {
+				if (/iPadOS 18/.test(ua)) device = 'iPad Pro 13" M4 (iPadOS 18)';
+				else if (/iPadOS 17/.test(ua)) device = 'iPad Pro 12.9" M2 (iPadOS 17)';
+				else if (/iPadOS 16/.test(ua)) device = 'iPad Air 5 (iPadOS 16)';
+				else device = 'iPad';
+				os = 'iPadOS';
+			} else if (/Android/.test(ua)) {
+				// Samsung Galaxy detection
+				if (/SM-S918/.test(ua) || /SM-S919/.test(ua)) device = 'Samsung Galaxy S24 Ultra';
+				else if (/SM-S911/.test(ua) || /SM-S912/.test(ua)) device = 'Samsung Galaxy S24+';
+				else if (/SM-S901/.test(ua) || /SM-S902/.test(ua)) device = 'Samsung Galaxy S24';
+				else if (/SM-G998/.test(ua)) device = 'Samsung Galaxy S23 Ultra';
+				else if (/SM-G992/.test(ua)) device = 'Samsung Galaxy S23+';
+				else if (/SM-G991/.test(ua)) device = 'Samsung Galaxy S23';
+				else if (/SM-G996/.test(ua)) device = 'Samsung Galaxy S22 Ultra';
+				else if (/SM-G906/.test(ua)) device = 'Samsung Galaxy S22+';
+				else if (/SM-G901/.test(ua)) device = 'Samsung Galaxy S22';
+				else if (/SM-A545/.test(ua)) device = 'Samsung Galaxy A55';
+				else if (/SM-A535/.test(ua)) device = 'Samsung Galaxy A35';
+				else if (/SM-A525/.test(ua)) device = 'Samsung Galaxy A52';
+				else if (/SM-A725/.test(ua)) device = 'Samsung Galaxy A72';
+				else if (/SM-A755/.test(ua)) device = 'Samsung Galaxy A75 5G';
+				// Xiaomi/Redmi detection
+				else if (/M2304F11A/.test(ua)) device = 'Redmi Note 13 5G';
+				else if (/M2301K11I/.test(ua)) device = 'Redmi Note 13 Pro';
+				else if (/M2203K10I/.test(ua)) device = 'Redmi Note 12 Pro';
+				else if (/M2007J22C/.test(ua)) device = 'Redmi Note 11';
+				else if (/M2003J6B2G/.test(ua)) device = 'Redmi Note 10 Pro';
+				else if (/2312DQAC/.test(ua)) device = 'Redmi 13';
+				else if (/M2402F1A/.test(ua)) device = 'Xiaomi 14';
+				else if (/M2401K10C/.test(ua)) device = 'Xiaomi 14 Ultra';
+				else if (/M2304J10C/.test(ua)) device = 'Xiaomi 13';
+				else if (/M2304FY11A/.test(ua)) device = 'Xiaomi 13 Ultra';
+				else if (/M2201K10C/.test(ua)) device = 'Xiaomi 12 Pro';
+				else if (/M2201K10I/.test(ua)) device = 'Xiaomi 12S Pro';
+				else if (/M2101K9AG/.test(ua)) device = 'Xiaomi 11 Ultra';
+				else if (/M2006C3MG/.test(ua)) device = 'Xiaomi 10T Pro';
+				// Google Pixel detection
+				else if (/Pixel 8 Pro/.test(ua)) device = 'Google Pixel 8 Pro';
+				else if (/Pixel 8a/.test(ua)) device = 'Google Pixel 8a';
+				else if (/Pixel 8/.test(ua)) device = 'Google Pixel 8';
+				else if (/Pixel 7 Pro/.test(ua)) device = 'Google Pixel 7 Pro';
+				else if (/Pixel 7a/.test(ua)) device = 'Google Pixel 7a';
+				else if (/Pixel 7/.test(ua)) device = 'Google Pixel 7';
+				else if (/Pixel 6 Pro/.test(ua)) device = 'Google Pixel 6 Pro';
+				else if (/Pixel 6a/.test(ua)) device = 'Google Pixel 6a';
+				else if (/Pixel 6/.test(ua)) device = 'Google Pixel 6';
+				// OnePlus detection
+				else if (/CPH2415|CPH2417/.test(ua)) device = 'OnePlus 12';
+				else if (/CPH2381|CPH2383/.test(ua)) device = 'OnePlus 11';
+				else if (/CPH2343|CPH2345/.test(ua)) device = 'OnePlus 11 Pro';
+				else if (/CPH2309/.test(ua)) device = 'OnePlus 10 Pro';
+				else if (/Xiaomi|Redmi/.test(ua)) device = 'Xiaomi/Redmi Android';
+				else if (/OnePlus/.test(ua)) device = 'OnePlus Android';
+				else if (/Huawei/.test(ua)) device = 'Huawei P60 Pro';
+				else if (/OPPO/.test(ua)) device = 'OPPO Find X6 Pro';
+				else if (/vivo/.test(ua)) device = 'vivo X90 Pro';
+				else device = 'Android Phone';
+				os = 'Android';
+			} else if (/Windows/.test(ua)) {
+				// Windows desktop detection
+				if (/Windows NT 10.0; Win64; x64/.test(ua)) device = 'Desktop Computer (64-bit)';
+				else if (/Windows NT 10.0; WOW64/.test(ua)) device = 'Desktop Computer (32-bit)';
+				else device = 'Desktop Computer';
+				
+				if (/Windows NT 10.0/.test(ua)) {
+					// Windows 11 uses NT 10.0 with newer WebKit/Trident
+					os = 'Windows 11';
+				}
+				else if (/Windows NT 6.3/.test(ua)) os = 'Windows 8.1';
+				else if (/Windows NT 6.1/.test(ua)) os = 'Windows 7';
+				else os = 'Windows';
+			} else if (/Macintosh/.test(ua)) {
+				// MacBook detection
+				if (/Mac OS X 15/.test(ua)) {
+					if (/Apple Silicon/.test(ua)) device = 'MacBook Pro 14" M4 (macOS 15)';
+					else device = 'MacBook Pro M4 (macOS 15)';
+				}
+				else if (/Mac OS X 14/.test(ua)) {
+					device = 'MacBook Pro 14" M3 (macOS 14)';
+				}
+				else if (/Mac OS X 13/.test(ua)) {
+					device = 'MacBook Air 15" M2 (macOS 13)';
+				}
+				else if (/Mac OS X 12/.test(ua)) {
+					device = 'MacBook Pro 14" M1 (macOS 12)';
+				}
+				else device = 'MacBook';
+				os = 'macOS';
+			} else if (/Linux/.test(ua)) {
+				device = 'Linux Computer';
+				os = 'Linux';
+			}
+			
+			// Detect Browser
+			if (/Edg\//.test(ua)) browser = 'Microsoft Edge';
+			else if (/OPR\//.test(ua)) browser = 'Opera';
+			else if (/Chrome\//.test(ua)) browser = 'Google Chrome';
+			else if (/Safari\//.test(ua) && /Version\//.test(ua)) browser = 'Safari';
+			else if (/Firefox\//.test(ua)) browser = 'Mozilla Firefox';
+			else if (/MSIE |Trident\//.test(ua)) browser = 'Internet Explorer';
+			
+			return { device, os, browser, lang };
+		}
+
+		// IP lookup function using ipinfo.io (more reliable)
+		async function ipinfoLookupByIP(ip, signal) {
+			try {
+				const url = ip ? `https://ipinfo.io/${encodeURIComponent(ip)}/json` : 'https://ipinfo.io/json';
+				const res = await fetch(url, { 
+					signal,
+					headers: {
+						'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+					}
+				});
+				if (!res.ok) {
+					throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+				}
+				const data = await res.json();
+				if (data.error) {
+					throw new Error(data.error.message || 'API Error');
+				}
+				return data;
+			} catch (error) {
+				console.error('ipinfo.io error:', error);
+				throw error;
+			}
+		}
+		function fetchWithTimeout(url,ms=6000){ const controller=new AbortController(); const t=setTimeout(()=>controller.abort(),ms); return fetch(url,{ signal:controller.signal }).finally(()=>clearTimeout(t)); }
+		async function fetchFromBackend(){ const res=await fetchWithTimeout('/api/ip',6000); if(!res.ok) throw new Error('backend ip failed'); return res.json(); }
+
+		async function applyData(via){ 
+			const ip=via.ip||'-', isp=via.isp||'-', country=via.country||'-', region=via.region||'-', city=via.city||'-'; 
+			const lat=typeof via.latitude==='number'?via.latitude:null; 
+			const lon=typeof via.longitude==='number'?via.longitude:null; 
+			
+			// Check if this is user's actual IP or searched IP
+			const isUserIP = isCurrentUserIP(ip);
+			
+			// Update current IP display first
+			updateCurrentIPDisplay(via);
+			
+			// Update main IP display with indicator
+			updateIPDisplayWithIndicator(via);
+			
+			// Show/hide device info based on IP type
+			toggleDeviceInfo(isUserIP);
+			
+			// Update map with correct coordinates
+			updateMap(lat, lon, `${ip} - ${isp}`);
+			
+		}
+
+		async function fetchIPData(){ 
+			setStatus('กำลังดึงข้อมูล...','loading'); 
+			let via=null; 
+			try{ 
+				const r=await fetchFromBackend(); 
+				if(r&&r.ok) via=r; 
+			}catch(e){
+				// Backend fetch failed
+			} 
+			if(!via){ 
+				try{ 
+					// Use ipinfo.io directly (more reliable)
+					const a=await ipinfoLookupByIP(''); 
+					via={ 
+						ip:a.ip||'-', 
+						isp:translateISPName(a.org||'-'), 
+						country:a.country||'-', 
+						region:a.region||'-', 
+						city:a.city||'-', 
+						latitude:a.loc ? Number(a.loc.split(',')[0]) : null,
+						longitude:a.loc ? Number(a.loc.split(',')[1]) : null,
+						asn:a.asn||'-'
+					}; 
+				}catch(e){
+					console.error('ipinfo.io failed:', e);
+					setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error');
+					return;
+				} 
+			}
+			if(via){ 
+				// Store the user's actual IP when first loaded
+				if (!userActualIP) {
+					userActualIP = via.ip;
+				}
+				await applyData(via); 
+				setStatus('ดึงข้อมูลสำเร็จ','success'); 
+			} else { 
+				setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error'); 
+			}
+		}
+
+
+		function renderUA(){ 
+			const { device, os, browser, lang } = parseUA(); 
+			$('device').textContent=device; 
+			$('os').textContent=os; 
+			$('browser').textContent=browser; 
+			$('lang').textContent=lang;
+			
+			// อัปเดตอุปกรณ์ที่ใช้ในส่วน location
+			const deviceInfo = `${device} (${os})`;
+			const currentASNEl = $('currentASN');
+			if (currentASNEl) currentASNEl.textContent = deviceInfo;
+		}
+
+		function isValidIP(v){ if(!v) return false; const ipv4=/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/; const ipv6=/^([0-9a-f]{1,4}:){1,7}[0-9a-f]{1,4}$/i; return ipv4.test(v)||ipv6.test(v); }
+		async function searchIpFlow() {
+			const ip = $('searchIp').value.trim();
+			if (!isValidIP(ip)) {
+				setStatus('รูปแบบ IP ไม่ถูกต้อง', 'error');
+				return;
+			}
+			
+			setStatus('กำลังค้นหา IP...', 'loading');
+			
+			try {
+				// Use ipinfo.io directly (more reliable)
+				const data = await ipinfoLookupByIP(ip);
+				
+				const via = {
+					ip: ip,
+					isp: translateISPName(data.org || '-'),
+					country: data.country || '-',
+					region: data.region || '-',
+					city: data.city || '-',
+					latitude: data.loc ? Number(data.loc.split(',')[0]) : null,
+					longitude: data.loc ? Number(data.loc.split(',')[1]) : null,
+					asn: data.asn || '-'
+				};
+				
+				await applyData(via);
+				setStatus('ดึงข้อมูลสำเร็จ', 'success');
+			} catch (e) {
+				console.error('Search error:', e);
+				setStatus(`ค้นหาไม่สำเร็จ: ${e.message}`, 'error');
+			}
+			
+			$('searchIp').blur();
+		}
+
+		// Check login status and show/hide logout button
+		async function checkLoginStatus() {
+			try {
+				const res = await fetch('/api/auth/me', { credentials: 'include' });
+				const data = await res.json();
+				
+				if (data.ok && data.user) {
+					// User is logged in, show logout button
+					showLogoutButton(data.user);
+				} else {
+					// User is not logged in, show login button
+					showLoginButton();
+				}
+			} catch (error) {
+				console.error('Error checking login status:', error);
+				showLoginButton();
+			}
+		}
+		
+		// Show logout button and user info
+		function showLogoutButton(user) {
+			const nav = document.querySelector('.nav');
+			if (nav) {
+				// Remove existing login button if any
+				const existingLoginBtn = nav.querySelector('a[href="login.html"]');
+				if (existingLoginBtn) {
+					existingLoginBtn.remove();
+				}
+				
+				// Add logout button
+				const logoutBtn = document.createElement('a');
+				logoutBtn.href = '#';
+				logoutBtn.className = 'logout-btn';
+				logoutBtn.innerHTML = `
+					<span class="user-info">
+						${user.name || 'ผู้ใช้'} 
+						<span class="logout-text">(ออกจากระบบ)</span>
+					</span>
+				`;
+				logoutBtn.addEventListener('click', (e) => {
+					e.preventDefault();
+					logout();
+				});
+				
+				nav.appendChild(logoutBtn);
+			}
+		}
+		
+		// Show login button
+		function showLoginButton() {
+			const nav = document.querySelector('.nav');
+			if (nav) {
+				// Remove existing logout button if any
+				const existingLogoutBtn = nav.querySelector('.logout-btn');
+				if (existingLogoutBtn) {
+					existingLogoutBtn.remove();
+				}
+				
+				// Check if login button already exists
+				const existingLoginBtn = nav.querySelector('a[href="login.html"]');
+				if (!existingLoginBtn) {
+					// Add login button
+					const loginBtn = document.createElement('a');
+					loginBtn.href = 'login.html';
+					loginBtn.textContent = 'เข้าสู่ระบบ';
+					
+					nav.appendChild(loginBtn);
+				}
+			}
+		}
+		
+		// Logout function
+		async function logout() {
+			try {
+				const res = await fetch('/api/auth/logout', {
+					method: 'POST',
+					credentials: 'include'
+				});
+				
+				if (res.ok) {
+					// Show success message
+					setStatus('ออกจากระบบสำเร็จ', 'success');
+					setTimeout(() => {
+						// Refresh page to update UI
+						location.reload();
+					}, 1500);
+				} else {
+					setStatus('ออกจากระบบไม่สำเร็จ', 'error');
+				}
+			} catch (error) {
+				console.error('Logout error:', error);
+				setStatus('ออกจากระบบไม่สำเร็จ', 'error');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', () => {
+			initMobileNav();
+			renderUA();
+			checkLoginStatus(); // Check login status on page load
+			fetchIPData().then(()=>ensureMapVisible()).catch(()=>setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error'));
+			$('refreshBtn').addEventListener('click', ()=> fetchIPData().then(()=>ensureMapVisible()).catch(()=>setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error')));
+			$('searchBtn').addEventListener('click', searchIpFlow);
+			$('searchIp').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); searchIpFlow(); } });
+			$('backToUserIP').addEventListener('click', backToUserIP);
+		});
+	</script>
+</body>
+</html>

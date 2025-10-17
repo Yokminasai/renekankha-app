@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>2FA Authenticator | สร้างรหัสยืนยันตัวตน</title>
+	<meta name="description" content="สร้างรหัสยืนยันตัวตน 2FA สำหรับ Google Authenticator, Authy และแอปอื่นๆ พร้อมระบบ TOTP ที่ปลอดภัย">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1020'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%235b8cff' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='12' fill='%235b8cff'/%3E%3Cpath d='M20 20l8 8M36 20l-8 8' stroke='%2322c55e' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+	<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230b1020'/%3E%3Ccircle cx='90' cy='90' r='50' fill='none' stroke='%235b8cff' stroke-width='8'/%3E%3Ccircle cx='90' cy='90' r='30' fill='%235b8cff'/%3E%3Cpath d='M60 60l20 20M120 60l-20 20' stroke='%2322c55e' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+	<style>
+		:root {
+			--bg: #0b1020;
+			--surface: #1a1f2e;
+			--surface-hover: #252a3a;
+			--border: #2a2f3f;
+			--text: #ffffff;
+			--text-muted: #a0a8b8;
+			--accent: #5b8cff;
+			--accent-hover: #4a7bff;
+			--ok: #22c55e;
+			--warn: #f59e0b;
+			--err: #ef4444;
+			--gradient: linear-gradient(135deg, #5b8cff 0%, #22c55e 100%);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: var(--bg);
+			color: var(--text);
+			line-height: 1.6;
+			min-height: 100vh;
+			overflow-x: hidden;
+		}
+
+		/* Mobile Navigation */
+		.mobile-nav {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 1000;
+			background: rgba(11, 16, 32, 0.95);
+			backdrop-filter: blur(20px);
+			border-bottom: 1px solid var(--border);
+			padding: 16px;
+		}
+
+		.mobile-nav-content {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.mobile-nav-toggle {
+			background: none;
+			border: none;
+			color: var(--text);
+			font-size: 24px;
+			cursor: pointer;
+			padding: 8px;
+			border-radius: 8px;
+			transition: background 0.3s ease;
+		}
+
+		.mobile-nav-toggle:hover {
+			background: var(--surface);
+		}
+
+		.mobile-nav-overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0, 0, 0, 0.8);
+			z-index: 999;
+			backdrop-filter: blur(10px);
+		}
+
+		.mobile-nav-menu {
+			position: fixed;
+			top: 0;
+			left: -100%;
+			width: 280px;
+			height: 100vh;
+			background: var(--surface);
+			z-index: 1001;
+			transition: left 0.3s ease;
+			padding: 80px 24px 24px;
+			overflow-y: auto;
+		}
+
+		.mobile-nav-menu.active {
+			left: 0;
+		}
+
+		.mobile-nav-item {
+			display: block;
+			padding: 16px 0;
+			color: var(--text);
+			text-decoration: none;
+			border-bottom: 1px solid var(--border);
+			transition: color 0.3s ease;
+		}
+
+		.mobile-nav-item:hover {
+			color: var(--accent);
+		}
+
+		.mobile-nav-item.active {
+			color: var(--accent);
+			font-weight: 600;
+		}
+
+		/* Desktop Navigation */
+		.desktop-nav {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 24px 32px;
+			background: rgba(11, 16, 32, 0.95);
+			backdrop-filter: blur(20px);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.nav-brand {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			font-size: 20px;
+			font-weight: 700;
+			color: var(--text);
+			text-decoration: none;
+		}
+
+		.nav-brand-icon {
+			width: 32px;
+			height: 32px;
+			background: var(--gradient);
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 16px;
+		}
+
+		.nav-links {
+			display: flex;
+			align-items: center;
+			gap: 32px;
+		}
+
+		.nav-link {
+			color: var(--text-muted);
+			text-decoration: none;
+			font-weight: 500;
+			transition: color 0.3s ease;
+			position: relative;
+		}
+
+		.nav-link:hover,
+		.nav-link.active {
+			color: var(--accent);
+		}
+
+		.nav-link.active::after {
+			content: '';
+			position: absolute;
+			bottom: -8px;
+			left: 0;
+			right: 0;
+			height: 2px;
+			background: var(--accent);
+			border-radius: 1px;
+		}
+
+		/* Main Content */
+		.main-content {
+			padding: 40px 32px;
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+
+		.page-header {
+			text-align: center;
+			margin-bottom: 48px;
+		}
+
+		.page-title {
+			font-size: 48px;
+			font-weight: 700;
+			background: var(--gradient);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin-bottom: 16px;
+		}
+
+		.page-subtitle {
+			font-size: 18px;
+			color: var(--text-muted);
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		/* Authenticator Container */
+		.authenticator-container {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 32px;
+			margin-bottom: 48px;
+		}
+
+		.authenticator-card {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 16px;
+			padding: 32px;
+			transition: all 0.3s ease;
+		}
+
+		.authenticator-card:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+			transform: translateY(-2px);
+		}
+
+		.card-header {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin-bottom: 24px;
+		}
+
+		.card-icon {
+			width: 48px;
+			height: 48px;
+			background: var(--gradient);
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24px;
+		}
+
+		.card-title {
+			font-size: 24px;
+			font-weight: 600;
+			color: var(--text);
+		}
+
+		.card-subtitle {
+			font-size: 14px;
+			color: var(--text-muted);
+			margin-top: 4px;
+		}
+
+		/* Form Elements */
+		.form-group {
+			margin-bottom: 24px;
+		}
+
+		.form-label {
+			display: block;
+			font-size: 14px;
+			font-weight: 600;
+			color: var(--text);
+			margin-bottom: 8px;
+		}
+
+		.form-input {
+			width: 100%;
+			padding: 16px;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 12px;
+			color: var(--text);
+			font-size: 16px;
+			transition: all 0.3s ease;
+		}
+
+		.form-input:focus {
+			outline: none;
+			border-color: var(--accent);
+			box-shadow: 0 0 0 3px rgba(91, 140, 255, 0.1);
+		}
+
+		.form-input::placeholder {
+			color: var(--text-muted);
+		}
+
+		.form-textarea {
+			resize: vertical;
+			min-height: 120px;
+		}
+
+		/* Buttons */
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			padding: 16px 24px;
+			background: var(--gradient);
+			color: white;
+			border: none;
+			border-radius: 12px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+		}
+
+		.btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(91, 140, 255, 0.3);
+		}
+
+		.btn:active {
+			transform: translateY(0);
+		}
+
+		.btn-secondary {
+			background: var(--surface);
+			color: var(--text);
+			border: 1px solid var(--border);
+		}
+
+		.btn-secondary:hover {
+			background: var(--surface-hover);
+			border-color: var(--accent);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+		}
+
+		.btn-small {
+			padding: 8px 16px;
+			font-size: 14px;
+		}
+
+		.btn-full {
+			width: 100%;
+		}
+
+		/* Code Display */
+		.code-display {
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 12px;
+			padding: 24px;
+			text-align: center;
+			margin-bottom: 24px;
+		}
+
+		.code-value {
+			font-size: 48px;
+			font-weight: 700;
+			font-family: 'Courier New', monospace;
+			color: var(--accent);
+			margin-bottom: 16px;
+			letter-spacing: 4px;
+		}
+
+		.code-time {
+			font-size: 14px;
+			color: var(--text-muted);
+			margin-bottom: 8px;
+		}
+
+		.code-progress {
+			width: 100%;
+			height: 4px;
+			background: var(--border);
+			border-radius: 2px;
+			overflow: hidden;
+		}
+
+		.code-progress-bar {
+			height: 100%;
+			background: var(--gradient);
+			border-radius: 2px;
+			transition: width 1s linear;
+		}
+
+		/* QR Code */
+		.qr-container {
+			text-align: center;
+			margin-bottom: 24px;
+		}
+
+		.qr-code {
+			width: 200px;
+			height: 200px;
+			margin: 0 auto 16px;
+			background: white;
+			border-radius: 12px;
+			padding: 16px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.qr-placeholder {
+			width: 100%;
+			height: 100%;
+			background: #f0f0f0;
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #666;
+			font-size: 14px;
+		}
+
+		/* Status Messages */
+		.status {
+			padding: 16px;
+			border-radius: 12px;
+			margin-bottom: 24px;
+			display: none;
+		}
+
+		.status.show {
+			display: block;
+		}
+
+		.status.success {
+			background: rgba(34, 197, 94, 0.1);
+			border: 1px solid rgba(34, 197, 94, 0.3);
+			color: var(--ok);
+		}
+
+		.status.error {
+			background: rgba(239, 68, 68, 0.1);
+			border: 1px solid rgba(239, 68, 68, 0.3);
+			color: var(--err);
+		}
+
+		.status.loading {
+			background: rgba(91, 140, 255, 0.1);
+			border: 1px solid rgba(91, 140, 255, 0.3);
+			color: var(--accent);
+		}
+		
+		.status.warning {
+			background: rgba(245, 158, 11, 0.1);
+			border: 1px solid rgba(245, 158, 11, 0.3);
+			color: #d97706;
+		}
+
+		/* Copy Button */
+		.copy-btn {
+			position: absolute;
+			top: 16px;
+			right: 16px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			color: var(--text-muted);
+			padding: 8px;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		.copy-btn:hover {
+			background: var(--accent);
+			color: white;
+			border-color: var(--accent);
+		}
+
+		/* Responsive Design */
+		@media (max-width: 768px) {
+			.desktop-nav {
+				display: none;
+			}
+
+			.mobile-nav {
+				display: block;
+			}
+
+			.main-content {
+				padding: 24px 16px;
+				padding-top: 100px;
+			}
+
+			.page-title {
+				font-size: 32px;
+			}
+
+			.authenticator-container {
+				grid-template-columns: 1fr;
+				gap: 24px;
+			}
+
+			.authenticator-card {
+				padding: 24px;
+			}
+
+			.code-value {
+				font-size: 36px;
+			}
+
+			.qr-code {
+				width: 160px;
+				height: 160px;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.main-content {
+				padding: 16px 12px;
+				padding-top: 100px;
+			}
+
+			.page-title {
+				font-size: 28px;
+			}
+
+			.authenticator-card {
+				padding: 20px;
+			}
+
+			.code-value {
+				font-size: 28px;
+			}
+
+			.qr-code {
+				width: 140px;
+				height: 140px;
+			}
+		}
+		
+		/* Saved Keys Styles */
+		.saved-keys-list {
+			max-height: 400px;
+			overflow-y: auto;
+		}
+		
+		.saved-key-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 16px;
+			margin-bottom: 12px;
+			background: var(--glass-bg);
+			border: 1px solid var(--glass-border);
+			border-radius: 12px;
+			backdrop-filter: blur(20px);
+			transition: all 0.3s ease;
+		}
+		
+		.saved-key-item:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-sm);
+			border-color: var(--border-accent);
+		}
+		
+		.saved-key-info {
+			flex: 1;
+		}
+		
+		.saved-key-name {
+			font-weight: 600;
+			color: var(--text-primary);
+			margin-bottom: 4px;
+		}
+		
+		.saved-key-secret {
+			font-family: 'Courier New', monospace;
+			font-size: 12px;
+			color: var(--text-tertiary);
+			margin-bottom: 4px;
+		}
+		
+		.saved-key-date {
+			font-size: 11px;
+			color: var(--text-muted);
+		}
+		
+		.saved-key-actions {
+			display: flex;
+			gap: 8px;
+		}
+		
+		.btn-small {
+			padding: 6px 12px;
+			font-size: 12px;
+			border-radius: 6px;
+		}
+		
+		.no-saved-keys {
+			text-align: center;
+			color: var(--text-tertiary);
+			padding: 40px 20px;
+			font-style: italic;
+		}
+		
+		/* User Info Display */
+		.user-info-display {
+			padding: 16px;
+		}
+		
+		.user-info-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 0;
+			border-bottom: 1px solid var(--border-primary);
+		}
+		
+		.user-info-item:last-child {
+			border-bottom: none;
+		}
+		
+		.user-info-label {
+			font-weight: 600;
+			color: var(--text-secondary);
+		}
+		
+		.user-info-value {
+			color: var(--text-primary);
+			font-family: 'Courier New', monospace;
+		}
+		
+		.user-status-logged-in {
+			background: rgba(0,212,170,.1);
+			border: 1px solid rgba(0,212,170,.3);
+			color: var(--success);
+			padding: 8px 16px;
+			border-radius: 8px;
+			font-weight: 600;
+			text-align: center;
+		}
+		
+		.user-status-not-logged-in {
+			background: rgba(255,167,38,.1);
+			border: 1px solid rgba(255,167,38,.3);
+			color: var(--warning);
+			padding: 8px 16px;
+			border-radius: 8px;
+			font-weight: 600;
+			text-align: center;
+		}
+		
+		/* Logout Button Styles */
+		.logout-btn {
+			color: var(--accent-primary) !important;
+			font-weight: 600;
+			text-decoration: none;
+			padding: 8px 16px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+		}
+		
+		.logout-btn:hover {
+			color: var(--error) !important;
+			background: rgba(255,87,34,.1) !important;
+			transform: translateY(-2px);
+		}
+		
+		.logout-btn .user-info {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			font-size: 12px;
+		}
+		
+		.logout-btn .logout-text {
+			font-size: 10px;
+			opacity: 0.8;
+			margin-top: 2px;
+		}
+	</style>
+</head>
+<body>
+	<!-- Mobile Navigation -->
+	<nav class="mobile-nav">
+		<div class="mobile-nav-content">
+			<a href="index.html" class="nav-brand">
+				<div class="nav-brand-icon">🔐</div>
+				<span>IP Checker</span>
+			</a>
+			<button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
+		</div>
+	</nav>
+
+	<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+	<div class="mobile-nav-menu" id="mobileNavMenu">
+		<a href="index.html" class="mobile-nav-item">🏠 หน้าแรก</a>
+		<a href="authenticator.html" class="mobile-nav-item active">🔐 2FA Authenticator</a>
+		<a href="reports.html" class="mobile-nav-item">📊 รายงาน</a>
+		<a href="services.html" class="mobile-nav-item">🛠️ บริการ</a>
+		<a href="orders.html" class="mobile-nav-item">📦 คำสั่งซื้อ</a>
+		<!-- Login/Logout button will be added here by JavaScript -->
+	</div>
+
+	<!-- Desktop Navigation -->
+	<nav class="desktop-nav">
+		<a href="index.html" class="nav-brand">
+			<div class="nav-brand-icon">🔐</div>
+			<span>IP Checker</span>
+		</a>
+		<div class="nav-links">
+			<a href="index.html" class="nav-link">🏠 หน้าแรก</a>
+			<a href="authenticator.html" class="nav-link active">🔐 2FA Authenticator</a>
+			<a href="reports.html" class="nav-link">📊 รายงาน</a>
+			<a href="services.html" class="nav-link">🛠️ บริการ</a>
+			<a href="orders.html" class="nav-link">📦 คำสั่งซื้อ</a>
+			<!-- Login/Logout button will be added here by JavaScript -->
+		</div>
+	</nav>
+
+	<!-- Main Content -->
+	<main class="main-content">
+		<div class="page-header">
+			<h1 class="page-title">2FA Authenticator</h1>
+			<p class="page-subtitle">สร้างรหัสยืนยันตัวตน 2FA สำหรับ Google Authenticator, Authy และแอปอื่นๆ พร้อมระบบ TOTP ที่ปลอดภัย</p>
+		</div>
+
+		<!-- Status Messages -->
+		<div class="status" id="status"></div>
+
+		<!-- Authenticator Container -->
+		<div class="authenticator-container">
+			<!-- User Status Card (Only shown when logged in) -->
+		<div class="authenticator-card" id="userStatusCard" style="display: none;">
+			<div class="card-header">
+				<div class="card-icon">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+						<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						<circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</div>
+				<div>
+					<h2 class="card-title">ข้อมูลผู้ใช้</h2>
+					<p class="card-subtitle">สถานะการเข้าสู่ระบบ</p>
+				</div>
+			</div>
+			
+			<div id="userInfo" class="user-info-display">
+				<!-- User info will be loaded here -->
+			</div>
+		</div>
+
+		<!-- Generate Code Card -->
+			<div class="authenticator-card">
+				<div class="card-header">
+					<div class="card-icon">🔑</div>
+					<div>
+						<h2 class="card-title">สร้างรหัส 2FA</h2>
+						<p class="card-subtitle">ป้อน Secret Key เพื่อสร้างรหัสยืนยันตัวตน</p>
+					</div>
+				</div>
+
+				<form id="generateForm">
+					<div class="form-group">
+						<label class="form-label" for="accountName">ชื่อบัญชี (ไม่บังคับ)</label>
+						<input type="text" id="accountName" class="form-input" placeholder="กรอกชื่อบัญชีของคุณ">
+					</div>
+					
+					<div class="form-group">
+						<label class="form-label" for="secretKey">Secret Key</label>
+						<div style="display: flex; gap: 8px;">
+							<input type="text" id="secretKey" class="form-input" placeholder="ป้อน Secret Key (Base32)" required>
+							<button type="button" class="btn btn-secondary btn-small" id="testApiBtn" title="ทดสอบ API">
+								🧪 ทดสอบ
+							</button>
+						</div>
+					</div>
+					
+					<div style="display: flex; gap: 8px; margin-bottom: 16px;">
+						<button type="submit" class="btn btn-primary" style="flex: 1;">🚀 สร้างรหัส 2FA</button>
+						<button type="button" class="btn btn-success" id="saveKeyBtn" style="flex: 1;">💾 บันทึกคีย์</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Display Code Card -->
+			<div class="authenticator-card">
+				<div class="card-header">
+					<div class="card-icon">📱</div>
+					<div>
+						<h2 class="card-title">รหัสยืนยันตัวตน</h2>
+						<p class="card-subtitle">รหัส 6 หลักที่ใช้สำหรับยืนยันตัวตน</p>
+					</div>
+				</div>
+
+				<div class="code-display" id="codeDisplay" style="display: none;">
+					<div class="code-value" id="codeValue">------</div>
+					<div class="code-time" id="codeTime">เหลือเวลา: 30 วินาที</div>
+					<div class="code-progress">
+						<div class="code-progress-bar" id="codeProgress"></div>
+					</div>
+					<button class="copy-btn" id="copyBtn" title="คัดลอกรหัส">📋</button>
+				</div>
+
+				<div id="noCodeMessage" style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
+					<div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+					<p>ป้อน Secret Key เพื่อสร้างรหัสยืนยันตัวตน</p>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Saved Keys Card -->
+		<div class="authenticator-card">
+			<div class="card-header">
+				<div class="card-icon">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+						<path d="M12 15l-3-3h6l-3 3z" fill="currentColor"/>
+						<path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+				</div>
+				<div>
+					<h2 class="card-title">คีย์ที่บันทึกไว้</h2>
+					<p class="card-subtitle">จัดการคีย์ 2FA ที่บันทึกไว้</p>
+				</div>
+			</div>
+			
+			<div id="savedKeysList" class="saved-keys-list">
+				<div class="no-saved-keys">กำลังโหลด...</div>
+			</div>
+		</div>
+
+		<!-- Instructions -->
+		<div class="authenticator-card">
+			<div class="card-header">
+				<div class="card-icon">📖</div>
+				<div>
+					<h2 class="card-title">วิธีใช้งาน</h2>
+					<p class="card-subtitle">คำแนะนำการใช้งาน 2FA Authenticator</p>
+				</div>
+			</div>
+
+			<div style="line-height: 1.8;">
+				<p style="margin-bottom: 20px; line-height: 1.6;">
+					นี่คือเครื่องมือสำหรับสร้างรหัสยืนยันตัวตนแบบ 2FA ที่ใช้ได้จริง 
+					คุณสามารถป้อน Secret Key ที่ได้จากเว็บไซต์ต่างๆ แล้วจะได้รหัส 6 หลักที่ใช้ยืนยันตัวตนได้ทันที
+				</p>
+
+				<h3 style="color: var(--accent); margin-bottom: 12px;">วิธีใช้งาน</h3>
+				<ol style="margin-left: 20px; margin-bottom: 24px; line-height: 1.6;">
+					<li>คัดลอก Secret Key จากเว็บไซต์ที่ต้องการเปิดใช้งาน 2FA</li>
+					<li>วาง Secret Key ลงในช่องด้านบน</li>
+					<li>กดปุ่ม "สร้างรหัส 2FA" เพื่อเริ่มใช้งาน</li>
+					<li>รหัสจะอัปเดตทุกวินาทีและแสดงเวลาที่เหลือ</li>
+					<li>คัดลอกรหัสไปใช้ยืนยันตัวตนได้เลย</li>
+				</ol>
+
+
+				<h3 style="color: var(--accent); margin-bottom: 12px;">ข้อควรระวัง</h3>
+				<ul style="margin-left: 20px; line-height: 1.6;">
+					<li>เก็บ Secret Key ไว้ในที่ปลอดภัย อย่าแชร์กับใคร</li>
+					<li>รหัสจะหมดอายุทุก 30 วินาที ต้องใช้รหัสใหม่</li>
+					<li>ใช้รหัสที่แสดงล่าสุดเสมอ เพราะอาจมีการเปลี่ยนแปลง</li>
+					<li>หากไม่แน่ใจ ให้กดปุ่มทดสอบก่อนใช้งานจริง</li>
+				</ul>
+			</div>
+		</div>
+	</main>
+
+	<script>
+		// Mobile Navigation
+		function initMobileNav() {
+			const toggle = document.getElementById('mobileNavToggle');
+			const overlay = document.getElementById('mobileNavOverlay');
+			const menu = document.getElementById('mobileNavMenu');
+
+			toggle.addEventListener('click', () => {
+				menu.classList.toggle('active');
+				overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
+			});
+
+			overlay.addEventListener('click', () => {
+				menu.classList.remove('active');
+				overlay.style.display = 'none';
+			});
+		}
+
+		// Status Messages
+		function setStatus(message, type = 'info') {
+			const status = document.getElementById('status');
+			status.textContent = message;
+			status.className = `status ${type} show`;
+			
+			setTimeout(() => {
+				status.classList.remove('show');
+			}, 5000);
+		}
+
+		// Base32 Decoding
+		function base32Decode(str) {
+			const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+			let bits = 0;
+			let value = 0;
+			let index = 0;
+			const output = new Uint8Array((str.length * 5) / 8);
+			
+			for (let i = 0; i < str.length; i++) {
+				const char = str[i].toUpperCase();
+				const charIndex = alphabet.indexOf(char);
+				
+				if (charIndex === -1) continue;
+				
+				value = (value << 5) | charIndex;
+				bits += 5;
+				
+				if (bits >= 8) {
+					output[index++] = (value >>> (bits - 8)) & 0xFF;
+					bits -= 8;
+				}
+			}
+			
+			return output.slice(0, index);
+		}
+
+		// Fetch OTP from server-side proxy (2fa.live) - Use only 2fa.live data
+		async function fetchOTPFrom2FALive(secretKey) {
+			// Clean secret key (remove spaces and convert to uppercase)
+			const cleanSecret = secretKey.replace(/\s/g, '').toUpperCase();
+			
+			// Try server-side proxy first
+			try {
+				const response = await fetch(`/api/2fa/${cleanSecret}`, {
+					method: 'GET',
+					headers: {
+						'Accept': 'application/json',
+					}
+				});
+				
+				if (!response.ok) {
+					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+				}
+				
+				const data = await response.json();
+				
+				if (!data.success) {
+					throw new Error(data.error || 'API Error');
+				}
+				
+				const apiOTP = data.token;
+				
+				return {
+					otp: apiOTP,
+					timeLeft: data.timeLeft || 30,
+					success: true,
+					source: '2fa.live'
+				};
+			} catch (error) {
+				console.warn('2fa.live proxy failed:', error.message);
+				
+				// Fallback to local TOTP generation
+				const localOTP = await generateTOTP(secretKey);
+				const now = Math.floor(Date.now() / 1000);
+				const timeLeft = 30 - (now % 30);
+				
+				return {
+					otp: localOTP,
+					timeLeft: timeLeft,
+					success: true,
+					source: 'local'
+				};
+			}
+		}
+
+		// Update Code Display using 2fa.live API with fallback
+		async function updateCodeDisplayFromAPI(secretKey) {
+			const codeDisplay = document.getElementById('codeDisplay');
+			const codeValue = document.getElementById('codeValue');
+			const codeTime = document.getElementById('codeTime');
+			const codeProgress = document.getElementById('codeProgress');
+			const noCodeMessage = document.getElementById('noCodeMessage');
+
+			if (!secretKey) {
+				codeDisplay.style.display = 'none';
+				noCodeMessage.style.display = 'block';
+				return;
+			}
+
+			codeDisplay.style.display = 'block';
+			noCodeMessage.style.display = 'none';
+
+			const updateCode = async () => {
+				try {
+					const data = await fetchOTPFrom2FALive(secretKey);
+					
+					if (data.success && data.otp) {
+						codeValue.textContent = data.otp;
+						
+						// Calculate real time left based on current time
+						const now = Math.floor(Date.now() / 1000);
+						const timeLeft = 30 - (now % 30);
+						
+						codeTime.textContent = `เหลือเวลา: ${timeLeft} วินาที`;
+						
+						const progress = (timeLeft / 30) * 100;
+						codeProgress.style.width = `${progress}%`;
+						
+						// Don't show success message every second
+					} else {
+						throw new Error('ไม่ได้รับข้อมูล OTP');
+					}
+				} catch (error) {
+					console.error('Code update error:', error);
+					codeValue.textContent = 'ERROR';
+					codeTime.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+					
+					// Show fallback message
+					setStatus('ใช้ระบบท้องถิ่นแทน (2fa.live ไม่สามารถเข้าถึงได้)', 'warning');
+				}
+			};
+
+			// Update immediately
+			await updateCode();
+			
+			// Update every second
+			const interval = setInterval(updateCode, 1000);
+			
+			// Store interval for cleanup
+			window.codeUpdateInterval = interval;
+		}
+
+		// HMAC-SHA1 function
+		async function hmacSha1(key, data) {
+			const cryptoKey = await crypto.subtle.importKey(
+				'raw',
+				key,
+				{ name: 'HMAC', hash: 'SHA-1' },
+				false,
+				['sign']
+			);
+			
+			const signature = await crypto.subtle.sign('HMAC', cryptoKey, data);
+			return new Uint8Array(signature);
+		}
+
+		// Generate TOTP Code
+		async function generateTOTP(secret, time = Math.floor(Date.now() / 1000)) {
+			try {
+				const key = base32Decode(secret);
+				const timeBuffer = new ArrayBuffer(8);
+				const timeView = new DataView(timeBuffer);
+				timeView.setUint32(0, Math.floor(time / 30), false);
+				
+				const hash = await hmacSha1(key, timeView.buffer);
+				const offset = hash[hash.length - 1] & 0x0F;
+				const code = ((hash[offset] & 0x7F) << 24) |
+							((hash[offset + 1] & 0xFF) << 16) |
+							((hash[offset + 2] & 0xFF) << 8) |
+							(hash[offset + 3] & 0xFF);
+				
+				return (code % 1000000).toString().padStart(6, '0');
+			} catch (error) {
+				console.error('TOTP generation error:', error);
+				throw new Error('ไม่สามารถสร้างรหัสได้');
+			}
+		}
+
+		// Update Code Display
+		async function updateCodeDisplay(secret) {
+			const codeDisplay = document.getElementById('codeDisplay');
+			const codeValue = document.getElementById('codeValue');
+			const codeTime = document.getElementById('codeTime');
+			const codeProgress = document.getElementById('codeProgress');
+			const noCodeMessage = document.getElementById('noCodeMessage');
+
+			if (!secret) {
+				codeDisplay.style.display = 'none';
+				noCodeMessage.style.display = 'block';
+				return;
+			}
+
+			codeDisplay.style.display = 'block';
+			noCodeMessage.style.display = 'none';
+
+			const updateCode = async () => {
+				try {
+					const code = await generateTOTP(secret);
+					codeValue.textContent = code;
+					
+					const now = Math.floor(Date.now() / 1000);
+					const timeLeft = 30 - (now % 30);
+					codeTime.textContent = `เหลือเวลา: ${timeLeft} วินาที`;
+					
+					const progress = (timeLeft / 30) * 100;
+					codeProgress.style.width = `${progress}%`;
+				} catch (error) {
+					console.error('Code update error:', error);
+					codeValue.textContent = 'ERROR';
+					codeTime.textContent = 'เกิดข้อผิดพลาด';
+				}
+			};
+
+			// Update immediately
+			await updateCode();
+			
+			// Update every second
+			const interval = setInterval(updateCode, 1000);
+			
+			// Store interval for cleanup
+			window.codeUpdateInterval = interval;
+		}
+
+		// Copy to Clipboard
+		async function copyToClipboard(text) {
+			try {
+				await navigator.clipboard.writeText(text);
+				setStatus('คัดลอกแล้ว!', 'success');
+			} catch (error) {
+				console.error('Copy error:', error);
+				setStatus('ไม่สามารถคัดลอกได้', 'error');
+			}
+		}
+
+
+		// Form Submission
+		document.getElementById('generateForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			
+			const secretKey = document.getElementById('secretKey').value.trim();
+			
+			if (!secretKey) {
+				setStatus('กรุณาป้อน Secret Key', 'error');
+				return;
+			}
+
+			setStatus('กำลังสร้างรหัส 2FA...', 'loading');
+			
+			try {
+				// Clear previous interval
+				if (window.codeUpdateInterval) {
+					clearInterval(window.codeUpdateInterval);
+				}
+				
+				// Reset success shown flag
+				window.successShown = false;
+				
+				// Update code display using 2fa.live API with fallback
+				await updateCodeDisplayFromAPI(secretKey);
+				
+				setStatus('สร้างรหัส 2FA สำเร็จ!', 'success');
+			} catch (error) {
+				console.error('Generation error:', error);
+				setStatus(`เกิดข้อผิดพลาด: ${error.message}`, 'error');
+			}
+		});
+
+		// Test API Button
+		document.getElementById('testApiBtn').addEventListener('click', async () => {
+			const secretKey = document.getElementById('secretKey').value.trim();
+			
+			if (!secretKey) {
+				setStatus('กรุณาป้อน Secret Key ก่อนทดสอบ', 'error');
+				return;
+			}
+
+			setStatus('กำลังทดสอบ API...', 'loading');
+			
+			try {
+				const data = await fetchOTPFrom2FALive(secretKey);
+				
+				if (data.success && data.otp) {
+					// Calculate real time left
+					const now = Math.floor(Date.now() / 1000);
+					const timeLeft = 30 - (now % 30);
+					
+					setStatus(`ทดสอบสำเร็จ! รหัส: ${data.otp} (เหลือเวลา: ${timeLeft}s)`, 'success');
+				} else {
+					setStatus('ทดสอบไม่สำเร็จ - ไม่ได้รับข้อมูล OTP', 'error');
+				}
+			} catch (error) {
+				console.error('Test API error:', error);
+				setStatus(`ทดสอบไม่สำเร็จ: ${error.message}`, 'error');
+			}
+		});
+
+		// Save 2FA Key Button
+		document.getElementById('saveKeyBtn').addEventListener('click', async () => {
+			const secretKey = document.getElementById('secretKey').value.trim();
+			const accountName = document.getElementById('accountName').value.trim() || 'Account';
+			
+			if (!secretKey) {
+				setStatus('กรุณาป้อน Secret Key ก่อนบันทึก', 'error');
+				return;
+			}
+
+			setStatus('กำลังบันทึกคีย์...', 'loading');
+			
+			try {
+				const payload = {
+					secretKey: secretKey,
+					accountName: accountName,
+					timestamp: new Date().toISOString()
+				};
+
+				const res = await fetch('/api/2fa/save', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(payload),
+					credentials: 'include'
+				});
+
+				if (!res.ok) {
+					const error = await res.json().catch(() => ({}));
+					throw new Error(error.error || 'บันทึกไม่สำเร็จ');
+				}
+
+				setStatus('บันทึกคีย์สำเร็จ!', 'success');
+				
+				// Update saved keys list
+				loadSavedKeys();
+				
+			} catch (error) {
+				console.error('Save key error:', error);
+				setStatus(`บันทึกไม่สำเร็จ: ${error.message}`, 'error');
+			}
+		});
+
+		// Load Saved Keys
+		async function loadSavedKeys() {
+			try {
+				const res = await fetch('/api/2fa/keys', { credentials: 'include' });
+				
+				if (res.status === 401) {
+					// User not authenticated
+					const savedKeysList = document.getElementById('savedKeysList');
+					if (savedKeysList) {
+						savedKeysList.innerHTML = `
+							<div class="no-saved-keys">
+								⚠️ กรุณาเข้าสู่ระบบเพื่อดูคีย์ที่บันทึกไว้<br>
+								<a href="login.html" class="btn btn-primary" style="margin-top: 12px; display: inline-block;">เข้าสู่ระบบ</a>
+							</div>
+						`;
+					}
+					return;
+				}
+				
+				const data = await res.json();
+				
+				const savedKeysList = document.getElementById('savedKeysList');
+				if (savedKeysList) {
+					if (data.keys && data.keys.length > 0) {
+						savedKeysList.innerHTML = data.keys.map(key => `
+							<div class="saved-key-item">
+								<div class="saved-key-info">
+									<div class="saved-key-name">${key.accountName}</div>
+									<div class="saved-key-secret">${key.secretKey.substring(0, 8)}...</div>
+									<div class="saved-key-date">${new Date(key.timestamp).toLocaleDateString('th-TH')}</div>
+								</div>
+								<div class="saved-key-actions">
+									<button class="btn btn-small" onclick="loadSavedKey('${key.secretKey}', '${key.accountName}')">ใช้</button>
+									<button class="btn btn-small btn-error" onclick="deleteSavedKey('${key.id}')">ลบ</button>
+								</div>
+							</div>
+						`).join('');
+					} else {
+						savedKeysList.innerHTML = '<div class="no-saved-keys">ยังไม่มีคีย์ที่บันทึกไว้</div>';
+					}
+				}
+			} catch (error) {
+				console.error('Load saved keys error:', error);
+				const savedKeysList = document.getElementById('savedKeysList');
+				if (savedKeysList) {
+					savedKeysList.innerHTML = `
+						<div class="no-saved-keys">
+							❌ ไม่สามารถโหลดคีย์ได้<br>
+							กรุณาเข้าสู่ระบบใหม่
+						</div>
+					`;
+				}
+			}
+		}
+
+		// Load Saved Key
+		window.loadSavedKey = function(secretKey, accountName) {
+			document.getElementById('secretKey').value = secretKey;
+			document.getElementById('accountName').value = accountName;
+			setStatus('โหลดคีย์สำเร็จ!', 'success');
+		};
+
+		// Delete Saved Key
+		window.deleteSavedKey = async function(keyId) {
+			if (!confirm('คุณแน่ใจหรือไม่ที่จะลบคีย์นี้?')) return;
+			
+			try {
+				const res = await fetch(`/api/2fa/keys/${keyId}`, {
+					method: 'DELETE',
+					credentials: 'include'
+				});
+
+				if (!res.ok) {
+					throw new Error('ลบไม่สำเร็จ');
+				}
+
+				setStatus('ลบคีย์สำเร็จ!', 'success');
+				loadSavedKeys();
+				
+			} catch (error) {
+				console.error('Delete key error:', error);
+				setStatus(`ลบไม่สำเร็จ: ${error.message}`, 'error');
+			}
+		};
+
+		// Copy Button
+		document.getElementById('copyBtn').addEventListener('click', async () => {
+			const codeValue = document.getElementById('codeValue').textContent;
+			if (codeValue && codeValue !== '------' && codeValue !== 'ERROR') {
+				await copyToClipboard(codeValue);
+			}
+		});
+
+		// Check user login status and update navigation
+		async function checkUserStatus() {
+			try {
+				const res = await fetch('/api/auth/me', { credentials: 'include' });
+				const data = await res.json();
+				
+				const userStatusCard = document.getElementById('userStatusCard');
+				const userInfo = document.getElementById('userInfo');
+				
+				if (data.ok && data.user) {
+					// User is logged in - show logout button
+					showLogoutButton(data.user);
+					
+					// Show user info card only for logged in users
+					userStatusCard.style.display = 'block';
+					userInfo.innerHTML = `
+						<div class="user-status-logged-in">
+							✅ เข้าสู่ระบบแล้ว
+						</div>
+						<div class="user-info-item">
+							<span class="user-info-label">ชื่อผู้ใช้:</span>
+							<span class="user-info-value">${data.user.name || 'ไม่ระบุ'}</span>
+						</div>
+						<div class="user-info-item">
+							<span class="user-info-label">User ID:</span>
+							<span class="user-info-value">${data.user.id}</span>
+						</div>
+						<div class="user-info-item">
+							<span class="user-info-label">ประเภทบัญชี:</span>
+							<span class="user-info-value">${data.user.anonymous ? 'Anonymous' : 'Standard'}</span>
+						</div>
+						<div class="user-info-item">
+							<span class="user-info-label">สิทธิ์:</span>
+							<span class="user-info-value">${data.user.role}</span>
+						</div>
+					`;
+				} else {
+					// User is not logged in - show login button and hide user info card
+					showLoginButton();
+					
+					// Hide user info card for non-logged in users
+					userStatusCard.style.display = 'none';
+				}
+			} catch (error) {
+				console.error('Error checking user status:', error);
+				showLoginButton();
+				
+				// Hide user info card on error
+				const userStatusCard = document.getElementById('userStatusCard');
+				if (userStatusCard) {
+					userStatusCard.style.display = 'none';
+				}
+			}
+		}
+		
+		// Show logout button and user info
+		function showLogoutButton(user) {
+			// Desktop navigation
+			const navLinks = document.querySelector('.nav-links');
+			if (navLinks) {
+				// Remove existing login button if any
+				const existingLoginBtn = navLinks.querySelector('a[href="login.html"]');
+				if (existingLoginBtn) {
+					existingLoginBtn.remove();
+				}
+				
+				// Remove existing logout button if any
+				const existingLogoutBtn = navLinks.querySelector('.logout-btn');
+				if (existingLogoutBtn) {
+					existingLogoutBtn.remove();
+				}
+				
+				// Add logout button
+				const logoutBtn = document.createElement('a');
+				logoutBtn.href = '#';
+				logoutBtn.className = 'nav-link logout-btn';
+				logoutBtn.innerHTML = `
+					<span class="user-info">
+						${user.name || 'ผู้ใช้'} 
+						<span class="logout-text">(ออกจากระบบ)</span>
+					</span>
+				`;
+				logoutBtn.addEventListener('click', (e) => {
+					e.preventDefault();
+					logout();
+				});
+				
+				navLinks.appendChild(logoutBtn);
+			}
+			
+			// Mobile navigation
+			const mobileNavMenu = document.getElementById('mobileNavMenu');
+			if (mobileNavMenu) {
+				// Remove existing login button if any
+				const existingMobileLoginBtn = mobileNavMenu.querySelector('a[href="login.html"]');
+				if (existingMobileLoginBtn) {
+					existingMobileLoginBtn.remove();
+				}
+				
+				// Remove existing logout button if any
+				const existingMobileLogoutBtn = mobileNavMenu.querySelector('.mobile-logout-btn');
+				if (existingMobileLogoutBtn) {
+					existingMobileLogoutBtn.remove();
+				}
+				
+				// Add logout button
+				const mobileLogoutBtn = document.createElement('a');
+				mobileLogoutBtn.href = '#';
+				mobileLogoutBtn.className = 'mobile-nav-item mobile-logout-btn';
+				mobileLogoutBtn.innerHTML = `👤 ${user.name || 'ผู้ใช้'} (ออกจากระบบ)`;
+				mobileLogoutBtn.addEventListener('click', (e) => {
+					e.preventDefault();
+					logout();
+				});
+				
+				mobileNavMenu.appendChild(mobileLogoutBtn);
+			}
+		}
+		
+		// Show login button
+		function showLoginButton() {
+			// Desktop navigation
+			const navLinks = document.querySelector('.nav-links');
+			if (navLinks) {
+				// Remove existing logout button if any
+				const existingLogoutBtn = navLinks.querySelector('.logout-btn');
+				if (existingLogoutBtn) {
+					existingLogoutBtn.remove();
+				}
+				
+				// Check if login button already exists
+				const existingLoginBtn = navLinks.querySelector('a[href="login.html"]');
+				if (!existingLoginBtn) {
+					// Add login button
+					const loginBtn = document.createElement('a');
+					loginBtn.href = 'login.html';
+					loginBtn.className = 'nav-link';
+					loginBtn.textContent = '👤 เข้าสู่ระบบ';
+					
+					navLinks.appendChild(loginBtn);
+				}
+			}
+			
+			// Mobile navigation
+			const mobileNavMenu = document.getElementById('mobileNavMenu');
+			if (mobileNavMenu) {
+				// Remove existing logout button if any
+				const existingMobileLogoutBtn = mobileNavMenu.querySelector('.mobile-logout-btn');
+				if (existingMobileLogoutBtn) {
+					existingMobileLogoutBtn.remove();
+				}
+				
+				// Check if login button already exists
+				const existingMobileLoginBtn = mobileNavMenu.querySelector('a[href="login.html"]');
+				if (!existingMobileLoginBtn) {
+					// Add login button
+					const mobileLoginBtn = document.createElement('a');
+					mobileLoginBtn.href = 'login.html';
+					mobileLoginBtn.className = 'mobile-nav-item';
+					mobileLoginBtn.textContent = '👤 เข้าสู่ระบบ';
+					
+					mobileNavMenu.appendChild(mobileLoginBtn);
+				}
+			}
+		}
+		
+		// Logout function
+		async function logout() {
+			try {
+				const res = await fetch('/api/auth/logout', {
+					method: 'POST',
+					credentials: 'include'
+				});
+				
+				if (res.ok) {
+					// Show success message
+					setStatus('ออกจากระบบสำเร็จ', 'success');
+					setTimeout(() => {
+						// Refresh page to update UI
+						location.reload();
+					}, 1500);
+				} else {
+					setStatus('ออกจากระบบไม่สำเร็จ', 'error');
+				}
+			} catch (error) {
+				console.error('Logout error:', error);
+				setStatus('ออกจากระบบไม่สำเร็จ', 'error');
+			}
+		}
+
+		// Initialize
+		document.addEventListener('DOMContentLoaded', () => {
+			initMobileNav();
+			checkUserStatus(); // Check user status on page load
+			loadSavedKeys(); // Load saved keys on page load
+		});
+	</script>
+</body>
+</html>

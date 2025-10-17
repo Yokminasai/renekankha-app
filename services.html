@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>บริการ - RENEKANKHA</title>
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+	
+	<style>
+		:root {
+			/* RENEKANKHA Color Palette */
+			--primary: #6366f1;
+			--primary-dark: #4f46e5;
+			--secondary: #8b5cf6;
+			--accent: #06b6d4;
+			--accent-light: #67e8f9;
+			--success: #10b981;
+			--warning: #f59e0b;
+			--error: #ef4444;
+			--info: #3b82f6;
+			
+			/* Background & Surface */
+			--bg-primary: #0f0f23;
+			--bg-secondary: #1a1a2e;
+			--bg-tertiary: #16213e;
+			--surface: rgba(255,255,255,.05);
+			--surface-hover: rgba(255,255,255,.08);
+			--glass-bg: rgba(255,255,255,.03);
+			--glass-border: rgba(255,255,255,.1);
+			
+			/* Text Colors */
+			--text-primary: #ffffff;
+			--text-secondary: #e2e8f0;
+			--text-tertiary: #94a3b8;
+			--text-muted: #64748b;
+			
+			/* Borders */
+			--border-primary: rgba(255,255,255,.1);
+			--border-secondary: rgba(255,255,255,.05);
+			--border-accent: rgba(99,102,241,.3);
+			
+			/* Shadows */
+			--shadow-sm: 0 1px 2px 0 rgba(0,0,0,.05);
+			--shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+			--shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+			--shadow-xl: 0 20px 25px -5px rgba(0,0,0,.1), 0 10px 10px -5px rgba(0,0,0,.04);
+			--shadow-glow: 0 0 20px rgba(99,102,241,.3);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+			color: var(--text-primary);
+			min-height: 100vh;
+			line-height: 1.6;
+		}
+
+		/* Navigation Styles */
+		.mobile-nav {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 1000;
+			background: var(--glass-bg);
+			backdrop-filter: blur(20px);
+			border-bottom: 1px solid var(--glass-border);
+			padding: 12px 16px;
+		}
+
+		.mobile-nav-content {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.nav-brand {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			text-decoration: none;
+			color: var(--text-primary);
+			font-weight: 700;
+			font-size: 18px;
+		}
+
+		.nav-brand-icon {
+			font-size: 24px;
+		}
+
+		.mobile-nav-toggle {
+			background: none;
+			border: none;
+			color: var(--text-primary);
+			font-size: 20px;
+			cursor: pointer;
+			padding: 8px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+		}
+
+		.mobile-nav-toggle:hover {
+			background: var(--surface-hover);
+		}
+
+		.mobile-nav-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0,0,0,.5);
+			z-index: 999;
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.3s ease;
+		}
+
+		.mobile-nav-overlay.active {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		.mobile-nav-menu {
+			position: fixed;
+			top: 0;
+			right: -300px;
+			width: 300px;
+			height: 100vh;
+			background: var(--bg-secondary);
+			z-index: 1000;
+			padding: 20px;
+			transition: right 0.3s ease;
+			overflow-y: auto;
+		}
+
+		.mobile-nav-menu.active {
+			right: 0;
+		}
+
+		.mobile-nav-item {
+			display: block;
+			padding: 12px 16px;
+			color: var(--text-secondary);
+			text-decoration: none;
+			border-radius: 8px;
+			margin-bottom: 8px;
+			transition: all 0.3s ease;
+		}
+
+		.mobile-nav-item:hover,
+		.mobile-nav-item.active {
+			background: var(--surface-hover);
+			color: var(--text-primary);
+		}
+
+		.desktop-nav {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 16px 32px;
+			background: var(--glass-bg);
+			backdrop-filter: blur(20px);
+			border-bottom: 1px solid var(--glass-border);
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 24px;
+			align-items: center;
+		}
+
+		.nav-link {
+			color: var(--text-secondary);
+			text-decoration: none;
+			font-weight: 500;
+			padding: 8px 16px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+		}
+
+		.nav-link:hover,
+		.nav-link.active {
+			color: var(--text-primary);
+			background: var(--surface-hover);
+		}
+
+		/* Main Content */
+		.main-content {
+			padding: 40px 32px;
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+
+		.page-header {
+			text-align: center;
+			margin-bottom: 48px;
+		}
+
+		.page-title {
+			font-size: 2.5rem;
+			font-weight: 700;
+			color: var(--text-primary);
+			margin-bottom: 12px;
+			letter-spacing: -0.02em;
+		}
+
+		.page-subtitle {
+			font-size: 1.1rem;
+			color: var(--text-tertiary);
+			max-width: 500px;
+			margin: 0 auto;
+			line-height: 1.5;
+		}
+
+		/* Services Grid */
+		.services-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 20px;
+			margin-bottom: 40px;
+		}
+
+		.service-card {
+			background: var(--surface);
+			border: 1px solid var(--border-primary);
+			border-radius: 12px;
+			padding: 24px;
+			transition: all 0.2s ease;
+			cursor: pointer;
+			position: relative;
+		}
+
+		.service-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 3px;
+			background: var(--primary);
+			transform: scaleX(0);
+			transition: transform 0.2s ease;
+		}
+
+		.service-card:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-md);
+			border-color: var(--primary);
+		}
+
+		.service-card:hover::before {
+			transform: scaleX(1);
+		}
+
+		.service-icon {
+			font-size: 2rem;
+			margin-bottom: 12px;
+			display: block;
+		}
+
+		.service-title {
+			font-size: 1.25rem;
+			font-weight: 600;
+			margin-bottom: 8px;
+			color: var(--text-primary);
+		}
+
+		.service-description {
+			color: var(--text-tertiary);
+			margin-bottom: 16px;
+			line-height: 1.5;
+			font-size: 0.9rem;
+		}
+
+		.service-features {
+			list-style: none;
+			margin-bottom: 20px;
+		}
+
+		.service-features li {
+			color: var(--text-tertiary);
+			margin-bottom: 6px;
+			padding-left: 16px;
+			position: relative;
+			font-size: 0.85rem;
+		}
+
+		.service-features li::before {
+			content: '•';
+			position: absolute;
+			left: 0;
+			color: var(--primary);
+			font-weight: bold;
+		}
+
+		.service-btn {
+			width: 100%;
+			padding: 10px 20px;
+			background: var(--primary);
+			color: white;
+			border: none;
+			border-radius: 8px;
+			font-weight: 500;
+			font-size: 0.9rem;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			position: relative;
+		}
+
+		.service-btn:hover {
+			background: var(--primary-dark);
+			transform: translateY(-1px);
+		}
+
+		/* Status Messages */
+		.status {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			padding: 12px 20px;
+			border-radius: 8px;
+			font-weight: 600;
+			z-index: 1000;
+			transform: translateX(400px);
+			transition: transform 0.3s ease;
+		}
+
+		.status.show {
+			transform: translateX(0);
+		}
+
+		.status.success {
+			background: var(--success);
+			color: white;
+		}
+
+		.status.error {
+			background: var(--error);
+			color: white;
+		}
+
+		.status.loading {
+			background: var(--info);
+			color: white;
+		}
+
+		/* Animations */
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.service-card {
+			animation: fadeInUp 0.4s ease;
+		}
+
+		.service-card:nth-child(1) { animation-delay: 0.05s; }
+		.service-card:nth-child(2) { animation-delay: 0.1s; }
+		.service-card:nth-child(3) { animation-delay: 0.15s; }
+		.service-card:nth-child(4) { animation-delay: 0.2s; }
+
+		/* Responsive Design */
+		@media (max-width: 768px) {
+			.desktop-nav {
+				display: none;
+			}
+
+			.mobile-nav {
+				display: block;
+			}
+
+			.main-content {
+				padding: 20px 16px;
+				padding-top: 80px;
+			}
+
+			.page-title {
+				font-size: 2rem;
+			}
+
+			.page-subtitle {
+				font-size: 1rem;
+			}
+
+			.services-grid {
+				grid-template-columns: 1fr;
+				gap: 16px;
+			}
+
+			.service-card {
+				padding: 20px;
+			}
+		}
+
+		/* Logout Button Styles */
+		.logout-btn {
+			color: var(--accent) !important;
+			font-weight: 600;
+			text-decoration: none;
+			padding: 8px 16px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+		}
+
+		.logout-btn:hover {
+			color: var(--error) !important;
+			background: rgba(255,87,34,.1) !important;
+			transform: translateY(-2px);
+		}
+
+		.logout-btn .user-info {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			font-size: 12px;
+		}
+
+		.logout-btn .logout-text {
+			font-size: 10px;
+			opacity: 0.8;
+			margin-top: 2px;
+		}
+	</style>
+</head>
+<body>
+	<!-- Mobile Navigation -->
+	<nav class="mobile-nav">
+		<div class="mobile-nav-content">
+			<a href="index.html" class="nav-brand">
+				<div class="nav-brand-icon">🔐</div>
+				<span>RENEKANKHA</span>
+			</a>
+			<button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
+		</div>
+	</nav>
+
+	<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+	<div class="mobile-nav-menu" id="mobileNavMenu">
+		<a href="index.html" class="mobile-nav-item">🏠 หน้าแรก</a>
+		<a href="authenticator.html" class="mobile-nav-item">🔐 2FA Authenticator</a>
+		<a href="reports.html" class="mobile-nav-item">📊 รายงาน</a>
+		<a href="services.html" class="mobile-nav-item active">🛠️ บริการ</a>
+		<a href="orders.html" class="mobile-nav-item">📦 คำสั่งซื้อ</a>
+		<!-- Login/Logout button will be added here by JavaScript -->
+	</div>
+
+	<!-- Desktop Navigation -->
+	<nav class="desktop-nav">
+		<a href="index.html" class="nav-brand">
+			<div class="nav-brand-icon">🔐</div>
+			<span>RENEKANKHA</span>
+		</a>
+		<div class="nav-links">
+			<a href="index.html" class="nav-link">🏠 หน้าแรก</a>
+			<a href="authenticator.html" class="nav-link">🔐 2FA Authenticator</a>
+			<a href="reports.html" class="nav-link">📊 รายงาน</a>
+			<a href="services.html" class="nav-link active">🛠️ บริการ</a>
+			<a href="orders.html" class="nav-link">📦 คำสั่งซื้อ</a>
+			<!-- Login/Logout button will be added here by JavaScript -->
+		</div>
+	</nav>
+
+	<!-- Main Content -->
+	<main class="main-content">
+		<div class="page-header">
+			<h1 class="page-title">บริการของเรา</h1>
+			<p class="page-subtitle">เลือกบริการที่ตรงกับความต้องการของคุณ เราพร้อมช่วยแก้ไขปัญหาทุกอย่าง</p>
+		</div>
+
+		<div class="services-grid">
+			<!-- Garena Services -->
+			<div class="service-card" data-service="garena">
+				<div class="service-icon">🎮</div>
+				<h3 class="service-title">บริการ Garena</h3>
+				<p class="service-description">แก้ไขปัญหาบัญชี Garena ที่ถูกแบนหรือมีปัญหา</p>
+				<ul class="service-features">
+					<li>แจ้งแบนไอดีโดนโกง</li>
+					<li>ยกเลิกเบอร์/อีเมลในการีน่า</li>
+					<li>แก้ไขปัญหาบัญชี เช่น ปลดแบนรีฟัน / ปลดแบนไอดี</li>
+					<li>รับรีพอร์ตผู้เล่นใช้โปรแกรมโกงในเกม</li>
+				</ul>
+			</div>
+
+			<!-- Email Services -->
+			<div class="service-card" data-service="email">
+				<div class="service-icon">📧</div>
+				<h3 class="service-title">แก้ไขปัญหา Email</h3>
+				<p class="service-description">แก้ไขปัญหาบัคเบอร์เก่าและเบอร์ตายใน Gmail/Hotmail</p>
+				<ul class="service-features">
+					<li>แก้ไข Gmail บัคเบอร์เก่า 7 วัน</li>
+					<li>แก้ไขเบอร์ตายภายในทันที</li>
+					<li>แก้ไข Hotmail ติดบัค 30 วัน</li>
+					<li>บริการแก้ไขปัญหา Email ทุกประเภท</li>
+				</ul>
+			</div>
+
+			<!-- Blacklist Dispute -->
+			<div class="service-card" data-service="blacklist">
+				<div class="service-icon">⚖️</div>
+				<h3 class="service-title">แก้ไขบัญชีดำ</h3>
+				<p class="service-description">ช่วยลบข้อมูลออกจากบัญชีดำและแก้ไขความเข้าใจผิด</p>
+				<ul class="service-features">
+					<li>ลบข้อมูลจาก BlacklistSeller</li>
+					<li>แก้ไขรายงานพฤติกรรม</li>
+					<li>ตรวจสอบสถานะบัญชีดำ</li>
+					<li>คำปรึกษาและแนะนำ</li>
+				</ul>
+			</div>
+
+			<!-- Google Removal -->
+			<div class="service-card" data-service="google">
+				<div class="service-icon">🗑️</div>
+				<h3 class="service-title">ลบข้อมูล Google</h3>
+				<p class="service-description">ช่วยลบข้อมูลที่ไม่ต้องการออกจาก Google และบริการต่างๆ</p>
+				<ul class="service-features">
+					<li>ลบข้อมูลจาก Google Search</li>
+					<li>ลบข้อมูลจาก Google Maps</li>
+					<li>ลบข้อมูลจาก Google My Business</li>
+					<li>ลบข้อมูลจาก YouTube</li>
+				</ul>
+			</div>
+
+			<!-- Email Checker -->
+			<div class="service-card" data-service="email-checker">
+				<div class="service-icon">✉️</div>
+				<h3 class="service-title">ตรวจสอบ Email</h3>
+				<p class="service-description">ตรวจสอบว่า Email นั้นจริง ปลอดภัย หรือ Scam</p>
+				<ul class="service-features">
+					<li>ตรวจสอบ Email จริงหรือปลอม</li>
+					<li>ตรวจสอบอายุการใช้งาน</li>
+					<li>ตรวจสอบความเสี่ยง Scam</li>
+					<li>ตรวจสอบการฝากจดทะเบียน</li>
+				</ul>
+			</div>
+
+			<!-- Twitter Shadowban Checker -->
+			<div class="service-card" data-service="twitter-checker">
+				<div class="service-icon">𝕏</div>
+				<h3 class="service-title">เช็ก Twitter Shadowban</h3>
+				<p class="service-description">ตรวจสอบบัญชี Twitter ถูก Shadowban หรือไม่ 100%</p>
+				<ul class="service-features">
+					<li>เช็ก Shadowban อัตโนมัติ</li>
+					<li>ตรวจสอบสถานะบัญชี</li>
+					<li>รายงานโดยละเอียด</li>
+					<li>วิธีแก้ไข Shadowban</li>
+				</ul>
+			</div>
+
+			<!-- Private ID Check (Garena) -->
+			<div class="service-card" data-service="private-id">
+				<div class="service-icon">🔒</div>
+				<h3 class="service-title">เช็ค ID ข้อมูลปิด</h3>
+				<p class="service-description">ตรวจสอบข้อมูลปิดของ ID การีน่า และสถานะบัญชี</p>
+				<ul class="service-features">
+					<li>ตรวจสอบข้อมูลการลงทะเบียน</li>
+					<li>ตรวจสอบสถานะการยืนยัน</li>
+					<li>ตรวจสอบข้อมูลการชำระเงิน</li>
+					<li>ให้คำปรึกษาด้านความปลอดภัย</li>
+				</ul>
+			</div>
+		</div>
+	</main>
+
+	<!-- Status Messages -->
+	<div class="status" id="status"></div>
+
+	<script>
+		// Mobile Navigation
+		function initMobileNav() {
+			const toggle = document.getElementById('mobileNavToggle');
+			const overlay = document.getElementById('mobileNavOverlay');
+			const menu = document.getElementById('mobileNavMenu');
+
+			toggle.addEventListener('click', () => {
+				menu.classList.toggle('active');
+				overlay.classList.toggle('active');
+			});
+
+			overlay.addEventListener('click', () => {
+				menu.classList.remove('active');
+				overlay.classList.remove('active');
+			});
+		}
+
+		// Status Messages
+		function setStatus(message, type = 'success') {
+			const status = document.getElementById('status');
+			status.textContent = message;
+			status.className = `status ${type} show`;
+			
+			setTimeout(() => {
+				status.classList.remove('show');
+			}, 3000);
+		}
+
+		// Service Selection
+		function selectService(serviceType) {
+			setStatus('กำลังเตรียมแบบฟอร์ม...', 'loading');
+			
+			setTimeout(() => {
+				switch(serviceType) {
+					case 'garena':
+						window.location.href = 'services-garena.html';
+						break;
+					case 'email':
+						window.location.href = 'services-email.html';
+						break;
+					case 'blacklist':
+						window.location.href = 'services-blacklist-dispute.html';
+						break;
+					case 'google':
+						window.location.href = 'services-google-removal.html';
+						break;
+					case 'email-checker':
+						window.location.href = 'services-email-checker.html';
+						break;
+					case 'twitter-checker':
+						window.location.href = 'services-twitter-checker.html';
+						break;
+					case 'private-id':
+						window.location.href = 'services-private-id-check.html';
+						break;
+					default:
+						setStatus('ไม่พบบริการที่เลือก', 'error');
+				}
+			}, 1000);
+		}
+
+		// Check user login status and update navigation
+		async function checkUserStatus() {
+			try {
+				const res = await fetch('/api/auth/me', { credentials: 'include' });
+				const data = await res.json();
+				
+				if (data.ok && data.user) {
+					// User is logged in - show logout button
+					showLogoutButton(data.user);
+				} else {
+					// User is not logged in - show login button
+					showLoginButton();
+				}
+			} catch (error) {
+				console.error('Error checking user status:', error);
+				showLoginButton();
+			}
+		}
+		
+		// Show logout button and user info
+		function showLogoutButton(user) {
+			// Desktop navigation
+			const navLinks = document.querySelector('.nav-links');
+			if (navLinks) {
+				// Remove existing login button if any
+				const existingLoginBtn = navLinks.querySelector('a[href="login.html"]');
+				if (existingLoginBtn) {
+					existingLoginBtn.remove();
+				}
+				
+				// Remove existing logout button if any
+				const existingLogoutBtn = navLinks.querySelector('.logout-btn');
+				if (existingLogoutBtn) {
+					existingLogoutBtn.remove();
+				}
+				
+				// Add logout button
+				const logoutBtn = document.createElement('a');
+				logoutBtn.href = '#';
+				logoutBtn.className = 'nav-link logout-btn';
+				logoutBtn.innerHTML = `
+					<span class="user-info">
+						${user.name || 'ผู้ใช้'} 
+						<span class="logout-text">(ออกจากระบบ)</span>
+					</span>
+				`;
+				logoutBtn.addEventListener('click', (e) => {
+					e.preventDefault();
+					logout();
+				});
+				
+				navLinks.appendChild(logoutBtn);
+			}
+			
+			// Mobile navigation
+			const mobileNavMenu = document.getElementById('mobileNavMenu');
+			if (mobileNavMenu) {
+				// Remove existing login button if any
+				const existingMobileLoginBtn = mobileNavMenu.querySelector('a[href="login.html"]');
+				if (existingMobileLoginBtn) {
+					existingMobileLoginBtn.remove();
+				}
+				
+				// Remove existing logout button if any
+				const existingMobileLogoutBtn = mobileNavMenu.querySelector('.mobile-logout-btn');
+				if (existingMobileLogoutBtn) {
+					existingMobileLogoutBtn.remove();
+				}
+				
+				// Add logout button
+				const mobileLogoutBtn = document.createElement('a');
+				mobileLogoutBtn.href = '#';
+				mobileLogoutBtn.className = 'mobile-nav-item mobile-logout-btn';
+				mobileLogoutBtn.innerHTML = `👤 ${user.name || 'ผู้ใช้'} (ออกจากระบบ)`;
+				mobileLogoutBtn.addEventListener('click', (e) => {
+					e.preventDefault();
+					logout();
+				});
+				
+				mobileNavMenu.appendChild(mobileLogoutBtn);
+			}
+		}
+		
+		// Show login button
+		function showLoginButton() {
+			// Desktop navigation
+			const navLinks = document.querySelector('.nav-links');
+			if (navLinks) {
+				// Remove existing logout button if any
+				const existingLogoutBtn = navLinks.querySelector('.logout-btn');
+				if (existingLogoutBtn) {
+					existingLogoutBtn.remove();
+				}
+				
+				// Check if login button already exists
+				const existingLoginBtn = navLinks.querySelector('a[href="login.html"]');
+				if (!existingLoginBtn) {
+					// Add login button
+					const loginBtn = document.createElement('a');
+					loginBtn.href = 'login.html';
+					loginBtn.className = 'nav-link';
+					loginBtn.textContent = '👤 เข้าสู่ระบบ';
+					
+					navLinks.appendChild(loginBtn);
+				}
+			}
+			
+			// Mobile navigation
+			const mobileNavMenu = document.getElementById('mobileNavMenu');
+			if (mobileNavMenu) {
+				// Remove existing logout button if any
+				const existingMobileLogoutBtn = mobileNavMenu.querySelector('.mobile-logout-btn');
+				if (existingMobileLogoutBtn) {
+					existingMobileLogoutBtn.remove();
+				}
+				
+				// Check if login button already exists
+				const existingMobileLoginBtn = mobileNavMenu.querySelector('a[href="login.html"]');
+				if (!existingMobileLoginBtn) {
+					// Add login button
+					const mobileLoginBtn = document.createElement('a');
+					mobileLoginBtn.href = 'login.html';
+					mobileLoginBtn.className = 'mobile-nav-item';
+					mobileLoginBtn.textContent = '👤 เข้าสู่ระบบ';
+					
+					mobileNavMenu.appendChild(mobileLoginBtn);
+				}
+			}
+		}
+		
+		// Logout function
+		async function logout() {
+			try {
+				const res = await fetch('/api/auth/logout', {
+					method: 'POST',
+					credentials: 'include'
+				});
+				
+				if (res.ok) {
+					// Show success message
+					setStatus('ออกจากระบบสำเร็จ', 'success');
+					setTimeout(() => {
+						// Refresh page to update UI
+						location.reload();
+					}, 1500);
+				} else {
+					setStatus('ออกจากระบบไม่สำเร็จ', 'error');
+				}
+			} catch (error) {
+				console.error('Logout error:', error);
+				setStatus('ออกจากระบบไม่สำเร็จ', 'error');
+			}
+		}
+
+		// Initialize
+		document.addEventListener('DOMContentLoaded', () => {
+			initMobileNav();
+			checkUserStatus(); // Check user status on page load
+			
+			// Add event listeners to service cards
+			const serviceCards = document.querySelectorAll('.service-card');
+			serviceCards.forEach(card => {
+				card.addEventListener('click', () => {
+					const serviceType = card.getAttribute('data-service');
+					console.log('Service card clicked:', serviceType);
+					selectService(serviceType);
+				});
+			});
+		});
+	</script>
+</body>
+</html>

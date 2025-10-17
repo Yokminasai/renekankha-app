@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>จัดการคำสั่งเช่าไอดี RoV | IP Trust Checker</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root{ --bg:#0b1020; --text:#e7ecff; --muted:#b8c0e0; --accent:#5b8cff }
+		body{ margin:0; font-family:'Noto Sans Thai',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif; background:radial-gradient(1000px 600px at 20% 0%, #0e1533 0%, var(--bg) 50%, #060913 100%); color:var(--text); line-height:1.6; padding:24px }
+		.container{ max-width:1040px; margin:0 auto }
+		.topbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px }
+		.brand{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px }
+		.nav{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+		.nav a{ text-decoration:none; color:var(--text); opacity:.9; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.12) }
+		.nav a:hover{ opacity:1; filter:brightness(1.1) }
+		.card{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:16px; backdrop-filter:blur(6px); padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.35) }
+		.controls{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px }
+		.input{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.16); color:var(--text); border-radius:10px; padding:10px 12px }
+		.btn{ appearance:none; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06); color:var(--text); border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer }
+		.btn:hover{ filter:brightness(1.1) }
+		table{ width:100%; border-collapse:collapse }
+		th,td{ padding:10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left }
+		th{ color:var(--muted); font-weight:600 }
+		.badge{ display:inline-block; font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.05) }
+		.small{ font-size:13px; color:var(--muted) }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="topbar">
+			<div class="brand">
+				<span style="width:10px;height:10px;background:var(--accent);border-radius:50%;display:inline-block"></span>
+				<span>IP Trust Checker</span>
+			</div>
+			<div class="nav">
+				<a href="index.html">หน้าหลัก</a>
+				<a href="orders.html" aria-current="page">คำสั่งเช่า</a>
+			</div>
+		</div>
+
+		<section class="card">
+			<div class="controls">
+				<input id="customer" class="input" placeholder="ชื่อลูกค้า/ช่องทางติดต่อ (เช่น Line/FB)" />
+				<input id="note" class="input" placeholder="หมายเหตุ (เช่น แพ็กเกจ, ระยะเวลาเช่า)" />
+				<button id="create" class="btn">สร้างคำสั่ง</button>
+			</div>
+			<div class="small">หลังสร้างจะได้ลิงก์ให้ลูกค้าเปิดเพื่อยืนยัน IP: /check.html?oid=... (คลิกปุ่มคัดลอก)</div>
+		</section>
+
+		<section class="card" style="margin-top:12px;">
+			<div class="controls">
+				<button id="refresh" class="btn">รีเฟรช</button>
+				<select id="limit" class="input">
+					<option value="50">50</option>
+					<option value="100">100</option>
+					<option value="200" selected>200</option>
+				</select>
+			</div>
+			<div style="overflow:auto;">
+				<table id="tbl">
+					<thead>
+						<tr>
+							<th>เวลา</th>
+							<th>รหัส</th>
+							<th>ลูกค้า</th>
+							<th>สถานะ</th>
+							<th>เช็คล่าสุด</th>
+							<th>การดำเนินการ</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</section>
+	</div>
+	<script>
+		const $=(id)=>document.getElementById(id);
+		const tbody=document.querySelector('#tbl tbody');
+		function fmtTime(iso){ try{ const d=new Date(iso); return d.toLocaleString(); }catch{ return iso||'-'; } }
+		function copy(t){ navigator.clipboard?.writeText(t).catch(()=>{}); }
+		async function createOrder(){ const customer=$('customer').value.trim(); const note=$('note').value.trim(); const res=await fetch('/api/orders',{ method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ customer, note }) }); if(!res.ok) return alert('สร้างไม่สำเร็จ'); const j=await res.json(); const url=location.origin+'/check.html?oid='+j.order.id; copy(url); alert('สร้างแล้ว และคัดลอกลิงก์ให้ลูกค้าเรียบร้อย: '+url); await load(); }
+		function rowHtml(o){ const last=o.checks?.[0]; const link=location.origin+'/check.html?oid='+o.id; return `<tr>
+			<td class="small">${fmtTime(o.createdAt)}</td>
+			<td><span class="badge">${o.id}</span></td>
+			<td>${(o.customer||'-').replace(/[<>]/g,'')}</td>
+			<td><span class="badge">${o.status}</span></td>
+			<td class="small">${last? `${last.ip} • ${last.country||''} ${last.city||''}` : '-'}</td>
+			<td class="small">
+				<button class="btn" data-action="copy" data-url="${link}">คัดลอกลิงก์</button>
+				<button class="btn" data-action="status" data-id="${o.id}" data-next="verified">ยืนยัน</button>
+				<button class="btn" data-action="status" data-id="${o.id}" data-next="flagged">ติดธง</button>
+			</td>
+		</tr>`; }
+		async function load(){ const limit=parseInt($('limit').value,10)||200; const res=await fetch('/api/orders?limit='+limit); if(!res.ok) return; const j=await res.json(); tbody.innerHTML=(j.items||[]).map(rowHtml).join(''); }
+		document.getElementById('create').addEventListener('click', createOrder);
+		document.getElementById('refresh').addEventListener('click', load);
+		document.getElementById('limit').addEventListener('change', load);
+		document.addEventListener('click', async (e)=>{ const t=e.target; if(!(t instanceof HTMLElement)) return; const action=t.getAttribute('data-action'); if(action==='copy'){ copy(t.getAttribute('data-url')); t.textContent='คัดลอกแล้ว'; setTimeout(()=>t.textContent='คัดลอกลิงก์',800); }
+			if(action==='status'){ const id=t.getAttribute('data-id'); const next=t.getAttribute('data-next'); const r=await fetch('/api/orders/'+id+'/status',{ method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ status: next }) }); if(!r.ok) return alert('อัปเดตสถานะไม่สำเร็จ'); load(); }
+		});
+		document.addEventListener('DOMContentLoaded', load);
+	</script>
+</body>
+</html>
+
+

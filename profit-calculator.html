@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>เครื่องมือคำนวณกำไร - RENEKANKHA</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%236366f1'/%3E%3C/svg%3E">
+	<style>
+		:root {
+			--primary: #6366f1;
+			--accent: #06b6d4;
+			--success: #10b981;
+			--warning: #f59e0b;
+			--error: #ef4444;
+			--bg-primary: #0a0e27;
+			--bg-secondary: #0f1428;
+			--text-primary: #ffffff;
+			--text-secondary: #e2e8f0;
+			--border: rgba(255,255,255,.1);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		html, body {
+			height: 100%;
+		}
+
+		body {
+			font-family: 'Inter', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+			color: var(--text-primary);
+			line-height: 1.6;
+			overflow-x: hidden;
+		}
+
+		.header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 20px 40px;
+			background: rgba(15, 20, 40, .4);
+			backdrop-filter: blur(20px);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.logo {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			font-size: 20px;
+			font-weight: 800;
+		}
+
+		.container {
+			max-width: 1600px;
+			margin: 0 auto;
+			padding: 40px;
+		}
+
+		.page-title {
+			font-size: 2rem;
+			font-weight: 800;
+			margin-bottom: 32px;
+			background: linear-gradient(135deg, var(--primary), var(--accent));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.card {
+			background: rgba(15, 20, 40, .4);
+			border: 1px solid var(--border);
+			border-radius: 16px;
+			padding: 32px;
+			backdrop-filter: blur(20px);
+			margin-bottom: 24px;
+		}
+
+		.tabs {
+			display: flex;
+			gap: 16px;
+			margin-bottom: 32px;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.tab-btn {
+			padding: 12px 24px;
+			background: none;
+			border: none;
+			color: var(--text-secondary);
+			font-weight: 600;
+			cursor: pointer;
+			border-bottom: 3px solid transparent;
+			transition: all 0.3s ease;
+		}
+
+		.tab-btn.active {
+			color: var(--accent);
+			border-bottom-color: var(--accent);
+		}
+
+		.tab-content {
+			display: none;
+		}
+
+		.tab-content.active {
+			display: block;
+		}
+
+		.form-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 16px;
+			margin-bottom: 24px;
+		}
+
+		.form-group {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.form-label {
+			font-size: 0.9rem;
+			font-weight: 600;
+			margin-bottom: 8px;
+			color: var(--text-secondary);
+		}
+
+		.form-input, .form-select {
+			padding: 12px 16px;
+			background: rgba(255, 255, 255, .05);
+			border: 1px solid var(--border);
+			border-radius: 10px;
+			color: var(--text-primary);
+			font-size: 1rem;
+			font-family: inherit;
+			transition: all 0.3s ease;
+		}
+
+		.form-input:focus, .form-select:focus {
+			outline: none;
+			border-color: var(--accent);
+			background: rgba(255, 255, 255, .08);
+		}
+
+		.btn-primary {
+			padding: 12px 24px;
+			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+			color: white;
+			border: none;
+			border-radius: 10px;
+			font-weight: 700;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			align-self: flex-end;
+		}
+
+		.btn-primary:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 0 20px rgba(99, 102, 241, .3);
+		}
+
+		.btn-small {
+			padding: 6px 12px;
+			background: rgba(255, 255, 255, .08);
+			color: var(--text-primary);
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			font-size: 0.85rem;
+		}
+
+		.btn-small:hover {
+			background: rgba(255, 255, 255, .12);
+		}
+
+		.transactions-table {
+			width: 100%;
+			border-collapse: collapse;
+			overflow: hidden;
+			border-radius: 12px;
+		}
+
+		.transactions-table th {
+			background: rgba(99, 102, 241, .15);
+			padding: 16px;
+			text-align: left;
+			font-weight: 700;
+			color: var(--accent);
+		}
+
+		.transactions-table td {
+			padding: 16px;
+			border-bottom: 1px solid var(--border);
+		}
+
+		.transactions-table tr:hover {
+			background: rgba(99, 102, 241, .08);
+		}
+
+		.status-badge {
+			display: inline-block;
+			padding: 4px 12px;
+			border-radius: 20px;
+			font-size: 0.85rem;
+			font-weight: 600;
+		}
+
+		.status-income {
+			background: rgba(16, 185, 129, .2);
+			color: var(--success);
+		}
+
+		.status-expense {
+			background: rgba(239, 68, 68, .2);
+			color: var(--error);
+		}
+
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 20px;
+			margin-bottom: 32px;
+		}
+
+		.stat-card {
+			background: linear-gradient(135deg, rgba(99, 102, 241, .1) 0%, rgba(6, 182, 212, .05) 100%);
+			border: 1px solid var(--border);
+			border-radius: 14px;
+			padding: 20px;
+			text-align: center;
+		}
+
+		.stat-label {
+			font-size: 0.9rem;
+			color: var(--text-secondary);
+			margin-bottom: 12px;
+		}
+
+		.stat-value {
+			font-size: 2.2rem;
+			font-weight: 800;
+			margin-bottom: 8px;
+		}
+
+		.stat-value.success {
+			color: var(--success);
+		}
+
+		.stat-value.error {
+			color: var(--error);
+		}
+
+		.stat-value.warning {
+			color: var(--warning);
+		}
+
+		.stat-change {
+			font-size: 0.9rem;
+			color: var(--text-secondary);
+		}
+
+		.chart-container {
+			position: relative;
+			height: 400px;
+			margin-bottom: 32px;
+		}
+
+		.empty-state {
+			text-align: center;
+			padding: 40px;
+			color: var(--text-secondary);
+		}
+
+		.month-selector {
+			display: flex;
+			gap: 12px;
+			align-items: center;
+			margin-bottom: 24px;
+		}
+
+		@media (max-width: 768px) {
+			.header {
+				padding: 16px 20px;
+			}
+
+			.container {
+				padding: 20px;
+			}
+
+			.card {
+				padding: 20px;
+			}
+
+			.form-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.stats-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<!-- Header -->
+	<div class="header">
+		<div class="logo">
+			<span style="font-size: 28px;">📊</span>
+			<span>เครื่องมือคำนวณกำไร</span>
+		</div>
+	</div>
+
+	<!-- Main Container -->
+	<div class="container">
+		<h1 class="page-title">วิเคราะห์การขายและรายได้</h1>
+
+		<!-- Tabs -->
+		<div class="tabs">
+			<button class="tab-btn active" data-tab="transactions">บันทึกธุรกรรม</button>
+			<button class="tab-btn" data-tab="analysis">วิเคราะห์กำไร</button>
+		</div>
+
+		<!-- Tab 1: Transactions -->
+		<div id="transactions" class="tab-content active">
+			<div class="card">
+				<h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 24px;">เพิ่มธุรกรรมใหม่</h2>
+				
+				<div class="form-grid">
+					<div class="form-group">
+						<label class="form-label">ประเภท</label>
+						<select id="transactionType" class="form-select">
+							<option value="">-- เลือกประเภท --</option>
+							<option value="id-purchase">ซื้อไอดี</option>
+							<option value="id-sale">ขายไอดี</option>
+							<option value="rental-income">รายได้จากการปล่อยเช่า</option>
+							<option value="expense">รายจ่ายอื่นๆ</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">วันที่</label>
+						<input type="date" id="transactionDate" class="form-input">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">จำนวนเงิน (บาท)</label>
+						<input type="number" id="transactionAmount" class="form-input" placeholder="0" min="0" step="100">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">รายละเอียด</label>
+						<input type="text" id="transactionDescription" class="form-input" placeholder="เช่น ID A, ลูกค้า, หมายเหตุ">
+					</div>
+
+					<div class="form-group" id="idPriceGroup" style="display:none;">
+						<label class="form-label">ราคาขาย (บาท)</label>
+						<input type="number" id="idSalePrice" class="form-input" placeholder="0" min="0" step="100">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">&nbsp;</label>
+						<button class="btn-primary" id="addTransactionBtn">เพิ่มธุรกรรม</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Transactions List -->
+			<div class="card">
+				<h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;">รายการธุรกรรมทั้งหมด</h2>
+				<div style="overflow-x: auto;">
+					<table class="transactions-table" id="transactionsTable">
+						<thead>
+							<tr>
+								<th>วันที่</th>
+								<th>ประเภท</th>
+								<th>รายละเอียด</th>
+								<th>จำนวนเงิน</th>
+								<th>กำไร/ขาดทุน</th>
+								<th>การจัดการ</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr style="text-align: center; color: var(--text-secondary);">
+								<td colspan="6">ยังไม่มีธุรกรรม</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- Tab 2: Analysis -->
+		<div id="analysis" class="tab-content">
+			<!-- Month Selector -->
+			<div class="card">
+				<div class="month-selector">
+					<label style="color: var(--text-secondary);">เลือกเดือน:</label>
+					<input type="month" id="monthSelector" class="form-input" style="width: 200px;">
+					<button class="btn-primary" id="analyzeMonthBtn">วิเคราะห์</button>
+				</div>
+			</div>
+
+			<!-- Summary Stats -->
+			<div class="stats-grid" id="statsGrid">
+				<div class="stat-card">
+					<div class="stat-label">📊 รายรับทั้งหมด</div>
+					<div class="stat-value success" id="totalIncome">0</div>
+					<div class="stat-change">บาท</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-label">💰 รายจ่ายทั้งหมด</div>
+					<div class="stat-value error" id="totalExpense">0</div>
+					<div class="stat-change">บาท</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-label">📈 กำไรสุทธิ</div>
+					<div class="stat-value" id="netProfit">0</div>
+					<div class="stat-change" id="netProfitChange"></div>
+				</div>
+			</div>
+
+			<!-- Charts -->
+			<div class="card">
+				<h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 24px;">กราฟรายได้และรายจ่าย</h2>
+				<div class="chart-container">
+					<canvas id="incomeExpenseChart"></canvas>
+				</div>
+			</div>
+
+			<div class="card">
+				<h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 24px;">สัดส่วนรายได้</h2>
+				<div class="chart-container">
+					<canvas id="incomeTypeChart"></canvas>
+				</div>
+			</div>
+
+			<!-- Yearly Summary -->
+			<div class="card">
+				<h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 24px;">สรุปรายปี</h2>
+				<div class="chart-container">
+					<canvas id="yearlyChart"></canvas>
+				</div>
+			</div>
+
+			<!-- Yearly Stats -->
+			<div class="stats-grid" id="yearlyStatsGrid" style="display: none;">
+				<div class="stat-card">
+					<div class="stat-label">📊 รายรับรายปี</div>
+					<div class="stat-value success" id="yearlyIncome">0</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-label">💰 รายจ่ายรายปี</div>
+					<div class="stat-value error" id="yearlyExpense">0</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-label">📈 กำไรสุทธิรายปี</div>
+					<div class="stat-value success" id="yearlyNetProfit">0</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const $ = id => document.getElementById(id);
+		let transactions = [];
+		let charts = {};
+
+		// Set today's date
+		document.addEventListener('DOMContentLoaded', () => {
+			const today = new Date().toISOString().split('T')[0];
+			$('transactionDate').value = today;
+			
+			const now = new Date();
+			const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+			$('monthSelector').value = yearMonth;
+
+			loadTransactions();
+			initializeEventListeners();
+		});
+
+		function initializeEventListeners() {
+			// Tab buttons
+			document.querySelectorAll('.tab-btn').forEach(btn => {
+				btn.addEventListener('click', (e) => {
+					const tabName = e.target.getAttribute('data-tab');
+					document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+					document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+					$(tabName).classList.add('active');
+					btn.classList.add('active');
+				});
+			});
+
+			// Transaction type change
+			$('transactionType').addEventListener('change', (e) => {
+				$('idPriceGroup').style.display = e.target.value === 'id-purchase' ? 'flex' : 'none';
+			});
+
+			// Add transaction
+			$('addTransactionBtn').addEventListener('click', addTransaction);
+
+			// Analyze month
+			$('analyzeMonthBtn').addEventListener('click', analyzeMonth);
+		}
+
+		function addTransaction() {
+			const type = $('transactionType').value;
+			const date = $('transactionDate').value;
+			const amount = parseFloat($('transactionAmount').value);
+			const description = $('transactionDescription').value.trim();
+			const salePrice = parseFloat($('idSalePrice').value) || 0;
+
+			if (!type || !date || !amount || !description) {
+				alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+				return;
+			}
+
+			let profit = 0;
+			if (type === 'id-purchase' && salePrice > 0) {
+				profit = salePrice - amount;
+			}
+
+			const transaction = {
+				id: Date.now(),
+				type,
+				date,
+				amount,
+				description,
+				salePrice,
+				profit,
+				timestamp: new Date(date).getTime()
+			};
+
+			transactions.push(transaction);
+			saveTransactions();
+			renderTransactions();
+
+			// Clear form
+			$('transactionType').value = '';
+			$('transactionAmount').value = '';
+			$('transactionDescription').value = '';
+			$('idSalePrice').value = '';
+			$('transactionDate').value = new Date().toISOString().split('T')[0];
+			$('idPriceGroup').style.display = 'none';
+		}
+
+		function renderTransactions() {
+			const tbody = $('transactionsTable').querySelector('tbody');
+			
+			if (transactions.length === 0) {
+				tbody.innerHTML = '<tr style="text-align: center; color: var(--text-secondary);"><td colspan="6">ยังไม่มีธุรกรรม</td></tr>';
+				return;
+			}
+
+			const sorted = [...transactions].sort((a, b) => b.timestamp - a.timestamp);
+
+			tbody.innerHTML = sorted.map(t => {
+				const typeLabel = {
+					'id-purchase': '🛒 ซื้อไอดี',
+					'id-sale': '💵 ขายไอดี',
+					'rental-income': '🔄 รายได้ปล่อยเช่า',
+					'expense': '📉 รายจ่าย'
+				}[t.type] || t.type;
+
+				const isIncome = ['id-sale', 'rental-income'].includes(t.type);
+				const profitDisplay = t.type === 'id-purchase' && t.profit !== 0 
+					? `<span style="color: ${t.profit > 0 ? 'var(--success)' : 'var(--error)'}">${t.profit > 0 ? '+' : ''}${t.profit}</span>`
+					: '-';
+
+				return `
+					<tr>
+						<td>${new Date(t.date).toLocaleDateString('th-TH')}</td>
+						<td><span class="status-badge ${isIncome ? 'status-income' : 'status-expense'}">${typeLabel}</span></td>
+						<td>${t.description}</td>
+						<td style="color: ${isIncome ? 'var(--success)' : 'var(--error)'}; font-weight: 600;">${isIncome ? '+' : '-'}${t.amount}</td>
+						<td>${profitDisplay}</td>
+						<td><button class="btn-small delete-transaction" data-id="${t.id}">ลบ</button></td>
+					</tr>
+				`;
+			}).join('');
+
+			// Add delete event listeners
+			document.querySelectorAll('.delete-transaction').forEach(btn => {
+				btn.addEventListener('click', (e) => {
+					const id = parseInt(e.target.getAttribute('data-id'));
+					transactions = transactions.filter(t => t.id !== id);
+					saveTransactions();
+					renderTransactions();
+				});
+			});
+		}
+
+		function analyzeMonth() {
+			const monthStr = $('monthSelector').value;
+			const [year, month] = monthStr.split('-');
+
+			const monthTransactions = transactions.filter(t => {
+				const tDate = new Date(t.date);
+				return tDate.getFullYear() === parseInt(year) && 
+					   tDate.getMonth() === parseInt(month) - 1;
+			});
+
+			// Calculate stats
+			let totalIncome = 0, totalExpense = 0;
+			const incomeByType = {};
+
+			monthTransactions.forEach(t => {
+				if (['id-sale', 'rental-income'].includes(t.type)) {
+					totalIncome += t.amount;
+					incomeByType[t.type] = (incomeByType[t.type] || 0) + t.amount;
+				} else {
+					totalExpense += t.amount;
+				}
+			});
+
+			const netProfit = totalIncome - totalExpense;
+
+			// Update stats
+			$('totalIncome').textContent = totalIncome.toLocaleString('th-TH');
+			$('totalExpense').textContent = totalExpense.toLocaleString('th-TH');
+			$('netProfit').textContent = netProfit.toLocaleString('th-TH');
+			$('netProfit').className = 'stat-value ' + (netProfit >= 0 ? 'success' : 'error');
+			$('netProfitChange').textContent = (netProfit >= 0 ? '+' : '') + netProfit + ' บาท';
+
+			// Update charts
+			updateCharts(monthTransactions, incomeByType);
+			updateYearlyChart(year);
+		}
+
+		function updateCharts(monthTransactions, incomeByType) {
+			// Destroy old charts
+			Object.values(charts).forEach(chart => chart.destroy());
+			charts = {};
+
+			// Income vs Expense Chart
+			const ctx1 = $('incomeExpenseChart').getContext('2d');
+			charts.incomeExpense = new Chart(ctx1, {
+				type: 'bar',
+				data: {
+					labels: ['รายรับ', 'รายจ่าย'],
+					datasets: [{
+						label: 'จำนวนเงิน',
+						data: [
+							monthTransactions.reduce((s, t) => s + (['id-sale', 'rental-income'].includes(t.type) ? t.amount : 0), 0),
+							monthTransactions.reduce((s, t) => s + (['expense', 'id-purchase'].includes(t.type) ? t.amount : 0), 0)
+						],
+						backgroundColor: ['rgba(16, 185, 129, 0.6)', 'rgba(239, 68, 68, 0.6)'],
+						borderColor: ['#10b981', '#ef4444'],
+						borderWidth: 2
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: { legend: { labels: { color: '#e2e8f0' } } },
+					scales: {
+						y: {
+							ticks: { color: '#e2e8f0' },
+							grid: { color: 'rgba(255,255,255,.1)' }
+						},
+						x: {
+							ticks: { color: '#e2e8f0' },
+							grid: { color: 'rgba(255,255,255,.1)' }
+						}
+					}
+				}
+			});
+
+			// Income Type Pie Chart
+			const incomeTypes = Object.keys(incomeByType).map(k => ({
+				'id-sale': '💵 ขายไอดี',
+				'rental-income': '🔄 ปล่อยเช่า'
+			}[k] || k);
+			const incomeValues = Object.values(incomeByType);
+
+			const ctx2 = $('incomeTypeChart').getContext('2d');
+			charts.incomeType = new Chart(ctx2, {
+				type: 'doughnut',
+				data: {
+					labels: incomeTypes,
+					datasets: [{
+						data: incomeValues,
+						backgroundColor: ['#10b981', '#06b6d4', '#6366f1', '#f59e0b']
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: { legend: { labels: { color: '#e2e8f0' } } }
+				}
+			});
+		}
+
+		function updateYearlyChart(year) {
+			const yearTransactions = transactions.filter(t => 
+				new Date(t.date).getFullYear() === parseInt(year)
+			);
+
+			const monthlyData = {};
+			for (let m = 1; m <= 12; m++) {
+				monthlyData[m] = { income: 0, expense: 0 };
+			}
+
+			yearTransactions.forEach(t => {
+				const month = new Date(t.date).getMonth() + 1;
+				if (['id-sale', 'rental-income'].includes(t.type)) {
+					monthlyData[month].income += t.amount;
+				} else {
+					monthlyData[month].expense += t.amount;
+				}
+			});
+
+			const monthLabels = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+			const incomeData = monthLabels.map((_, i) => monthlyData[i + 1].income);
+			const expenseData = monthLabels.map((_, i) => monthlyData[i + 1].expense);
+
+			if (charts.yearly) charts.yearly.destroy();
+
+			const ctx = $('yearlyChart').getContext('2d');
+			charts.yearly = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: monthLabels,
+					datasets: [
+						{
+							label: 'รายรับ',
+							data: incomeData,
+							borderColor: '#10b981',
+							backgroundColor: 'rgba(16, 185, 129, 0.1)',
+							tension: 0.3,
+							fill: true
+						},
+						{
+							label: 'รายจ่าย',
+							data: expenseData,
+							borderColor: '#ef4444',
+							backgroundColor: 'rgba(239, 68, 68, 0.1)',
+							tension: 0.3,
+							fill: true
+						}
+					]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: { legend: { labels: { color: '#e2e8f0' } } },
+					scales: {
+						y: {
+							ticks: { color: '#e2e8f0' },
+							grid: { color: 'rgba(255,255,255,.1)' }
+						},
+						x: {
+							ticks: { color: '#e2e8f0' },
+							grid: { color: 'rgba(255,255,255,.1)' }
+						}
+					}
+				}
+			});
+
+			// Update yearly stats
+			const yearlyIncome = incomeData.reduce((a, b) => a + b, 0);
+			const yearlyExpense = expenseData.reduce((a, b) => a + b, 0);
+			const yearlyProfit = yearlyIncome - yearlyExpense;
+
+			$('yearlyIncome').textContent = yearlyIncome.toLocaleString('th-TH');
+			$('yearlyExpense').textContent = yearlyExpense.toLocaleString('th-TH');
+			$('yearlyNetProfit').textContent = yearlyProfit.toLocaleString('th-TH');
+			$('yearlyStatsGrid').style.display = 'grid';
+		}
+
+		function saveTransactions() {
+			localStorage.setItem('profitTransactions', JSON.stringify(transactions));
+		}
+
+		function loadTransactions() {
+			const saved = localStorage.getItem('profitTransactions');
+			if (saved) {
+				try {
+					transactions = JSON.parse(saved);
+					renderTransactions();
+				} catch (e) {
+					console.error('Error loading transactions:', e);
+				}
+			}
+		}
+	</script>
+</body>
+</html>

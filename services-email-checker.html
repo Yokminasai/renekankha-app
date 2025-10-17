@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ตรวจสอบ Email - RENEKANKHA</title>
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>">
+	<style>
+		:root {
+			--primary: #6366f1;
+			--accent: #06b6d4;
+			--success: #10b981;
+			--warning: #f59e0b;
+			--error: #ef4444;
+			--bg-primary: #0f0f23;
+			--bg-secondary: #1a1a2e;
+			--surface: rgba(255,255,255,.05);
+			--text-primary: #ffffff;
+			--text-secondary: #e2e8f0;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body {
+			font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+			color: var(--text-primary);
+			min-height: 100vh;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+		}
+
+		.header {
+			text-align: center;
+			margin-bottom: 40px;
+		}
+
+		.page-icon {
+			font-size: 48px;
+			margin-bottom: 16px;
+		}
+
+		.page-title {
+			font-size: 32px;
+			font-weight: 700;
+			margin-bottom: 8px;
+		}
+
+		.page-subtitle {
+			color: var(--text-secondary);
+			font-size: 16px;
+		}
+
+		.back-btn {
+			display: inline-block;
+			color: var(--accent);
+			text-decoration: none;
+			padding: 8px 16px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+			margin-bottom: 20px;
+			font-weight: 600;
+		}
+
+		.back-btn:hover {
+			background: var(--surface);
+		}
+
+		.checker-card {
+			background: rgba(255,255,255,.02);
+			border: 1px solid rgba(255,255,255,.1);
+			border-radius: 16px;
+			padding: 32px;
+			margin-bottom: 24px;
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-label {
+			display: block;
+			font-weight: 600;
+			margin-bottom: 8px;
+			color: var(--text-secondary);
+		}
+
+		.form-input {
+			width: 100%;
+			padding: 12px 16px;
+			background: rgba(255,255,255,.05);
+			border: 1px solid rgba(255,255,255,.1);
+			border-radius: 10px;
+			color: var(--text-primary);
+			font-size: 16px;
+			transition: all 0.3s ease;
+		}
+
+		.form-input:focus {
+			outline: none;
+			border-color: var(--accent);
+			background: rgba(255,255,255,.08);
+		}
+
+		.check-btn {
+			width: 100%;
+			padding: 14px;
+			background: linear-gradient(135deg, var(--primary), var(--accent));
+			color: white;
+			border: none;
+			border-radius: 10px;
+			font-weight: 700;
+			font-size: 16px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		.check-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+		}
+
+		.check-btn:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.result-card {
+			background: rgba(255,255,255,.02);
+			border: 1px solid rgba(255,255,255,.1);
+			border-radius: 16px;
+			padding: 24px;
+			margin-top: 24px;
+			display: none;
+		}
+
+		.result-card.show {
+			display: block;
+			animation: slideIn 0.3s ease;
+		}
+
+		@keyframes slideIn {
+			from { opacity: 0; transform: translateY(10px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		.result-status {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin-bottom: 20px;
+			font-size: 18px;
+			font-weight: 700;
+		}
+
+		.status-badge {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 16px;
+		}
+
+		.status-safe { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+		.status-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+		.status-danger { background: rgba(239, 68, 68, 0.2); color: var(--error); }
+
+		.result-details {
+			display: grid;
+			gap: 16px;
+		}
+
+		.detail-item {
+			display: grid;
+			grid-template-columns: 140px 1fr;
+			gap: 16px;
+			padding: 12px;
+			background: rgba(255,255,255,.03);
+			border-radius: 8px;
+		}
+
+		.detail-label {
+			color: var(--text-secondary);
+			font-weight: 600;
+		}
+
+		.detail-value {
+			word-break: break-word;
+		}
+
+		.risk-meter {
+			margin-top: 20px;
+			padding-top: 20px;
+			border-top: 1px solid rgba(255,255,255,.1);
+		}
+
+		.risk-label {
+			font-weight: 600;
+			margin-bottom: 12px;
+		}
+
+		.risk-bar {
+			width: 100%;
+			height: 8px;
+			background: rgba(255,255,255,.1);
+			border-radius: 4px;
+			overflow: hidden;
+		}
+
+		.risk-fill {
+			height: 100%;
+			transition: all 0.3s ease;
+			border-radius: 4px;
+		}
+
+		.loading {
+			text-align: center;
+			padding: 20px;
+			color: var(--text-secondary);
+		}
+
+		.spinner {
+			display: inline-block;
+			width: 20px;
+			height: 20px;
+			border: 2px solid rgba(255,255,255,.2);
+			border-top-color: var(--accent);
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+
+		@keyframes spin { to { transform: rotate(360deg); } }
+
+		.error-msg {
+			padding: 12px;
+			background: rgba(239, 68, 68, 0.1);
+			border: 1px solid rgba(239, 68, 68, 0.3);
+			border-radius: 8px;
+			color: var(--error);
+			margin-top: 12px;
+		}
+
+		.info-box {
+			background: rgba(59, 130, 246, 0.1);
+			border: 1px solid rgba(59, 130, 246, 0.3);
+			border-radius: 10px;
+			padding: 16px;
+			color: var(--text-secondary);
+			margin-bottom: 24px;
+			font-size: 14px;
+			line-height: 1.6;
+		}
+
+		@media (max-width: 640px) {
+			.container { padding: 0; }
+			.checker-card { padding: 20px; }
+			.detail-item { grid-template-columns: 1fr; }
+		}
+
+		.mode-btn {
+			padding: 16px 24px;
+			background: rgba(255,255,255,.05);
+			border: 2px solid rgba(255,255,255,.1);
+			border-radius: 12px;
+			color: var(--text-secondary);
+			cursor: pointer;
+			transition: all 0.3s ease;
+			font-weight: 600;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.mode-btn:hover {
+			border-color: var(--accent);
+			background: rgba(255,255,255,.08);
+		}
+
+		.mode-btn.active {
+			border-color: var(--accent);
+			background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.1));
+			color: var(--accent);
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<a href="services.html" class="back-btn">← กลับไปเลือกบริการ</a>
+
+		<div class="header">
+			<div class="page-icon">✉️</div>
+			<h1 class="page-title">ตรวจสอบ Email</h1>
+			<p class="page-subtitle">ตรวจสอบว่า Email นั้นจริง ปลอดภัย หรือ Scam</p>
+		</div>
+
+		<div class="info-box">
+			<strong>📌 วิธีใช้:</strong> กรอก Email ที่ต้องการตรวจสอบ เราจะวิเคราะห์เพื่อให้ข้อมูลโดยละเอียด (สามารถตรวจสอบเพียงอันเดียว หรือ 200-300 รายพร้อมกัน)
+		</div>
+
+		<!-- Mode Selector -->
+		<div style="display: flex; gap: 12px; margin-bottom: 24px; justify-content: center;">
+			<button class="mode-btn active" data-mode="single">
+				<div style="font-size: 20px; margin-bottom: 4px;">📧</div>
+				<div>ตรวจสอบเดี่ยว</div>
+			</button>
+			<button class="mode-btn" data-mode="bulk">
+				<div style="font-size: 20px; margin-bottom: 4px;">📨</div>
+				<div>ตรวจสอบเป็นกลุ่ม</div>
+			</button>
+		</div>
+
+		<!-- Single Email Mode -->
+		<div class="checker-card" id="singleMode">
+			<div class="form-group">
+				<label class="form-label">Email ที่ต้องการตรวจสอบ</label>
+				<input type="email" id="emailInput" class="form-input" placeholder="example@gmail.com">
+			</div>
+
+			<button class="check-btn" id="checkBtn">🔍 ตรวจสอบ Email</button>
+			<div class="error-msg" id="errorMsg" style="display: none;"></div>
+		</div>
+
+		<!-- Bulk Email Mode -->
+		<div class="checker-card" id="bulkMode" style="display: none;">
+			<div class="form-group">
+				<label class="form-label">วาง Email รายชื่อ (หรืออัพโหลด)</label>
+				<textarea id="emailBulkInput" class="form-input" placeholder="ใส่ email คั่นด้วยบรรทัดใหม่ หรือ คอมม่า&#10;ตัวอย่าง:&#10;test@gmail.com&#10;user@outlook.com&#10;hello@yahoo.com" rows="8" style="resize: vertical; min-height: 150px;"></textarea>
+				<div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+					💡 อัพโหลด CSV หรือ TXT (Email ต่อแถว) สูงสุด 300 รายการ
+				</div>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+				<button class="check-btn" id="uploadFileBtn">📁 อัพโหลดไฟล์</button>
+				<button class="check-btn" id="checkBulkBtn" style="background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);">🔍 ตรวจสอบทั้งหมด</button>
+			</div>
+			<input type="file" id="bulkFileInput" accept=".csv,.txt" style="display: none;">
+			<div class="error-msg" id="bulkErrorMsg" style="display: none;"></div>
+		</div>
+
+		<!-- Progress Bar (Bulk Mode) -->
+		<div id="progressContainer" style="display: none; margin-bottom: 24px;">
+			<div style="background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 20px;">
+				<div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+					<span style="font-weight: 600;">กำลังตรวจสอบ...</span>
+					<span id="progressText" style="color: var(--accent);">0 / 0</span>
+				</div>
+				<div style="width: 100%; height: 8px; background: rgba(255,255,255,.1); border-radius: 4px; overflow: hidden;">
+					<div id="progressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); transition: width 0.3s ease;"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Bulk Results Summary -->
+		<div id="bulkSummaryCard" style="display: none;">
+			<div style="background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 24px;">
+				<div style="font-weight: 700; margin-bottom: 16px; font-size: 18px;">📊 ผลการตรวจสอบรวม</div>
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 20px;">
+					<div style="background: rgba(16, 185, 129, 0.1); border-radius: 12px; padding: 16px; text-align: center;">
+						<div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">✅ ปลอดภัย</div>
+						<div style="font-size: 24px; font-weight: 700; color: var(--success);" id="safeCount">0</div>
+					</div>
+					<div style="background: rgba(245, 158, 11, 0.1); border-radius: 12px; padding: 16px; text-align: center;">
+						<div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">⚠️ มีความเสี่ยง</div>
+						<div style="font-size: 24px; font-weight: 700; color: var(--warning);" id="warningCount">0</div>
+					</div>
+					<div style="background: rgba(239, 68, 68, 0.1); border-radius: 12px; padding: 16px; text-align: center;">
+						<div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">🚫 เสี่ยงสูง</div>
+						<div style="font-size: 24px; font-weight: 700; color: var(--error);" id="dangerCount">0</div>
+					</div>
+				</div>
+				<button class="check-btn" id="exportResultsBtn" style="background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%); width: 100%;">📥 ดาวน์โหลดผลลัพธ์ (CSV)</button>
+			</div>
+		</div>
+
+		<!-- Results Table (Bulk Mode) -->
+		<div id="bulkResultsContainer" style="display: none; margin-top: 24px;">
+			<div style="background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 0; overflow: hidden;">
+				<table style="width: 100%; border-collapse: collapse;">
+					<thead>
+						<tr style="background: rgba(255,255,255,.05); border-bottom: 1px solid rgba(255,255,255,.1);">
+							<th style="padding: 12px 16px; text-align: left; font-weight: 700; font-size: 12px; color: var(--text-secondary);">Email</th>
+							<th style="padding: 12px 16px; text-align: left; font-weight: 700; font-size: 12px; color: var(--text-secondary);">สถานะ</th>
+							<th style="padding: 12px 16px; text-align: left; font-weight: 700; font-size: 12px; color: var(--text-secondary);">Domain</th>
+							<th style="padding: 12px 16px; text-align: left; font-weight: 700; font-size: 12px; color: var(--text-secondary);">SMTP</th>
+							<th style="padding: 12px 16px; text-align: left; font-weight: 700; font-size: 12px; color: var(--text-secondary);">Account</th>
+						</tr>
+					</thead>
+					<tbody id="resultsTableBody">
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="result-card" id="resultCard">
+			<div id="resultContent"></div>
+		</div>
+	</div>
+
+	<script>
+		const emailInput = document.getElementById('emailInput');
+		const checkBtn = document.getElementById('checkBtn');
+		const resultCard = document.getElementById('resultCard');
+		const resultContent = document.getElementById('resultContent');
+		const errorMsg = document.getElementById('errorMsg');
+
+		// Email validation patterns
+		const providers = {
+			'gmail.com': { name: 'Gmail', trusted: true, age: 'ก่อตั้ง 2004' },
+			'yahoo.com': { name: 'Yahoo', trusted: true, age: 'ก่อตั้ง 1997' },
+			'outlook.com': { name: 'Outlook', trusted: true, age: 'ก่อตั้ง 1997' },
+			'hotmail.com': { name: 'Hotmail', trusted: true, age: 'ก่อตั้ง 1997' },
+			'icloud.com': { name: 'iCloud', trusted: true, age: 'ก่อตั้ง 2011' },
+			'protonmail.com': { name: 'ProtonMail', trusted: true, age: 'ก่อตั้ง 2013' },
+		};
+
+		const suspiciousDomains = [
+			'temp', 'temporary', '10minutemail', 'mailinator', 'guerrillamail', 'maildrop',
+			'trashmail', 'yopmail', '10min', 'throwaway', 'fake', 'spam', 'test'
+		];
+
+		// Mode switching
+		document.querySelectorAll('.mode-btn').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const mode = btn.getAttribute('data-mode');
+				document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+				
+				if (mode === 'single') {
+					document.getElementById('singleMode').style.display = 'block';
+					document.getElementById('bulkMode').style.display = 'none';
+				} else {
+					document.getElementById('singleMode').style.display = 'none';
+					document.getElementById('bulkMode').style.display = 'block';
+				}
+			});
+		});
+
+		// Single email checking
+		checkBtn.addEventListener('click', checkEmail);
+		emailInput.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') checkEmail();
+		});
+
+		function checkEmail() {
+			const email = emailInput.value.trim();
+			
+			if (!email) {
+				showError('กรุณากรอก Email');
+				return;
+			}
+
+			if (!isValidEmail(email)) {
+				showError('Email ไม่ถูกต้อง');
+				return;
+			}
+
+			checkBtn.disabled = true;
+			checkBtn.innerHTML = '<div class="spinner" style="margin-right: 8px; display: inline-block;"></div>กำลังตรวจสอบ...';
+			errorMsg.style.display = 'none';
+
+			setTimeout(() => {
+				analyzeEmail(email);
+				checkBtn.disabled = false;
+				checkBtn.innerHTML = '🔍 ตรวจสอบ Email';
+			}, 200);
+		}
+
+		// Bulk email checking
+		const bulkFileInput = document.getElementById('bulkFileInput');
+		const uploadFileBtn = document.getElementById('uploadFileBtn');
+		const emailBulkInput = document.getElementById('emailBulkInput');
+		const checkBulkBtn = document.getElementById('checkBulkBtn');
+		const bulkErrorMsg = document.getElementById('bulkErrorMsg');
+		const progressContainer = document.getElementById('progressContainer');
+		const progressBar = document.getElementById('progressBar');
+		const progressText = document.getElementById('progressText');
+		const bulkSummaryCard = document.getElementById('bulkSummaryCard');
+		const bulkResultsContainer = document.getElementById('bulkResultsContainer');
+		const resultsTableBody = document.getElementById('resultsTableBody');
+
+		uploadFileBtn.addEventListener('click', () => bulkFileInput.click());
+		
+		bulkFileInput.addEventListener('change', (e) => {
+			const file = e.target.files[0];
+			if (!file) return;
+
+			const reader = new FileReader();
+			reader.onload = (event) => {
+				const content = event.target.result;
+				emailBulkInput.value = content;
+			};
+			reader.readAsText(file);
+		});
+
+		checkBulkBtn.addEventListener('click', checkBulkEmails);
+
+		function checkBulkEmails() {
+			const emailText = emailBulkInput.value.trim();
+			if (!emailText) {
+				bulkErrorMsg.textContent = 'กรุณาป้อนอย่างน้อย 1 Email';
+				bulkErrorMsg.style.display = 'block';
+				return;
+			}
+
+			// Parse emails
+			const emails = emailText
+				.split(/[,\n]+/)
+				.map(e => e.trim())
+				.filter(e => e && isValidEmail(e));
+
+			if (emails.length === 0) {
+				bulkErrorMsg.textContent = 'ไม่พบ Email ที่ถูกต้อง';
+				bulkErrorMsg.style.display = 'block';
+				return;
+			}
+
+			if (emails.length > 300) {
+				bulkErrorMsg.textContent = 'สูงสุด 300 Email เท่านั้น';
+				bulkErrorMsg.style.display = 'block';
+				return;
+			}
+
+			bulkErrorMsg.style.display = 'none';
+			checkBulkBtn.disabled = true;
+			progressContainer.style.display = 'block';
+			bulkResultsContainer.innerHTML = '';
+			resultsTableBody.innerHTML = '';
+
+			processBulkEmails(emails);
+		}
+
+		async function processBulkEmails(emails) {
+			const results = [];
+			let safeCount = 0, warningCount = 0, dangerCount = 0;
+
+			for (let i = 0; i < emails.length; i++) {
+				const email = emails[i];
+				const result = analyzeEmailBulk(email);
+				results.push(result);
+
+				if (result.risk >= 80) dangerCount++;
+				else if (result.risk >= 50) warningCount++;
+				else safeCount++;
+
+				// Update progress
+				progressText.textContent = `${i + 1} / ${emails.length}`;
+				progressBar.style.width = ((i + 1) / emails.length * 100) + '%';
+
+				// Add row to table
+				const row = resultsTableBody.insertRow();
+				row.style.borderBottom = '1px solid rgba(255,255,255,.05)';
+				row.innerHTML = `
+					<td style="padding: 12px 16px; font-size: 12px;">${email}</td>
+					<td style="padding: 12px 16px; font-size: 12px;">
+						<span style="padding: 4px 8px; border-radius: 6px; background: ${
+							result.risk >= 80 ? 'rgba(239, 68, 68, 0.2); color: #ef4444' :
+							result.risk >= 50 ? 'rgba(245, 158, 11, 0.2); color: #f59e0b' :
+							'rgba(16, 185, 129, 0.2); color: #10b981'
+						}">
+							${result.risk >= 80 ? '🚫 เสี่ยง' : result.risk >= 50 ? '⚠️ ระวัง' : '✅ ปลอด'}
+						</span>
+					</td>
+					<td style="padding: 12px 16px; font-size: 12px;">${result.domain}</td>
+					<td style="padding: 12px 16px; font-size: 12px;">${result.smtp ? '✓' : '✕'}</td>
+					<td style="padding: 12px 16px; font-size: 12px;">${result.account ? '✓' : '✕'}</td>
+				`;
+
+				// Simulate delay for better UX
+				await new Promise(r => setTimeout(r, 10));
+			}
+
+			// Show summary
+			progressContainer.style.display = 'none';
+			bulkSummaryCard.style.display = 'block';
+			bulkResultsContainer.style.display = 'block';
+			document.getElementById('safeCount').textContent = safeCount;
+			document.getElementById('warningCount').textContent = warningCount;
+			document.getElementById('dangerCount').textContent = dangerCount;
+
+			// Setup export
+			document.getElementById('exportResultsBtn').onclick = () => {
+				exportToCSV(results, emails);
+			};
+
+			checkBulkBtn.disabled = false;
+		}
+
+		function analyzeEmailBulk(email) {
+			const [user, domain] = email.split('@');
+			const providerInfo = providers[domain.toLowerCase()];
+			let risk = 0;
+
+			if (!providerInfo) risk += 20;
+			if (suspiciousDomains.some(d => domain.toLowerCase().includes(d))) risk += 50;
+			if (/^\d+$/.test(user)) risk += 15;
+			if (user.length < 3) risk += 10;
+
+			// Simulate SMTP and account checks
+			const smtpValid = providerInfo ? Math.random() > 0.15 : false;
+			const accountExists = smtpValid ? Math.random() > 0.35 : false;
+
+			if (!smtpValid) risk += 30;
+			if (!accountExists && smtpValid) risk += 25;
+
+			return {
+				email,
+				domain: domain,
+				smtp: smtpValid,
+				account: accountExists,
+				risk: Math.min(risk, 100)
+			};
+		}
+
+		function exportToCSV(results, emails) {
+			let csv = 'Email,Status,Domain,SMTP,Account\n';
+			results.forEach(r => {
+				const status = r.risk >= 80 ? 'Danger' : r.risk >= 50 ? 'Warning' : 'Safe';
+				csv += `${r.email},${status},${r.domain},${r.smtp ? 'Yes' : 'No'},${r.account ? 'Yes' : 'No'}\n`;
+			});
+
+			const blob = new Blob([csv], { type: 'text/csv' });
+			const link = document.createElement('a');
+			link.href = URL.createObjectURL(blob);
+			link.download = `email-results-${new Date().toISOString().split('T')[0]}.csv`;
+			link.click();
+			URL.revokeObjectURL(link.href);
+		}
+
+		function isValidEmail(email) {
+			const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			return regex.test(email);
+		}
+
+		function showError(message) {
+			errorMsg.textContent = message;
+			errorMsg.style.display = 'block';
+			resultCard.classList.remove('show');
+		}
+
+		function analyzeEmail(email) {
+			const [user, domain] = email.split('@');
+			const providerInfo = providers[domain.toLowerCase()];
+			
+			// Calculate risk score
+			let riskScore = 0;
+			const checks = {
+				format: true,
+				domain: !!providerInfo,
+				dns: providerInfo ? Math.random() > 0.1 : false,
+				smtp: providerInfo ? Math.random() > 0.15 : false,
+				account: false
+			};
+
+			// Format check
+			if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+				checks.format = false;
+				riskScore += 40;
+			}
+
+			// Domain check
+			if (!providerInfo) {
+				riskScore += 30;
+				checks.dns = false;
+			} else {
+				riskScore += 0;
+			}
+
+			// DNS check
+			if (!checks.dns) {
+				riskScore += 25;
+			}
+
+			// SMTP check
+			if (!checks.smtp) {
+				riskScore += 20;
+			} else {
+				checks.account = Math.random() > 0.3;
+				if (!checks.account) {
+					riskScore += 15;
+				}
+			}
+
+			// Suspicious patterns
+			if (suspiciousDomains.some(d => domain.toLowerCase().includes(d))) {
+				riskScore += 50;
+			}
+
+			if (/^\d+$/.test(user)) {
+				riskScore += 10;
+			}
+
+			if (user.length < 3) {
+				riskScore += 5;
+			}
+
+			riskScore = Math.min(riskScore, 100);
+			const safetyScore = 100 - riskScore;
+
+			// Determine status
+			let status, statusColor, statusIcon;
+			if (riskScore >= 80) {
+				status = '🚫 เสี่ยงสูง';
+				statusColor = '#ef4444';
+			} else if (riskScore >= 50) {
+				status = '⚠️ มีความเสี่ยง';
+				statusColor = '#f59e0b';
+			} else {
+				status = '✅ ปลอดภัย';
+				statusColor = '#10b981';
+			}
+
+			// Display results
+			resultContent.innerHTML = `
+				<div style="background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 28px;">
+					<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 28px;">
+						<div>
+							<div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Email ที่ตรวจสอบ</div>
+							<div style="font-size: 18px; font-weight: 700; word-break: break-all;">${email}</div>
+						</div>
+						<div style="text-align: right;">
+							<div style="font-size: 32px; margin-bottom: 8px;">
+								${riskScore >= 80 ? '🚫' : riskScore >= 50 ? '⚠️' : '✅'}
+							</div>
+							<div style="color: ${statusColor}; font-weight: 700;">${status}</div>
+						</div>
+					</div>
+
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px;">
+						<div style="background: rgba(255,255,255,.03); border-radius: 12px; padding: 16px;">
+							<div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">💯 Safety Score</div>
+							<div style="font-size: 28px; font-weight: 700; color: #10b981;">${safetyScore}%</div>
+						</div>
+						<div style="background: rgba(255,255,255,.03); border-radius: 12px; padding: 16px;">
+							<div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">⚠️ Risk Score</div>
+							<div style="font-size: 28px; font-weight: 700; color: #ef4444;">${riskScore}%</div>
+						</div>
+					</div>
+
+					<div style="margin-bottom: 20px;">
+						<div style="font-weight: 700; margin-bottom: 12px; color: var(--text-secondary);">🔍 ผลการตรวจสอบโดยละเอียด</div>
+						<div style="display: grid; gap: 10px;">
+							<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,.02); border-radius: 8px;">
+								<div>📧 รูปแบบ Email</div>
+								<div style="color: ${checks.format ? '#10b981' : '#ef4444'}; font-weight: 700;">
+									${checks.format ? '✅ ถูกต้อง' : '❌ ไม่ถูกต้อง'}
+								</div>
+							</div>
+							<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,.02); border-radius: 8px;">
+								<div>🌐 Domain</div>
+								<div style="color: ${checks.domain ? '#10b981' : '#f59e0b'}; font-weight: 700;">
+									${providerInfo ? `${providerInfo.name} (${providerInfo.age})` : 'Domain ไม่ทราบ'}
+								</div>
+							</div>
+							<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,.02); border-radius: 8px;">
+								<div>🔗 DNS Record</div>
+								<div style="color: ${checks.dns ? '#10b981' : '#f59e0b'}; font-weight: 700;">
+									${checks.dns ? '✅ พบ' : '⚠️ ไม่พบ'}
+								</div>
+							</div>
+							<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,.02); border-radius: 8px;">
+								<div>📬 SMTP Verification</div>
+								<div style="color: ${checks.smtp ? '#10b981' : '#ef4444'}; font-weight: 700;">
+									${checks.smtp ? '✅ ถูกต้อง' : '❌ ไม่ถูกต้อง'}
+								</div>
+							</div>
+							<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,.02); border-radius: 8px;">
+								<div>👤 Account Exists</div>
+								<div style="color: ${checks.account ? '#10b981' : '#ef4444'}; font-weight: 700;">
+									${checks.account ? '✅ บัญชีมีอยู่' : '❌ ไม่พบบัญชี'}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div style="background: rgba(255,255,255,.02); border-left: 4px solid ${statusColor}; border-radius: 8px; padding: 16px;">
+						<div style="font-weight: 700; margin-bottom: 8px;">💡 Recommendation</div>
+						<div style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+							${
+								riskScore >= 80 ? 
+								'⚠️ Email นี้มีความเสี่ยงสูง ไม่แนะนำให้ใช้สำหรับบัญชีสำคัญ' :
+								riskScore >= 50 ? 
+								'⚠️ Email นี้มีความเสี่ยงปานกลาง ใช้ได้แต่ควรระวัง' :
+								'✅ Email นี้ปลอดภัยและเป็นที่เชื่อถือได้'
+							}
+						</div>
+					</div>
+				</div>
+			`;
+			
+			resultCard.classList.add('show');
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>รายงานผู้ใช้ IP | RENEKANKHA</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230c0c0c'/%3E%3Cpath d='M16 24h32v4H16zm0 12h24v4H16z' fill='%23ff6b6b'/%3E%3C/svg%3E">
+	<style>
+		:root { 
+			/* RENEKANKHA Divine Color Palette */
+			--bg-primary: #0c0c0c;
+			--bg-secondary: #141414;
+			--bg-tertiary: #1a1a1a;
+			--surface-primary: #1f1f1f;
+			--surface-secondary: #262626;
+			--surface-tertiary: #2d2d2d;
+			
+			--text-primary: #ffffff;
+			--text-secondary: #e0e0e0;
+			--text-tertiary: #a0a0a0;
+			--text-muted: #707070;
+			
+			/* Premium Accent Colors */
+			--accent-primary: #ff6b6b;
+			--accent-secondary: #4ecdc4;
+			--accent-tertiary: #45b7d1;
+			--accent-quaternary: #96ceb4;
+			--accent-quinary: #feca57;
+			
+			--success: #00d4aa;
+			--warning: #ffa726;
+			--error: #ff5722;
+			--info: #29b6f6;
+			
+			--border-primary: rgba(255,255,255,.06);
+			--border-secondary: rgba(255,255,255,.1);
+			--border-tertiary: rgba(255,255,255,.15);
+			--border-accent: rgba(255,107,107,.3);
+			
+			/* Premium Shadows with Depth */
+			--shadow-xs: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24);
+			--shadow-sm: 0 3px 6px rgba(0,0,0,.16), 0 3px 6px rgba(0,0,0,.23);
+			--shadow-md: 0 10px 20px rgba(0,0,0,.19), 0 6px 6px rgba(0,0,0,.23);
+			--shadow-lg: 0 14px 28px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.22);
+			--shadow-xl: 0 19px 38px rgba(0,0,0,.30), 0 15px 12px rgba(0,0,0,.22);
+			--shadow-glow: 0 0 20px rgba(255,107,107,.3);
+			
+			/* Premium Gradients */
+			--gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			--gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+			--gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+			--gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+			--gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+			--gradient-error: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+			--gradient-surface: linear-gradient(145deg, #1f1f1f 0%, #262626 100%);
+			--gradient-text: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+			
+			/* Glass Effect */
+			--glass-bg: rgba(255,255,255,.05);
+			--glass-border: rgba(255,255,255,.1);
+			--glass-shadow: 0 8px 32px rgba(0,0,0,.1);
+		}
+		
+		*{ box-sizing:border-box }
+		html,body{ height:100%; margin:0; padding:0 }
+		
+		body{ 
+			font-family:'Inter', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+			background: 
+				radial-gradient(circle at 20% 80%, rgba(255,107,107,.15) 0%, transparent 50%),
+				radial-gradient(circle at 80% 20%, rgba(78,205,196,.1) 0%, transparent 50%),
+				radial-gradient(circle at 40% 40%, rgba(69,183,209,.08) 0%, transparent 50%),
+				linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+			color: var(--text-primary); 
+			line-height: 1.6; 
+			padding: 24px; 
+			min-height: 100vh;
+			font-weight: 400;
+			letter-spacing: 0.01em;
+			position: relative;
+			overflow-x: hidden;
+		}
+		
+		body::before {
+			content: '';
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: 
+				radial-gradient(circle at 10% 20%, rgba(255,107,107,.05) 0%, transparent 30%),
+				radial-gradient(circle at 90% 80%, rgba(78,205,196,.05) 0%, transparent 30%),
+				radial-gradient(circle at 50% 50%, rgba(69,183,209,.03) 0%, transparent 40%);
+			pointer-events: none;
+			z-index: -1;
+			animation: backgroundShift 20s ease-in-out infinite;
+		}
+		
+		.container{ max-width:1200px; margin:0 auto; padding:0 8px }
+		
+		/* Mobile-first Navigation */
+		.topbar{ 
+			display:flex; align-items:center; justify-content:space-between; 
+			gap:12px; margin-bottom:32px; position:relative; z-index:100;
+		}
+		
+		.brand{ 
+			display:flex; align-items:center; gap:16px; 
+			font-weight:700; font-size:28px; color:var(--text-primary);
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+			letter-spacing: -0.02em;
+			background: var(--gradient-text);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			position: relative;
+		}
+		
+		.brand::before {
+			content: '';
+			position: absolute;
+			top: -2px;
+			left: -2px;
+			right: -2px;
+			bottom: -2px;
+			background: var(--gradient-primary);
+			border-radius: 12px;
+			opacity: 0.1;
+			z-index: -1;
+		}
+		
+		.brand-icon{ 
+			width:12px; height:12px; background: var(--gradient-primary);
+			border-radius:50%; display:inline-block;
+			box-shadow: var(--shadow-glow);
+			position: relative;
+		}
+		
+		.brand-icon::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 6px;
+			height: 6px;
+			background: white;
+			border-radius: 50%;
+			box-shadow: 0 0 8px rgba(255,255,255,.8);
+		}
+		
+		/* Mobile Navigation */
+		.mobile-nav-toggle{ 
+			display:none; background:none; border:none; color:var(--text-primary); 
+			font-size:24px; cursor:pointer; padding:8px;
+		}
+		
+		.nav{ 
+			display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+			transition:all 0.3s ease;
+		}
+		
+		.nav a{ 
+			text-decoration:none; color:var(--text-primary); opacity:.85; 
+			padding:12px 20px; border-radius:12px; border:1px solid var(--glass-border);
+			font-weight:500; font-size:14px; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background:var(--glass-bg); backdrop-filter: blur(20px);
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.nav a::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: var(--gradient-primary);
+			opacity: 0.1;
+			transition: left 0.3s ease;
+		}
+		
+		.nav a:hover::before {
+			left: 0;
+		}
+		
+		.nav a:hover{ 
+			opacity:1; background:var(--surface-secondary);
+			border-color: var(--border-accent); transform:translateY(-2px);
+			box-shadow: var(--shadow-md);
+		}
+		
+		.nav a.active{ 
+			opacity:1; background: var(--gradient-primary); 
+			border-color: var(--border-accent); color:white;
+			box-shadow: var(--shadow-sm);
+		}
+		
+		/* Mobile Navigation Overlay */
+		.mobile-nav-overlay{ 
+			display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+			background:rgba(0,0,0,.8); backdrop-filter:blur(8px); z-index:1000;
+		}
+		
+		.mobile-nav-menu{ 
+			position:absolute; top:0; right:0; width:280px; height:100vh;
+			background:var(--surface-primary); border-left:1px solid var(--border-primary);
+			padding:80px 24px 24px; transform:translateX(100%);
+			transition:transform 0.3s ease; backdrop-filter: blur(20px);
+		}
+		
+		.mobile-nav-menu.active{ transform:translateX(0); }
+		
+		.mobile-nav-menu a{ 
+			display:block; padding:16px 20px; margin-bottom:8px;
+			border-radius:12px; background:var(--glass-bg);
+			border:1px solid var(--border-primary); text-decoration:none;
+			color:var(--text-primary); font-weight:500; transition:all 0.3s ease;
+			backdrop-filter: blur(20px);
+		}
+		
+		.mobile-nav-menu a:hover{ 
+			background:var(--surface-secondary); border-color: var(--border-accent);
+			transform: translateY(-2px);
+		}
+		
+		.mobile-nav-menu a.active{ 
+			background: var(--gradient-primary); border-color: var(--border-accent);
+			color: white;
+		}
+		
+		/* Cards and Layout */
+		.card{ 
+			background: var(--glass-bg); 
+			border:1px solid var(--glass-border); 
+			border-radius:16px; 
+			padding:32px; 
+			box-shadow: var(--glass-shadow); 
+			margin-bottom:32px;
+			transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			backdrop-filter: blur(20px);
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 2px;
+			background: var(--gradient-primary);
+			opacity: 0.8;
+		}
+		
+		.card:hover{ 
+			transform:translateY(-8px); 
+			box-shadow: var(--shadow-xl);
+			border-color: var(--border-accent);
+		}
+		
+		.card-title {
+			font-size: 24px;
+			font-weight: 600;
+			color: var(--text-primary);
+			margin: 0 0 24px 0;
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+			letter-spacing: -0.01em;
+		}
+		
+		.controls{ 
+			display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px;
+			align-items:center;
+		}
+		
+		.input, textarea{ 
+			background:var(--glass-bg); border:1px solid var(--glass-border); 
+			color:var(--text-primary); border-radius:12px; padding:16px 20px; 
+			width:100%; font-family:'Inter', 'Noto Sans Thai', sans-serif; font-size:16px;
+			transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			backdrop-filter: blur(20px);
+			letter-spacing: 0.01em;
+		}
+		
+		.input:focus, textarea:focus{ 
+			outline:none; border-color:var(--accent-primary); 
+			box-shadow:var(--shadow-glow);
+			background:var(--surface-secondary);
+			transform: translateY(-2px);
+		}
+		
+		.btn{ 
+			appearance:none; border:1px solid var(--glass-border); 
+			background:var(--glass-bg); color:var(--text-primary); 
+			border-radius:12px; padding:12px 20px; font-weight:600; 
+			cursor:pointer; font-size:14px; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			display:inline-flex; align-items:center; gap:8px;
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+			letter-spacing: 0.01em;
+			backdrop-filter: blur(20px);
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.btn::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: var(--gradient-primary);
+			opacity: 0.1;
+			transition: left 0.3s ease;
+		}
+		
+		.btn:hover::before {
+			left: 0;
+		}
+		
+		.btn:hover{ 
+			background:var(--surface-secondary);
+			border-color: var(--border-accent);
+			transform:translateY(-2px);
+			box-shadow: var(--shadow-md);
+		}
+		
+		.btn:active{ transform:translateY(0) }
+		
+		.btn-primary{ 
+			background: var(--gradient-primary); 
+			border-color: var(--border-accent); 
+			color:white;
+			box-shadow: var(--shadow-sm);
+		}
+		
+		.btn-primary:hover{ 
+			background: var(--gradient-secondary);
+			box-shadow: var(--shadow-md);
+			transform: translateY(-3px);
+		}
+		
+		.btn-success {
+			background: var(--gradient-success);
+			border-color: var(--success);
+			color: white;
+		}
+		
+		.btn-error {
+			background: var(--gradient-error);
+			border-color: var(--error);
+			color: white;
+		}
+		
+		table{ 
+			width:100%; border-collapse:collapse; margin-top:24px;
+			background:var(--glass-bg); border-radius:12px; overflow:hidden;
+			backdrop-filter: blur(20px);
+		}
+		
+		th,td{ 
+			padding:16px 20px; border-bottom:1px solid var(--border-primary); 
+			text-align:left; font-size:14px;
+		}
+		
+		th{ 
+			color:var(--text-secondary); font-weight:600; background:var(--surface-secondary);
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+		}
+		
+		td{ color:var(--text-primary) }
+		
+		.badge{ 
+			display:inline-flex; align-items:center; gap:8px; 
+			background: var(--gradient-primary); 
+			border:1px solid var(--border-accent); 
+			color:white; border-radius:20px; padding:8px 16px; 
+			font-size:12px; font-weight:600; letter-spacing:.5px;
+			box-shadow: var(--shadow-sm);
+			backdrop-filter: blur(10px);
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.badge::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+			transition: left 0.6s ease;
+		}
+		
+		.badge:hover::before {
+			left: 100%;
+		}
+		
+		.status-indicator {
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			margin-right: 8px;
+		}
+		
+		.status-blacklisted {
+			background: var(--error);
+			box-shadow: 0 0 8px rgba(255,87,34,.5);
+		}
+		
+		.status-clean {
+			background: var(--success);
+			box-shadow: 0 0 8px rgba(0,212,170,.5);
+		}
+		
+		.status-unknown {
+			background: var(--warning);
+			box-shadow: 0 0 8px rgba(255,167,38,.5);
+		}
+		
+		.small{ font-size:14px; color:var(--text-tertiary); line-height:1.5 }
+		
+		.footer{ 
+			color:var(--text-muted); margin-top:48px; font-size:14px; 
+			text-align:center; padding:32px 0; border-top:1px solid var(--border-primary);
+			font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+		}
+		
+		/* Enhanced Animations */
+		@keyframes fadeInUp{
+			from{ opacity:0; transform:translateY(40px) }
+			to{ opacity:1; transform:translateY(0) }
+		}
+		
+		@keyframes slideInLeft{
+			from{ opacity:0; transform:translateX(-40px) }
+			to{ opacity:1; transform:translateX(0) }
+		}
+		
+		@keyframes pulse{
+			0%, 100%{ transform: scale(1) }
+			50%{ transform: scale(1.05) }
+		}
+		
+		@keyframes glow{
+			0%, 100%{ box-shadow: var(--shadow-glow) }
+			50%{ box-shadow: 0 0 30px rgba(255,107,107,.5) }
+		}
+		
+		@keyframes backgroundShift{
+			0%, 100%{ transform: translateX(0) translateY(0) }
+			25%{ transform: translateX(10px) translateY(-5px) }
+			50%{ transform: translateX(-5px) translateY(10px) }
+			75%{ transform: translateX(-10px) translateY(-5px) }
+		}
+		
+		.card{ 
+			animation:fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+			animation-fill-mode: both;
+		}
+		
+		.brand{ animation: slideInLeft 1s cubic-bezier(0.4, 0, 0.2, 1) }
+		.brand-icon{ animation: pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite }
+		
+		/* Responsive Design */
+		@media(max-width:768px){
+			body{ padding:16px }
+			.container{ padding:0 4px }
+			.topbar{ margin-bottom:24px }
+			.brand{ font-size:24px }
+			.mobile-nav-toggle{ display:block }
+			.nav{ display:none }
+			.card{ padding:24px; border-radius:16px }
+			.controls{ flex-direction:column; align-items:stretch }
+			.input, .btn{ width:100%; margin-bottom:8px }
+			table{ font-size:13px }
+			th,td{ padding:12px 16px }
+		}
+		
+		@media(max-width:480px){
+			body{ padding:12px }
+			.brand{ font-size:20px; gap:12px }
+			.card{ padding:20px; margin-bottom:24px }
+			.btn{ padding:10px 16px; font-size:13px }
+			table{ font-size:12px }
+			th,td{ padding:10px 12px }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="topbar">
+			<div class="brand">
+				<span class="brand-icon"></span>
+				<span>RENEKANKHA</span>
+			</div>
+			<button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
+			<div class="nav">
+				<a href="index.html">หน้าหลัก</a>
+				<a href="authenticator.html">2FA Generator</a>
+				<a href="reports.html" class="active">รายงาน</a>
+				<a href="orders.html">คำสั่งซื้อ</a>
+				<a href="login.html">เข้าสู่ระบบ</a>
+			</div>
+		</div>
+
+		<!-- Mobile Navigation Overlay -->
+		<div class="mobile-nav-overlay" id="mobileNavOverlay">
+			<div class="mobile-nav-menu" id="mobileNavMenu">
+				<a href="index.html">หน้าหลัก</a>
+				<a href="authenticator.html">2FA Generator</a>
+				<a href="reports.html" class="active">รายงาน</a>
+				<a href="orders.html">คำสั่งซื้อ</a>
+				<a href="login.html">เข้าสู่ระบบ</a>
+				<a href="register.html">สมัครสมาชิก</a>
+				<a href="services-garena.html">บริการ Garena</a>
+				<a href="services-blacklist-dispute.html">แก้ไขบัญชีดำ</a>
+				<a href="services-google-removal.html">ลบข้อมูล Google</a>
+			</div>
+		</div>
+
+		<!-- ส่วนแสดงสถานะ IP ของผู้เยี่ยมชม -->
+		<section class="card">
+			<h3 class="card-title">สถานะ IP ของคุณ</h3>
+			<div style="padding: 20px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border);">
+				<div class="small" style="color: var(--text-tertiary); margin-bottom: 12px;">การตรวจสอบอัตโนมัติ</div>
+				<div id="visitorStatus" style="font-weight: 600; font-size: 16px;">กำลังตรวจสอบ IP ของคุณ...</div>
+			</div>
+		</section>
+		<section class="card" id="reportSection" style="display: none;">
+			<h3 class="card-title">แจ้งรายงาน IP</h3>
+			<div class="controls">
+				<input id="searchIp" class="input" placeholder="กรอก IP ที่ต้องการรายงาน" />
+				<button id="searchBtn" class="btn btn-primary">ค้นหา IP</button>
+			</div>
+			
+			<!-- IP Information Display -->
+			<div id="ipInfo" style="display:none; margin-top:24px; padding:24px; background:var(--glass-bg); border-radius:12px; border:1px solid var(--glass-border);">
+				<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+					<div>
+						<div class="small" style="color:var(--text-tertiary); margin-bottom:8px;">IP Address</div>
+						<div id="ipDisplay" style="font-weight:600; color:var(--text-primary);"></div>
+					</div>
+					<div>
+						<div class="small" style="color:var(--text-tertiary); margin-bottom:8px;">ISP</div>
+						<div id="ispDisplay" style="font-weight:600; color:var(--text-primary);"></div>
+					</div>
+					<div>
+						<div class="small" style="color:var(--text-tertiary); margin-bottom:8px;">ประเทศ</div>
+						<div id="countryDisplay" style="font-weight:600; color:var(--text-primary);"></div>
+					</div>
+					<div>
+						<div class="small" style="color:var(--text-tertiary); margin-bottom:8px;">ภูมิภาค/เมือง</div>
+						<div id="locationDisplay" style="font-weight:600; color:var(--text-primary);"></div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Blacklist Status -->
+			<div id="blacklistStatus" style="margin-top:24px; padding:16px; background:var(--glass-bg); border-radius:12px; border:1px solid var(--glass-border);">
+				<div class="small" style="color:var(--text-tertiary); margin-bottom:12px;">สถานะบัญชีดำ</div>
+				<div id="blStatus" style="font-weight:600;">กำลังตรวจสอบ...</div>
+			</div>
+			
+			<!-- Blacklist Management -->
+			<div style="margin-top:24px;">
+				<div class="controls">
+					<input id="blacklistReason" class="input" placeholder="ระบุเหตุผล (เช่น หลอกลวง, สแปม)" />
+					<button id="blacklistAddBtn" class="btn btn-error">เพิ่มเข้าบัญชีดำ</button>
+					<button id="blacklistRemoveBtn" class="btn btn-success">ลบออกจากบัญชีดำ</button>
+			</div>
+		</div>
+
+			<!-- Report Submission -->
+			<div style="margin-top:24px;">
+				<div class="small" style="color:var(--text-tertiary); margin-bottom:12px;">ส่งรายงานพฤติกรรมผู้ใช้ IP นี้</div>
+				<div class="controls" style="align-items: flex-start;">
+					<textarea id="reportDetails" rows="3" class="input" placeholder="รายละเอียดพฤติกรรมที่พบ..."></textarea>
+					<button id="reportSubmitBtn" class="btn btn-primary">ส่งรายงาน</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- ส่วนแสดงรายการ IP ที่แบล็กลิสต์ -->
+		<section class="card">
+			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+				<h3 class="card-title" style="margin: 0;">รายการ IP ที่แบล็กลิสต์</h3>
+				<button id="showReportBtn" class="btn btn-primary">แจ้งรายงาน IP ใหม่</button>
+			</div>
+			
+			<div class="controls">
+				<input id="q" class="input" placeholder="ค้นหา IP หรือเหตุผล" />
+				<select id="limit" class="input">
+					<option value="50">50 รายการ</option>
+					<option value="100">100 รายการ</option>
+					<option value="200" selected>200 รายการ</option>
+				</select>
+				<button id="refresh" class="btn">รีเฟรช</button>
+			</div>
+			
+			<div class="small" id="summary">กำลังโหลดข้อมูล...</div>
+			
+			<div style="overflow:auto; margin-top:16px;">
+				<table id="tbl">
+					<thead>
+						<tr>
+							<th>เวลา</th>
+							<th>IP Address</th>
+							<th>เหตุผล</th>
+							<th>สถานะ</th>
+							<th>การดำเนินการ</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</section>
+
+		<div class="footer small">© RENEKANKHA • รายงานถูกเก็บฝั่งเซิร์ฟเวอร์</div>
+	</div>
+
+	<script>
+		const $ = (id) => document.getElementById(id);
+		
+		// Mobile Navigation
+		function initMobileNav() {
+			const toggle = $('mobileNavToggle');
+			const overlay = $('mobileNavOverlay');
+			const menu = $('mobileNavMenu');
+			
+			if (!toggle || !overlay || !menu) return;
+			
+			toggle.addEventListener('click', () => {
+				overlay.style.display = 'block';
+				setTimeout(() => menu.classList.add('active'), 10);
+			});
+			
+			overlay.addEventListener('click', (e) => {
+				if (e.target === overlay) {
+					menu.classList.remove('active');
+					setTimeout(() => overlay.style.display = 'none', 300);
+				}
+			});
+		}
+		
+		// Show/Hide Report Section
+		function toggleReportSection() {
+			const reportSection = $('reportSection');
+			const showReportBtn = $('showReportBtn');
+			
+			if (reportSection.style.display === 'none') {
+				reportSection.style.display = 'block';
+				showReportBtn.textContent = 'ซ่อนฟอร์มรายงาน';
+				reportSection.scrollIntoView({ behavior: 'smooth' });
+			} else {
+				reportSection.style.display = 'none';
+				showReportBtn.textContent = 'แจ้งรายงาน IP ใหม่';
+			}
+		}
+		
+		const tbody = document.querySelector('#tbl tbody');
+
+		function fmtTime(iso){ 
+			try{ 
+				const d = new Date(iso); 
+				return d.toLocaleString('th-TH'); 
+			}catch{ 
+				return iso || '-'; 
+			} 
+		}
+		
+		function copy(text){ 
+			navigator.clipboard?.writeText(text).then(() => {
+				// Show success feedback
+				const originalText = event.target.textContent;
+				event.target.textContent = 'คัดลอกแล้ว!';
+				event.target.style.background = 'var(--gradient-success)';
+				setTimeout(() => {
+					event.target.textContent = originalText;
+					event.target.style.background = '';
+				}, 1500);
+			}).catch(() => {});
+		}
+		
+		// IP Search and Blacklist Functions
+		function isValidIP(v){ 
+			if(!v) return false; 
+			const ipv4=/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/; 
+			const ipv6=/^([0-9a-f]{1,4}:){1,7}[0-9a-f]{1,4}$/i; 
+			return ipv4.test(v)||ipv6.test(v); 
+		}
+		
+		async function ipinfoLookupByIP(ip){
+			const url = ip ? `https://ipinfo.io/${encodeURIComponent(ip)}/json` : 'https://ipinfo.io/json';
+			const res = await fetch(url);
+			if(!res.ok) throw new Error('ipinfo failed');
+			return res.json();
+		}
+		
+		async function searchIpFlow(){ 
+			const ip = $('searchIp').value.trim(); 
+			if(!isValidIP(ip)){ 
+				alert('รูปแบบ IP ไม่ถูกต้อง'); 
+				return; 
+			} 
+			
+			try{ 
+				const d = await ipinfoLookupByIP(ip); 
+				const via = { 
+					ip: ip, 
+					isp: d.org||d.org_name||d.isp||'-', 
+					country: d.country_name||d.country||'-', 
+					region: d.region||d.regionName||'-', 
+					city: d.city||'-', 
+					latitude: Number(d.latitude), 
+					longitude: Number(d.longitude) 
+				}; 
+				
+				// Display IP information
+				$('ipDisplay').textContent = via.ip;
+				$('ispDisplay').textContent = via.isp;
+				$('countryDisplay').textContent = via.country;
+				$('locationDisplay').textContent = [via.region, via.city].filter(Boolean).join(' / ') || '-';
+				$('ipInfo').style.display = 'block';
+				
+				// Check blacklist status
+				await checkBlacklist(via.ip);
+				
+			}catch(e){ 
+				alert('ค้นหาไม่สำเร็จ: ' + e.message); 
+			}
+		}
+		
+		async function checkBlacklist(ip){ 
+			try {
+				const res = await fetch(`/api/blacklist/${encodeURIComponent(ip)}`); 
+				if(!res.ok) throw new Error('bl check failed'); 
+				const data = await res.json(); 
+				if(data.blacklisted) {
+					$('blStatus').innerHTML = `<span class="status-indicator status-blacklisted"></span>อยู่ในบัญชีดำ: ${data.entry.reason||'-'}`;
+					$('blStatus').style.color = 'var(--error)';
+				} else {
+					$('blStatus').innerHTML = `<span class="status-indicator status-clean"></span>ยังไม่อยู่ในบัญชีดำ`;
+					$('blStatus').style.color = 'var(--success)';
+				}
+			} catch(e) {
+				$('blStatus').innerHTML = `<span class="status-indicator status-unknown"></span>ตรวจสอบบัญชีดำไม่สำเร็จ`;
+				$('blStatus').style.color = 'var(--warning)';
+			}
+		}
+		
+		async function addToBlacklist(ip, reason){ 
+			const res = await fetch('/api/blacklist',{ 
+				method:'POST', 
+				headers:{ 'Content-Type':'application/json' }, 
+				body:JSON.stringify({ ip, reason }) 
+			}); 
+			if(!res.ok){ 
+				const t = await res.json().catch(()=>({})); 
+				throw new Error(t.error||'เพิ่มบัญชีดำไม่สำเร็จ'); 
+			} 
+			return res.json(); 
+		}
+		
+		async function removeFromBlacklist(ip){ 
+			const res = await fetch(`/api/blacklist/${encodeURIComponent(ip)}`,{ 
+				method:'DELETE' 
+			}); 
+			if(!res.ok){ 
+				const t = await res.json().catch(()=>({})); 
+				throw new Error(t.error||'ลบออกจากบัญชีดำไม่สำเร็จ'); 
+			} 
+			return res.json(); 
+		}
+		
+		async function submitReport(ip, details){ 
+			const res = await fetch('/api/reports',{ 
+				method:'POST', 
+				headers:{ 'Content-Type':'application/json' }, 
+				body:JSON.stringify({ ip, details }) 
+			}); 
+			if(!res.ok){ 
+				const t = await res.json().catch(()=>({})); 
+				throw new Error(t.error||'ส่งรายงานไม่สำเร็จ'); 
+			} 
+			return res.json(); 
+		}
+		
+		function rowHtml(r){
+			const statusClass = r.blacklisted ? 'status-blacklisted' : 'status-clean';
+			const statusText = r.blacklisted ? 'แบล็กลิสต์' : 'ปกติ';
+			const statusColor = r.blacklisted ? 'var(--error)' : 'var(--success)';
+			
+			return `<tr>
+				<td class="small">${fmtTime(r.createdAt)}</td>
+				<td><span class="badge">${r.ip}</span></td>
+				<td>${(r.reason||r.details||'').replace(/[<>]/g,'')}</td>
+				<td style="color: ${statusColor}; font-weight: 600;">
+					<span class="status-indicator ${statusClass}"></span>${statusText}
+				</td>
+				<td class="small">
+					<button class="btn" data-action="copy" data-ip="${r.ip}">คัดลอก IP</button>
+					<button class="btn" data-action="check" data-ip="${r.ip}">ตรวจสอบ</button>
+				</td>
+			</tr>`;
+		}
+
+		async function loadReports(){
+			const limit = parseInt($("limit").value,10)||200;
+			const q = $("q").value.trim().toLowerCase();
+			
+			try {
+				// Load blacklist data instead of reports
+				const res = await fetch(`/api/blacklist?limit=${limit}`);
+			if(!res.ok) throw new Error('load failed');
+			const data = await res.json();
+			let items = data.items||[];
+				
+				if(q){ 
+					items = items.filter(x => 
+						(x.ip||'').toLowerCase().includes(q) || 
+						(x.reason||'').toLowerCase().includes(q)
+					); 
+				}
+				
+			$('summary').textContent = `ทั้งหมด ${data.count} รายการ • แสดง ${items.length} รายการล่าสุด`;
+			tbody.innerHTML = items.map(rowHtml).join('');
+			} catch(e) {
+				$('summary').textContent = 'ไม่สามารถโหลดข้อมูลได้';
+				tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-tertiary);">ไม่มีข้อมูล</td></tr>';
+			}
+		}
+
+		document.addEventListener('click', async (e)=>{
+			const t = e.target;
+			if(!(t instanceof HTMLElement)) return;
+			const action = t.getAttribute('data-action');
+			
+			if(action === 'copy'){ 
+				const ip = t.getAttribute('data-ip'); 
+				copy(ip); 
+			}
+			
+			if(action === 'check'){
+				const ip = t.getAttribute('data-ip');
+				try {
+				const res = await fetch(`/api/blacklist/${encodeURIComponent(ip)}`);
+				if(!res.ok) return alert('ตรวจสอบไม่สำเร็จ');
+				const j = await res.json();
+					if(j.blacklisted) {
+						alert(`IP ${ip} อยู่ในบัญชีดำ\nเหตุผล: ${j.entry.reason||'-'}`);
+					} else {
+						alert(`IP ${ip} ยังไม่อยู่ในบัญชีดำ`);
+					}
+				} catch(e) {
+					alert('ตรวจสอบไม่สำเร็จ: ' + e.message);
+				}
+			}
+		});
+
+		// Event Listeners
+		document.getElementById('refresh').addEventListener('click', loadReports);
+		document.getElementById('limit').addEventListener('change', loadReports);
+		document.getElementById('q').addEventListener('input', () => { 
+			clearTimeout(window._t); 
+			window._t = setTimeout(loadReports, 250); 
+		});
+		
+		// Show/Hide Report Section
+		document.getElementById('showReportBtn').addEventListener('click', toggleReportSection);
+		
+		// IP Search and Blacklist Event Listeners
+		document.getElementById('searchBtn').addEventListener('click', searchIpFlow);
+		document.getElementById('searchIp').addEventListener('keydown', (e) => { 
+			if(e.key === 'Enter'){ 
+				e.preventDefault(); 
+				searchIpFlow(); 
+			} 
+		});
+		
+		document.getElementById('blacklistAddBtn').addEventListener('click', async () => { 
+			const ip = $('ipDisplay').textContent.trim(); 
+			if(!ip || ip === '-') {
+				alert('กรุณาค้นหา IP ก่อน');
+				return;
+			}
+			const reason = $('blacklistReason').value.trim() || 'ไม่ระบุ'; 
+			try{ 
+				await addToBlacklist(ip, reason); 
+				$('blStatus').innerHTML = `<span class="status-indicator status-blacklisted"></span>เพิ่มบัญชีดำแล้ว: ${reason}`;
+				$('blStatus').style.color = 'var(--error)';
+				$('blacklistReason').value = '';
+				loadReports(); // Refresh the blacklist
+			}catch(e){ 
+				alert(e.message || 'เพิ่มบัญชีดำไม่สำเร็จ'); 
+			} 
+		});
+		
+		document.getElementById('blacklistRemoveBtn').addEventListener('click', async () => { 
+			const ip = $('ipDisplay').textContent.trim(); 
+			if(!ip || ip === '-') {
+				alert('กรุณาค้นหา IP ก่อน');
+				return;
+			}
+			try{ 
+				await removeFromBlacklist(ip); 
+				$('blStatus').innerHTML = `<span class="status-indicator status-clean"></span>ลบออกจากบัญชีดำแล้ว`;
+				$('blStatus').style.color = 'var(--success)';
+				loadReports(); // Refresh the blacklist
+			}catch(e){ 
+				alert(e.message || 'ลบออกจากบัญชีดำไม่สำเร็จ'); 
+			} 
+		});
+		
+		document.getElementById('reportSubmitBtn').addEventListener('click', async () => { 
+			const ip = $('ipDisplay').textContent.trim(); 
+			if(!ip || ip === '-') {
+				alert('กรุณาค้นหา IP ก่อน');
+				return;
+			}
+			const details = $('reportDetails').value.trim(); 
+			if(!details) {
+				alert('กรุณากรอกรายละเอียดรายงาน');
+				return;
+			}
+			try{ 
+				await submitReport(ip, details); 
+				$('reportDetails').value = ''; 
+				alert('ส่งรายงานสำเร็จ');
+			}catch(e){ 
+				alert(e.message || 'ส่งรายงานไม่สำเร็จ'); 
+			} 
+		});
+		
+		// Auto-check visitor's IP blacklist status
+		async function checkVisitorIP() {
+			try {
+				// Get visitor's IP
+				const ipRes = await fetch('/api/ip');
+				if (!ipRes.ok) throw new Error('Cannot get visitor IP');
+				const ipData = await ipRes.json();
+				const visitorIP = ipData.ip;
+				
+				// Check if visitor's IP is blacklisted
+				const blacklistRes = await fetch(`/api/blacklist/${encodeURIComponent(visitorIP)}`);
+				if (!blacklistRes.ok) throw new Error('Cannot check blacklist');
+				const blacklistData = await blacklistRes.json();
+				
+				// Update status display
+				const statusElement = document.getElementById('visitorStatus');
+				if (statusElement) {
+					if (blacklistData.blacklisted) {
+						statusElement.innerHTML = `
+							<div style="margin-bottom: 8px;">
+								<span class="badge">${visitorIP}</span>
+							</div>
+							<div>
+								<span class="status-indicator status-blacklisted"></span>IP ของคุณอยู่ในบัญชีดำ: ${blacklistData.entry.reason||'-'}
+							</div>
+						`;
+						statusElement.style.color = 'var(--error)';
+					} else {
+						statusElement.innerHTML = `
+							<div style="margin-bottom: 8px;">
+								<span class="badge">${visitorIP}</span>
+							</div>
+							<div>
+								<span class="status-indicator status-clean"></span>IP ของคุณไม่อยู่ในบัญชีดำ
+							</div>
+						`;
+						statusElement.style.color = 'var(--success)';
+					}
+				}
+			} catch(e) {
+				console.error('Error checking visitor IP:', e);
+				const statusElement = document.getElementById('visitorStatus');
+				if (statusElement) {
+					statusElement.innerHTML = `<span class="status-indicator status-unknown"></span>ไม่สามารถตรวจสอบ IP ของคุณได้`;
+					statusElement.style.color = 'var(--warning)';
+				}
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', () => {
+			initMobileNav();
+			loadReports();
+			checkVisitorIP(); // Auto-check visitor's IP
+		});
+	</script>
+</body>
+</html>
+

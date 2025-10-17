@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>บริการ Garena - RENEKANKHA</title>
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+	
+	<style>
+		:root {
+			/* RENEKANKHA Premium Color Palette */
+			--primary: #6366f1;
+			--primary-dark: #4f46e5;
+			--secondary: #8b5cf6;
+			--accent: #06b6d4;
+			--accent-light: #67e8f9;
+			--success: #10b981;
+			--warning: #f59e0b;
+			--error: #ef4444;
+			--info: #3b82f6;
+			
+			/* Background & Surface */
+			--bg-primary: #0a0e27;
+			--bg-secondary: #0f1428;
+			--bg-tertiary: #141d3a;
+			--surface: rgba(255,255,255,.04);
+			--surface-hover: rgba(255,255,255,.08);
+			--glass-bg: rgba(15,20,40,.4);
+			--glass-border: rgba(99,102,241,.2);
+			
+			/* Text Colors */
+			--text-primary: #ffffff;
+			--text-secondary: #e2e8f0;
+			--text-tertiary: #a0aec0;
+			--text-muted: #718096;
+			
+			/* Borders & Shadows */
+			--border-primary: rgba(255,255,255,.08);
+			--border-secondary: rgba(255,255,255,.04);
+			--border-accent: rgba(99,102,241,.4);
+			--shadow-sm: 0 1px 2px 0 rgba(0,0,0,.05);
+			--shadow-md: 0 4px 6px -1px rgba(0,0,0,.1);
+			--shadow-lg: 0 10px 15px -3px rgba(0,0,0,.2);
+			--shadow-xl: 0 20px 25px -5px rgba(0,0,0,.3);
+			--shadow-glow: 0 0 30px rgba(99,102,241,.4);
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+			color: var(--text-primary);
+			min-height: 100vh;
+			line-height: 1.6;
+		}
+
+		body::before {
+			content: '';
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: 
+				radial-gradient(circle at 20% 50%, rgba(99,102,241,.1) 0%, transparent 50%),
+				radial-gradient(circle at 80% 80%, rgba(168,85,247,.08) 0%, transparent 50%);
+			pointer-events: none;
+			z-index: -1;
+		}
+
+		/* Navigation Styles */
+		.desktop-nav {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 16px 40px;
+			background: linear-gradient(90deg, rgba(15,20,40,.6) 0%, rgba(20,29,55,.4) 100%);
+			backdrop-filter: blur(20px);
+			border-bottom: 1px solid var(--glass-border);
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
+
+		.nav-brand {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			text-decoration: none;
+			color: var(--text-primary);
+			font-weight: 700;
+			font-size: 20px;
+			transition: all 0.3s ease;
+		}
+
+		.nav-brand:hover {
+			color: var(--accent);
+			transform: translateY(-2px);
+		}
+
+		.nav-brand-icon {
+			font-size: 28px;
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 32px;
+			align-items: center;
+		}
+
+		.nav-link {
+			color: var(--text-secondary);
+			text-decoration: none;
+			font-weight: 500;
+			font-size: 14px;
+			padding: 10px 16px;
+			border-radius: 10px;
+			transition: all 0.3s ease;
+			position: relative;
+		}
+
+		.nav-link::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 16px;
+			width: 0;
+			height: 2px;
+			background: linear-gradient(90deg, var(--primary), var(--accent));
+			transition: width 0.3s ease;
+		}
+
+		.nav-link:hover {
+			color: var(--text-primary);
+			background: rgba(255,255,255,.05);
+		}
+
+		.nav-link:hover::after {
+			width: calc(100% - 32px);
+		}
+
+		/* Mobile Navigation */
+		.mobile-nav {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 1000;
+			background: linear-gradient(90deg, rgba(15,20,40,.8) 0%, rgba(20,29,55,.6) 100%);
+			backdrop-filter: blur(20px);
+			border-bottom: 1px solid var(--glass-border);
+			padding: 12px 16px;
+		}
+
+		.mobile-nav-content {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.mobile-nav-toggle {
+			background: none;
+			border: none;
+			color: var(--text-primary);
+			font-size: 24px;
+			cursor: pointer;
+			padding: 8px;
+			border-radius: 10px;
+			transition: all 0.3s ease;
+		}
+
+		.mobile-nav-toggle:hover {
+			background: rgba(255,255,255,.08);
+		}
+
+		.mobile-nav-menu {
+			position: fixed;
+			top: 0;
+			right: -300px;
+			width: 300px;
+			height: 100vh;
+			background: var(--bg-secondary);
+			z-index: 999;
+			padding: 80px 20px 20px;
+			transition: right 0.3s ease;
+			overflow-y: auto;
+		}
+
+		.mobile-nav-menu.active {
+			right: 0;
+		}
+
+		.mobile-nav-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0,0,0,.5);
+			z-index: 998;
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.3s ease;
+		}
+
+		.mobile-nav-overlay.active {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		.mobile-nav-item {
+			display: block;
+			padding: 14px 16px;
+			color: var(--text-secondary);
+			text-decoration: none;
+			border-radius: 10px;
+			margin-bottom: 8px;
+			transition: all 0.3s ease;
+		}
+
+		.mobile-nav-item:hover,
+		.mobile-nav-item.active {
+			background: rgba(255,255,255,.08);
+			color: var(--text-primary);
+		}
+
+		/* Main Content */
+		.main-content {
+			padding: 60px 40px;
+			max-width: 1400px;
+			margin: 0 auto;
+			position: relative;
+			z-index: 10;
+		}
+
+		.page-header {
+			text-align: center;
+			margin-bottom: 60px;
+		}
+
+		.page-title {
+			font-size: 3.5rem;
+			font-weight: 900;
+			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin-bottom: 20px;
+			animation: fadeInDown 0.8s ease;
+		}
+
+		.page-subtitle {
+			font-size: 1.1rem;
+			color: var(--text-secondary);
+			max-width: 700px;
+			margin: 0 auto;
+			animation: fadeInUp 0.8s ease 0.2s both;
+		}
+
+		/* Service Options Grid */
+		.service-options {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+			gap: 28px;
+			margin-bottom: 60px;
+		}
+
+		.service-option {
+			background: linear-gradient(135deg, rgba(99,102,241,.1) 0%, rgba(168,85,247,.05) 100%);
+			border: 1px solid var(--glass-border);
+			border-radius: 20px;
+			padding: 40px 32px;
+			backdrop-filter: blur(20px);
+			transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			cursor: pointer;
+			position: relative;
+			overflow: hidden;
+			text-align: center;
+		}
+
+		.service-option::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 4px;
+			background: linear-gradient(90deg, var(--primary), var(--accent));
+			transform: scaleX(0);
+			transform-origin: left;
+			transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.service-option::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: linear-gradient(135deg, rgba(99,102,241,.1) 0%, transparent 100%);
+			opacity: 0;
+			transition: opacity 0.4s ease;
+		}
+
+		.service-option:hover {
+			transform: translateY(-12px);
+			border-color: var(--border-accent);
+			box-shadow: var(--shadow-glow);
+		}
+
+		.service-option:hover::before {
+			transform: scaleX(1);
+		}
+
+		.service-option:hover::after {
+			opacity: 1;
+		}
+
+		.service-icon {
+			font-size: 3.5rem;
+			margin-bottom: 24px;
+			display: block;
+			transition: transform 0.4s ease;
+		}
+
+		.service-option:hover .service-icon {
+			transform: scale(1.15) rotate(5deg);
+		}
+
+		.service-title {
+			font-size: 1.6rem;
+			font-weight: 800;
+			margin-bottom: 12px;
+			color: var(--text-primary);
+			letter-spacing: -0.02em;
+		}
+
+		.service-description {
+			color: var(--text-tertiary);
+			margin-bottom: 24px;
+			line-height: 1.7;
+			font-size: 0.95rem;
+		}
+
+		.service-option > div:last-child {
+			color: var(--accent-light);
+			font-weight: 700;
+			font-size: 0.9rem;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		/* Form Container */
+		.form-container {
+			background: linear-gradient(135deg, rgba(99,102,241,.08) 0%, rgba(168,85,247,.04) 100%);
+			border: 1px solid var(--glass-border);
+			border-radius: 20px;
+			padding: 48px;
+			backdrop-filter: blur(20px);
+			margin-top: 40px;
+			animation: slideInUp 0.5s ease;
+		}
+
+		.form-title {
+			font-size: 2rem;
+			font-weight: 900;
+			margin-bottom: 32px;
+			color: var(--text-primary);
+			text-align: center;
+			background: linear-gradient(135deg, var(--primary), var(--accent));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.form-group {
+			margin-bottom: 24px;
+		}
+
+		.form-label {
+			display: block;
+			margin-bottom: 12px;
+			font-weight: 600;
+			color: var(--text-secondary);
+			font-size: 0.95rem;
+		}
+
+		.form-control {
+			width: 100%;
+			padding: 14px 18px;
+			background: rgba(255,255,255,.04);
+			border: 1px solid var(--border-primary);
+			border-radius: 12px;
+			color: var(--text-primary);
+			font-size: 1rem;
+			font-family: inherit;
+			transition: all 0.3s ease;
+		}
+
+		.form-control:focus {
+			outline: none;
+			border-color: var(--accent);
+			background: rgba(255,255,255,.06);
+			box-shadow: 0 0 0 4px rgba(6,182,212,.1);
+		}
+
+		.form-control::placeholder {
+			color: var(--text-muted);
+		}
+
+		.notice {
+			background: rgba(59,130,246,.08);
+			border: 1px solid rgba(59,130,246,.3);
+			border-radius: 14px;
+			padding: 20px 24px;
+			margin-bottom: 32px;
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+			line-height: 1.7;
+		}
+
+		.btn-submit {
+			width: 100%;
+			padding: 16px 32px;
+			background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+			color: white;
+			border: none;
+			border-radius: 14px;
+			font-weight: 700;
+			font-size: 1.05rem;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			margin-top: 32px;
+			position: relative;
+			overflow: hidden;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		.btn-submit::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+			transition: left 0.5s ease;
+		}
+
+		.btn-submit:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 0 30px rgba(239,68,68,.4);
+		}
+
+		.btn-submit:hover::before {
+			left: 100%;
+		}
+
+		.service-btn {
+			width: auto;
+			padding: 14px 32px;
+			background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+			color: white;
+			border: none;
+			border-radius: 14px;
+			font-weight: 700;
+			font-size: 1rem;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: inline-block;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		.service-btn:hover {
+			transform: translateY(-3px);
+			box-shadow: var(--shadow-glow);
+		}
+
+		/* Status Messages */
+		.status {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			padding: 16px 24px;
+			border-radius: 12px;
+			font-weight: 700;
+			z-index: 2000;
+			transform: translateX(400px);
+			transition: transform 0.3s ease;
+			box-shadow: var(--shadow-lg);
+		}
+
+		.status.show {
+			transform: translateX(0);
+		}
+
+		.status.success {
+			background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+			color: white;
+		}
+
+		.status.error {
+			background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+			color: white;
+		}
+
+		.status.loading {
+			background: linear-gradient(135deg, var(--info) 0%, #1d4ed8 100%);
+			color: white;
+		}
+
+		/* Animations */
+		@keyframes fadeInDown {
+			from {
+				opacity: 0;
+				transform: translateY(-30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@keyframes slideInUp {
+			from {
+				opacity: 0;
+				transform: translateY(40px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.service-option {
+			animation: fadeInUp 0.6s ease both;
+		}
+
+		.service-option:nth-child(1) { animation-delay: 0.1s; }
+		.service-option:nth-child(2) { animation-delay: 0.2s; }
+		.service-option:nth-child(3) { animation-delay: 0.3s; }
+		.service-option:nth-child(4) { animation-delay: 0.4s; }
+
+		/* Responsive Design */
+		@media (max-width: 768px) {
+			.desktop-nav {
+				display: none;
+			}
+
+			.mobile-nav {
+				display: block;
+			}
+
+			.main-content {
+				padding: 40px 20px;
+				padding-top: 80px;
+			}
+
+			.page-title {
+				font-size: 2.2rem;
+			}
+
+			.page-subtitle {
+				font-size: 0.95rem;
+			}
+
+			.service-options {
+				grid-template-columns: 1fr;
+				gap: 20px;
+			}
+
+			.service-option {
+				padding: 32px 24px;
+			}
+
+			.form-container {
+				padding: 32px 20px;
+			}
+
+			.form-title {
+				font-size: 1.5rem;
+			}
+
+			.service-btn {
+				width: 100%;
+				display: block;
+			}
+		}
+
+		/* Logout Button */
+		.logout-btn {
+			color: var(--accent) !important;
+			font-weight: 700;
+			text-decoration: none;
+			padding: 10px 16px;
+			border-radius: 10px;
+			transition: all 0.3s ease;
+			font-size: 13px;
+		}
+
+		.logout-btn:hover {
+			color: var(--error) !important;
+			background: rgba(239,68,68,.1) !important;
+			transform: translateY(-2px);
+		}
+	</style>
+</head>
+<body>
+	<!-- Mobile Navigation -->
+	<nav class="mobile-nav">
+		<div class="mobile-nav-content">
+			<a href="index.html" class="nav-brand">
+				<div class="nav-brand-icon">🔐</div>
+				<span>RENEKANKHA</span>
+			</a>
+			<button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
+		</div>
+	</nav>
+
+	<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+	<div class="mobile-nav-menu" id="mobileNavMenu">
+		<a href="index.html" class="mobile-nav-item">🏠 หน้าแรก</a>
+		<a href="authenticator.html" class="mobile-nav-item">🔐 2FA Authenticator</a>
+		<a href="reports.html" class="mobile-nav-item">📊 รายงาน</a>
+		<a href="services.html" class="mobile-nav-item">🛠️ บริการ</a>
+		<a href="orders.html" class="mobile-nav-item">📦 คำสั่งซื้อ</a>
+		<!-- Login/Logout button will be added here by JavaScript -->
+	</div>
+
+	<!-- Desktop Navigation -->
+	<nav class="desktop-nav">
+		<a href="index.html" class="nav-brand">
+			<div class="nav-brand-icon">🔐</div>
+			<span>RENEKANKHA</span>
+		</a>
+		<div class="nav-links">
+			<a href="index.html" class="nav-link">🏠 หน้าแรก</a>
+			<a href="authenticator.html" class="nav-link">🔐 2FA Authenticator</a>
+			<a href="reports.html" class="nav-link">📊 รายงาน</a>
+			<a href="services.html" class="nav-link">🛠️ บริการ</a>
+			<a href="orders.html" class="nav-link">📦 คำสั่งซื้อ</a>
+			<!-- Login/Logout button will be added here by JavaScript -->
+		</div>
+	</nav>
+
+	<!-- Main Content -->
+	<main class="main-content">
+		<div class="page-header">
+			<h1 class="page-title">บริการ Garena</h1>
+			<p class="page-subtitle">เลือกบริการที่ตรงกับความต้องการของคุณ เราพร้อมช่วยแก้ไขปัญหาทุกอย่าง</p>
+		</div>
+
+		<div class="service-options">
+			<!-- Report Ban -->
+			<div class="service-option" data-service="report-ban">
+				<div class="service-icon">🚨</div>
+				<h3 class="service-title">แจ้งแบนไอดีโดนโกง</h3>
+				<p class="service-description">รายงานผู้เล่นที่ใช้โปรแกรมโกงหรือทำผิดกฎเกม</p>
+				<div style="margin-top: 16px; color: var(--accent); font-weight: 600;">คลิกเพื่อเลือก</div>
+			</div>
+
+			<!-- Cancel Email/Phone -->
+			<div class="service-option" data-service="cancel-contact">
+				<div class="service-icon">📞</div>
+				<h3 class="service-title">ยกเลิกเบอร์/อีเมลในการีน่า</h3>
+				<p class="service-description">แก้ไขปัญหาข้อมูลติดต่อที่ติดบัคหรือไม่ถูกต้อง</p>
+				<div style="margin-top: 16px; color: var(--accent); font-weight: 600;">คลิกเพื่อเลือก</div>
+			</div>
+
+			<!-- Account Recovery -->
+			<div class="service-option" data-service="account-recovery">
+				<div class="service-icon">🔓</div>
+				<h3 class="service-title">แก้ไขปัญหาบัญชี</h3>
+				<p class="service-description">ปลดแบนรีฟัน / ปลดแบนไอดี และแก้ไขปัญหาอื่นๆ</p>
+				<div style="margin-top: 16px; color: var(--accent); font-weight: 600;">คลิกเพื่อเลือก</div>
+			</div>
+
+			<!-- Report Cheating -->
+			<div class="service-option" data-service="report-cheating">
+				<div class="service-icon">🎯</div>
+				<h3 class="service-title">รับรีพอร์ตผู้เล่นใช้โปรแกรมโกง</h3>
+				<p class="service-description">ส่งรายงานผู้เล่นที่ใช้โปรแกรมโกงในเกม</p>
+				<div style="margin-top: 16px; color: var(--accent); font-weight: 600;">คลิกเพื่อเลือก</div>
+			</div>
+		</div>
+
+		<!-- Report Ban Form -->
+		<div id="report-ban-form" class="form-container" style="display: none;">
+			<h3 class="form-title">แจ้งระงับ Garena ID</h3>
+			<div class="notice">
+				<p><strong>หมายเหตุ:</strong> สำหรับแจ้งระงับไอดีการีนาเท่านั้น</p>
+				<p>หลังจากทำการกรอกข้อมูลแจ้งเรื่องเรียบร้อย รบกวนรอการตรวจสอบและตอบกลับทางอีเมลที่สามารถติดต่อได้ ภายใน 1-5 วัน หลังจากกดส่งข้อมูล</p>
+				<p>เมื่อคุณกด "ส่งข้อมูล" คุณยินยอมให้การีนาทำการเก็บรวมรวม ใช้ ประมวลผล และเปิดเผยข้อมูลของคุณแก่บุคคลที่เกี่ยวข้อง เพื่อดำเนินการปรับปรุงหรือแก้ไขปัญหาตามที่คุณได้ร้องขอ</p>
+			</div>
+			
+			<form action="https://support.garena.in.th/new/games/store/ticket" onsubmit="return beforeSubmit()" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="_token" value="dZ8t3dqOj3ibYpuymUTzqyWKrX7BT4X7YZ8BMafX">
+				<input type="hidden" name="template_id" value="523">
+				<input type="hidden" name="game_id" value="12">
+				<input type="hidden" name="uid" value="">
+				<input type="hidden" name="open_id" value="639636453">
+				<input type="hidden" name="chatbot" value="">
+
+				<div class="form-group">
+					<label class="form-label">ชื่อไอดีการีนาที่ต้องการระงับ (ไม่สามารถใส่ OpenID / GameID ได้) <span style="color:red">*</span></label>
+					<input type="text" required name="Acc08" class="form-control" placeholder="กรอกชื่อไอดีการีนา">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">อีเมลที่สามารถติดต่อได้ <span style="color:red">*</span></label>
+					<input type="email" required name="Acc09" class="form-control" placeholder="กรอกอีเมลที่สามารถติดต่อได้">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">เบอร์โทรติดต่อ (เพื่อประโยชน์ในการตรวจสอบข้อมูล โปรดระบุเบอร์โทรที่สามารถติดต่อกลับให้ถูกต้อง) <span style="color:red">*</span></label>
+					<input type="text" required name="Acc10" class="form-control" placeholder="กรอกเบอร์โทรติดต่อ">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">เหตุผลในการกระทำผิด <span style="color:red">*</span></label>
+					<select required class="form-control" name="Acc111">
+						<option value="0 | ส่งลิงก์หลอกลวง">ส่งลิงก์หลอกลวง</option>
+						<option value="1 | รูป Profile ไม่เหมาะสม">รูป Profile ไม่เหมาะสม</option>
+						<option value="2 | ซื้อขาย หรือ แบ่งปันไอดี">ซื้อขาย หรือ แบ่งปันไอดี</option>
+						<option value="3 | อื่นๆ">อื่นๆ</option>
+				</select>
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">รายละเอียดเพิ่มเติม</label>
+					<textarea name="Acc112" class="form-control" rows="4" placeholder="กรอกรายละเอียดเพิ่มเติม (ถ้ามี)"></textarea>
+				</div>
+
+				<button type="submit" class="btn-submit">ส่งข้อมูล</button>
+			</form>
+		</div>
+
+		<!-- Cancel Contact Form -->
+		<div id="cancel-contact-form" class="form-container" style="display: none;">
+			<h3 class="form-title">แจ้งยกเลิกการยืนยัน Email และเบอร์โทรศัพท์ (2-Step)</h3>
+			<div class="notice">
+				<p><strong>หมายเหตุ:</strong> สำหรับยกเลิกการยืนยันข้อมูล Email และเบอร์โทรศัพท์</p>
+				<p>หลังจากทำการกรอกข้อมูลแจ้งเรื่องเรียบร้อย รบกวนรอการตรวจสอบและตอบกลับทางอีเมลที่สามารถติดต่อได้ ภายใน 1-5 วัน หลังจากกดส่งข้อมูล</p>
+				<p>เมื่อคุณกด "ส่งข้อมูล" คุณยินยอมให้การีนาทำการเก็บรวมรวม ใช้ ประมวลผล และเปิดเผยข้อมูลของคุณแก่บุคคลที่เกี่ยวข้อง เพื่อดำเนินการปรับปรุงหรือแก้ไขปัญหาตามที่คุณได้ร้องขอ</p>
+			</div>
+			
+			<form action="https://support.garena.in.th/new/games/store/ticket" onsubmit="return beforeSubmit()" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="_token" value="dZ8t3dqOj3ibYpuymUTzqyWKrX7BT4X7YZ8BMafX">
+				<input type="hidden" name="template_id" value="156">
+				<input type="hidden" name="game_id" value="12">
+				<input type="hidden" name="uid" value="">
+				<input type="hidden" name="open_id" value="639636453">
+				<input type="hidden" name="chatbot" value="">
+
+				<div class="form-group">
+					<label class="form-label">ระบุไอดี Garena ที่ต้องการยกเลิกการยืนยันข้อมูล <span style="color:red">*</span></label>
+					<input type="text" required name="AC_011" class="form-control" placeholder="กรอกไอดี Garena">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">ชื่อ - นามสกุล ตามบัตรประชาชน <span style="color:red">*</span></label>
+					<input type="text" required name="AC_012" class="form-control" placeholder="กรอกชื่อ-นามสกุลตามบัตรประชาชน">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">เลขประจำตัวประชาชน 13 หลัก <span style="color:red">*</span></label>
+					<input type="text" required name="AC_013" class="form-control" placeholder="กรอกเลขประจำตัวประชาชน 13 หลัก" maxlength="13">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">อีเมลที่สามารถติดต่อได้ <span style="color:red">*</span></label>
+					<input type="email" required name="AC_014" class="form-control" placeholder="กรอกอีเมลที่สามารถติดต่อได้">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">เบอร์โทรติดต่อได้ (กรุณากรอกข้อมูลตามจริงเพื่อประโยชน์ของท่าน) <span style="color:red">*</span></label>
+					<input type="tel" required name="AC_015" class="form-control" placeholder="กรอกเบอร์โทรติดต่อ" maxlength="10">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">กรุณาระบุอีเมลและเบอร์ที่ยืนยันที่ท่านต้องการยกเลิก <span style="color:red">*</span></label>
+					<input type="text" required name="AC_016" class="form-control" placeholder="ระบุอีเมลและเบอร์ที่ต้องการยกเลิก">
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">กรุณาระบุเหตุผลที่ต้องการยกเลิก Email และเบอร์ <span style="color:red">*</span></label>
+					<input type="text" required name="AC_0004" class="form-control" placeholder="ระบุเหตุผลที่ต้องการยกเลิก">
+				</div>
+
+				<button type="submit" class="btn-submit">ส่งข้อมูล</button>
+			</form>
+		</div>
+
+		<!-- Account Recovery Form -->
+		<div id="account-recovery-form" class="form-container" style="display: none;">
+			<h3 class="form-title">แก้ไขปัญหาบัญชี - ปลดแบนรีฟัน</h3>
+			<div class="notice">
+				<p><strong>หมายเหตุ:</strong> สำหรับบริการปลดแบนรีฟันและแก้ไขปัญหาบัญชี</p>
+				<p>กรุณาติดต่อทีมงานผ่านช่องทางด้านล่างเพื่อขอข้อมูลเพิ่มเติมและขั้นตอนการดำเนินการ</p>
+			</div>
+			
+			<div style="text-align: center; margin: 32px 0;">
+				<a href="https://linktr.ee/renekankha" target="_blank" class="service-btn" style="display: inline-block; text-decoration: none; width: auto; padding: 16px 32px;">
+					🔗 ติดต่อทีมงานผ่าน Linktree
+				</a>
+			</div>
+			
+			<div style="text-align: center; margin-top: 24px;">
+				<button class="service-btn" id="goBackBtn">กลับไปเลือกบริการอื่น</button>
+			</div>
+		</div>
+
+		<!-- Other Service Forms (Placeholder) -->
+		<div id="other-forms" class="form-container" style="display: none;">
+			<h3 class="form-title">รับรีพอร์ตผู้เล่นใช้โปรแกรมโกง</h3>
+			<p style="text-align: center; color: var(--text-secondary); margin-bottom: 24px;">
+				บริการนี้กำลังอยู่ในระหว่างการพัฒนา<br>
+				กรุณาติดต่อทีมงานเพื่อขอข้อมูลเพิ่มเติม
+			</p>
+			<button class="service-btn" id="goBackBtn2">กลับไปเลือกบริการอื่น</button>
+	</div>
+	</main>
+
+	<!-- Status Messages -->
+	<div class="status" id="status"></div>
+
+	<script>
+		// Mobile Navigation
+		function initMobileNav() {
+			const toggle = document.getElementById('mobileNavToggle');
+			const overlay = document.getElementById('mobileNavOverlay');
+			const menu = document.getElementById('mobileNavMenu');
+
+			toggle.addEventListener('click', () => {
+				menu.classList.toggle('active');
+				overlay.classList.toggle('active');
+			});
+
+			overlay.addEventListener('click', () => {
+				menu.classList.remove('active');
+				overlay.classList.remove('active');
+			});
+		}
+
+		// Status Messages
+		function setStatus(message, type = 'success') {
+			const status = document.getElementById('status');
+			status.textContent = message;
+			status.className = `status ${type} show`;
+			
+			setTimeout(() => {
+				status.classList.remove('show');
+			}, 3000);
+		}
+
+		// Service Selection
+		function selectService(serviceType) {
+			console.log('selectService called with:', serviceType);
+			
+			// Hide all forms first
+			document.getElementById('report-ban-form').style.display = 'none';
+			document.getElementById('cancel-contact-form').style.display = 'none';
+			document.getElementById('account-recovery-form').style.display = 'none';
+			document.getElementById('other-forms').style.display = 'none';
+			
+			// Hide service options
+			document.querySelector('.service-options').style.display = 'none';
+			
+			switch(serviceType) {
+				case 'report-ban':
+					console.log('Showing report-ban form');
+					document.getElementById('report-ban-form').style.display = 'block';
+					break;
+				case 'cancel-contact':
+					console.log('Showing cancel-contact form');
+					document.getElementById('cancel-contact-form').style.display = 'block';
+					break;
+				case 'account-recovery':
+					console.log('Showing account-recovery form');
+					document.getElementById('account-recovery-form').style.display = 'block';
+					break;
+				case 'report-cheating':
+					console.log('Showing report-cheating form');
+					document.getElementById('other-forms').style.display = 'block';
+					break;
+				default:
+					console.log('Unknown service type:', serviceType);
+					setStatus('ไม่พบบริการที่เลือก', 'error');
+			}
+		}
+
+		// Go back to service selection
+		function goBack() {
+			document.querySelector('.service-options').style.display = 'grid';
+			document.getElementById('report-ban-form').style.display = 'none';
+			document.getElementById('cancel-contact-form').style.display = 'none';
+			document.getElementById('account-recovery-form').style.display = 'none';
+			document.getElementById('other-forms').style.display = 'none';
+		}
+
+		// Form submission validation
+		function beforeSubmit() {
+			const form = event.target;
+			const requiredFields = form.querySelectorAll('[required]');
+			let isValid = true;
+
+			requiredFields.forEach(field => {
+				if (!field.value.trim()) {
+					isValid = false;
+					field.style.borderColor = 'var(--error)';
+				} else {
+					field.style.borderColor = 'var(--border-primary)';
+				}
+			});
+
+			if (!isValid) {
+				setStatus('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+				return false;
+			}
+
+			setStatus('กำลังส่งข้อมูล...', 'loading');
+			return true;
+		}
+
+		// Check user login status and update navigation
+		async function checkUserStatus() {
+			try {
+				const res = await fetch('/api/auth/me', { credentials: 'include' });
+				const data = await res.json();
+				
+				if (data.ok && data.user) {
+					// User is logged in - show logout button
+					showLogoutButton(data.user);
+				} else {
+					// User is not logged in - show login button
+					showLoginButton();
+				}
+			} catch (error) {
+				console.error('Error checking user status:', error);
+				showLoginButton();
+			}
+		}
+		
+		// Show logout button and user info
+		function showLogoutButton(user) {
+			// Desktop navigation
+			const navLinks = document.querySelector('.nav-links');
+			if (navLinks) {
+				// Remove existing login button if any
+				const existingLoginBtn = navLinks.querySelector('a[href="login.html"]');
+				if (existingLoginBtn) {
+					existingLoginBtn.remove();
+				}
+				
+				// Remove existing logout button if any
+				const existingLogoutBtn = navLinks.querySelector('.logout-btn');
+				if (existingLogoutBtn) {
+					existingLogoutBtn.remove();
+				}
+				
+				// Add logout button
+				const logoutBtn = document.createElement('a');
+				logoutBtn.href = '#';
+				logoutBtn.className = 'nav-link logout-btn';
+				logoutBtn.innerHTML = `
+					<span class="user-info">
+						${user.name || 'ผู้ใช้'} 
+						<span class="logout-text">(ออกจากระบบ)</span>
+					</span>
+				`;
+				logoutBtn.addEventListener('click', (e) => {
+					e.preventDefault();
+					logout();
+				});
+				
+				navLinks.appendChild(logoutBtn);
+			}
+			
+			// Mobile navigation
+			const mobileNavMenu = document.getElementById('mobileNavMenu');
+			if (mobileNavMenu) {
+				// Remove existing login button if any
+				const existingMobileLoginBtn = mobileNavMenu.querySelector('a[href="login.html"]');
+				if (existingMobileLoginBtn) {
+					existingMobileLoginBtn.remove();
+				}
+				
+				// Remove existing logout button if any
+				const existingMobileLogoutBtn = mobileNavMenu.querySelector('.mobile-logout-btn');
+				if (existingMobileLogoutBtn) {
+					existingMobileLogoutBtn.remove();
+				}
+				
+				// Add logout button
+				const mobileLogoutBtn = document.createElement('a');
+				mobileLogoutBtn.href = '#';
+				mobileLogoutBtn.className = 'mobile-nav-item mobile-logout-btn';
+				mobileLogoutBtn.innerHTML = `👤 ${user.name || 'ผู้ใช้'} (ออกจากระบบ)`;
+				mobileLogoutBtn.addEventListener('click', (e) => {
+					e.preventDefault();
+					logout();
+				});
+				
+				mobileNavMenu.appendChild(mobileLogoutBtn);
+			}
+		}
+		
+		// Show login button
+		function showLoginButton() {
+			// Desktop navigation
+			const navLinks = document.querySelector('.nav-links');
+			if (navLinks) {
+				// Remove existing logout button if any
+				const existingLogoutBtn = navLinks.querySelector('.logout-btn');
+				if (existingLogoutBtn) {
+					existingLogoutBtn.remove();
+				}
+				
+				// Check if login button already exists
+				const existingLoginBtn = navLinks.querySelector('a[href="login.html"]');
+				if (!existingLoginBtn) {
+					// Add login button
+					const loginBtn = document.createElement('a');
+					loginBtn.href = 'login.html';
+					loginBtn.className = 'nav-link';
+					loginBtn.textContent = '👤 เข้าสู่ระบบ';
+					
+					navLinks.appendChild(loginBtn);
+				}
+			}
+			
+			// Mobile navigation
+			const mobileNavMenu = document.getElementById('mobileNavMenu');
+			if (mobileNavMenu) {
+				// Remove existing logout button if any
+				const existingMobileLogoutBtn = mobileNavMenu.querySelector('.mobile-logout-btn');
+				if (existingMobileLogoutBtn) {
+					existingMobileLogoutBtn.remove();
+				}
+				
+				// Check if login button already exists
+				const existingMobileLoginBtn = mobileNavMenu.querySelector('a[href="login.html"]');
+				if (!existingMobileLoginBtn) {
+					// Add login button
+					const mobileLoginBtn = document.createElement('a');
+					mobileLoginBtn.href = 'login.html';
+					mobileLoginBtn.className = 'mobile-nav-item';
+					mobileLoginBtn.textContent = '👤 เข้าสู่ระบบ';
+					
+					mobileNavMenu.appendChild(mobileLoginBtn);
+				}
+			}
+		}
+		
+		// Logout function
+		async function logout() {
+			try {
+				const res = await fetch('/api/auth/logout', {
+					method: 'POST',
+					credentials: 'include'
+				});
+				
+				if (res.ok) {
+					// Show success message
+					setStatus('ออกจากระบบสำเร็จ', 'success');
+					setTimeout(() => {
+						// Refresh page to update UI
+						location.reload();
+					}, 1500);
+				} else {
+					setStatus('ออกจากระบบไม่สำเร็จ', 'error');
+				}
+			} catch (error) {
+				console.error('Logout error:', error);
+				setStatus('ออกจากระบบไม่สำเร็จ', 'error');
+			}
+		}
+
+		// Initialize
+		document.addEventListener('DOMContentLoaded', () => {
+			initMobileNav();
+			checkUserStatus(); // Check user status on page load
+			
+			// Add event listeners to service options
+			const serviceOptions = document.querySelectorAll('.service-option');
+			serviceOptions.forEach(option => {
+				option.addEventListener('click', () => {
+					const serviceType = option.getAttribute('data-service');
+					console.log('Service option clicked:', serviceType);
+					selectService(serviceType);
+				});
+			});
+			
+			// Add event listener to go back button
+			const goBackBtn = document.getElementById('goBackBtn');
+			if (goBackBtn) {
+				goBackBtn.addEventListener('click', goBack);
+			}
+			
+			// Add event listener to second go back button
+			const goBackBtn2 = document.getElementById('goBackBtn2');
+			if (goBackBtn2) {
+				goBackBtn2.addEventListener('click', goBack);
+			}
+		});
+	</script>
+</body>
+</html>

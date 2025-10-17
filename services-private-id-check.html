@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>เช็ค ID ข้อมูลปิด - RENEKANKHA</title>
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+	<style>
+		:root {
+			--primary: #6366f1;
+			--accent: #06b6d4;
+			--success: #10b981;
+			--warning: #f59e0b;
+			--error: #ef4444;
+			--bg-primary: #0f0f23;
+			--bg-secondary: #1a1a2e;
+			--surface: rgba(255,255,255,.05);
+			--text-primary: #ffffff;
+			--text-secondary: #e2e8f0;
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body {
+			font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+			color: var(--text-primary);
+			min-height: 100vh;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+		}
+
+		.back-btn {
+			display: inline-block;
+			color: var(--accent);
+			text-decoration: none;
+			padding: 8px 16px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+			margin-bottom: 20px;
+			font-weight: 600;
+		}
+
+		.back-btn:hover {
+			background: var(--surface);
+		}
+
+		.header {
+			text-align: center;
+			margin-bottom: 40px;
+		}
+
+		.page-icon {
+			font-size: 64px;
+			margin-bottom: 16px;
+		}
+
+		.page-title {
+			font-size: 32px;
+			font-weight: 700;
+			margin-bottom: 8px;
+		}
+
+		.page-subtitle {
+			color: var(--text-secondary);
+			font-size: 16px;
+		}
+
+		.service-card {
+			background: rgba(255,255,255,.02);
+			border: 1px solid rgba(255,255,255,.1);
+			border-radius: 16px;
+			padding: 32px;
+			margin-bottom: 24px;
+		}
+
+		.section-title {
+			font-size: 18px;
+			font-weight: 700;
+			margin-bottom: 16px;
+			color: var(--accent);
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.section-content {
+			color: var(--text-secondary);
+			line-height: 1.8;
+			margin-bottom: 24px;
+		}
+
+		.features-list {
+			list-style: none;
+			margin: 16px 0;
+		}
+
+		.features-list li {
+			padding: 12px;
+			background: rgba(255,255,255,.03);
+			border-radius: 8px;
+			margin-bottom: 8px;
+			border-left: 3px solid var(--primary);
+			padding-left: 16px;
+		}
+
+		.cta-button {
+			width: 100%;
+			padding: 16px 24px;
+			background: linear-gradient(135deg, var(--accent) 0%, #0891b2 100%);
+			border: none;
+			border-radius: 10px;
+			color: var(--text-primary);
+			font-weight: 700;
+			font-size: 16px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: block;
+			text-align: center;
+			margin-top: 20px;
+		}
+
+		.cta-button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3);
+		}
+
+		.info-box {
+			background: rgba(6, 182, 212, 0.1);
+			border-left: 4px solid var(--accent);
+			border-radius: 8px;
+			padding: 16px;
+			margin-bottom: 24px;
+			color: var(--text-secondary);
+			font-size: 14px;
+			line-height: 1.6;
+		}
+
+		.highlight {
+			background: rgba(99, 102, 241, 0.2);
+			padding: 16px;
+			border-radius: 8px;
+			margin: 20px 0;
+			border-left: 4px solid var(--primary);
+		}
+
+		.highlight-title {
+			font-weight: 700;
+			color: var(--primary);
+			margin-bottom: 8px;
+		}
+
+		.price-box {
+			background: rgba(16, 185, 129, 0.1);
+			border: 1px solid rgba(16, 185, 129, 0.3);
+			border-radius: 8px;
+			padding: 20px;
+			text-align: center;
+			margin: 20px 0;
+		}
+
+		.price-label {
+			color: var(--text-secondary);
+			font-size: 14px;
+			margin-bottom: 8px;
+		}
+
+		.price-value {
+			font-size: 28px;
+			font-weight: 700;
+			color: var(--success);
+		}
+
+		@media (max-width: 768px) {
+			.page-title { font-size: 24px; }
+			.service-card { padding: 20px; }
+			.page-icon { font-size: 48px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<a href="services.html" class="back-btn">← กลับไปเลือกบริการ</a>
+
+		<div class="header">
+			<div class="page-icon">🔒</div>
+			<h1 class="page-title">เช็ค ID ข้อมูลปิด</h1>
+			<p class="page-subtitle">ตรวจสอบว่าข้อมูล ID ปิดจริงหรือไม่ ก่อนที่จะซื้อ</p>
+		</div>
+
+		<div class="info-box">
+			<strong>ทำไมต้องเช็ค ID ข้อมูลปิด</strong><br>
+			ID ข้อมูลปิดที่ไม่ปิดจริง สามารถถูกดึงกลับได้ง่ายโดยเจ้าของดั้งเดิม หากเฟส/ข้อมูลยังขึ้นอยู่กับเขา นี่คือความเสี่ยงที่ใหญ่ที่สุดเมื่อซื้อ ID เสียเงินแล้วถูกเอาคืน
+		</div>
+
+		<!-- Service Overview -->
+		<div class="service-card">
+			<div class="section-title">
+				<span>📋</span> บริการของเรา
+			</div>
+			<div class="section-content">
+				เราให้บริการตรวจสอบข้อมูลปิด/ข้อมูลตาย ของ ID Garena อย่างละเอียดโดยผู้เชี่ยวชาญ ตรวจสอบรวมถึง
+			</div>
+			<ul class="features-list">
+				<li>ข้อมูลการลงทะเบียนปิดจริงหรือไม่</li>
+				<li>Email และเบอร์โทรศัพท์ได้รับการยืนยัน</li>
+				<li>ไม่มีการผูกพัน/ติดบัญชีอื่น</li>
+				<li>ประวัติการใช้งาน (Active/Inactive)</li>
+				<li>ข้อมูลการชำระเงิน/ประวัติ</li>
+				<li>ความเสี่ยงต่อการดึงกลับ</li>
+				<li>คำแนะนำด้านความปลอดภัย</li>
+			</ul>
+		</div>
+
+		<!-- What We Check -->
+		<div class="service-card">
+			<div class="section-title">
+				<span>🔍</span> ขอบเขตการตรวจสอบ
+			</div>
+
+			<div style="margin-bottom: 24px;">
+				<strong style="color: var(--accent);">1. ข้อมูลการลงทะเบียน</strong>
+				<div style="color: var(--text-secondary); margin-top: 8px; padding-left: 16px;">
+					สถานะการลงทะเบียน อายุบัญชี ความครบถ้วนของข้อมูล
+				</div>
+			</div>
+
+			<div style="margin-bottom: 24px;">
+				<strong style="color: var(--success);">2. สถานะการยืนยัน</strong>
+				<div style="color: var(--text-secondary); margin-top: 8px; padding-left: 16px;">
+					Email Verification Phone Verification Two-Factor Authentication สถานะระงับหรือปัญหา
+				</div>
+			</div>
+
+			<div style="margin-bottom: 24px;">
+				<strong style="color: var(--warning);">3. ข้อมูลการชำระเงิน</strong>
+				<div style="color: var(--text-secondary); margin-top: 8px; padding-left: 16px;">
+					วิธีการชำระเงินที่ลงทะเบียน ประวัติการชำระเงิน ปัญหาการหักเงิน
+				</div>
+			</div>
+
+			<div>
+				<strong style="color: var(--error);">4. ความเสี่ยง และคำแนะนำ</strong>
+				<div style="color: var(--text-secondary); margin-top: 8px; padding-left: 16px;">
+					ความเสี่ยงต่อการดึงกลับ สัญญาณเตือนที่พบ คำแนะนำการป้องกัน
+				</div>
+			</div>
+		</div>
+
+		<!-- How It Works -->
+		<div class="service-card">
+			<div class="section-title">
+				<span>⚙️</span> ขั้นตอนการทำงาน
+			</div>
+			<ol style="color: var(--text-secondary); line-height: 2.2; padding-left: 20px;">
+				<li>ติดต่อเราผ่าน Linktree พร้อมข้อมูล ID ที่ต้องการตรวจสอบ</li>
+				<li>ให้ข้อมูล ID Nickname หรือ Link Profile Garena</li>
+				<li>เราจะตรวจสอบลึกซึ้งทั้งด้านหน้า</li>
+				<li>ส่งรายงานการตรวจสอบโดยละเอียด พร้อมคำแนะนำ</li>
+				<li>คุณตัดสินใจซื้อหรือไม่ตามรายงาน</li>
+			</ol>
+		</div>
+
+		<!-- Pricing -->
+		<div class="service-card">
+			<div class="section-title">
+				<span>💰</span> ราคาบริการ
+			</div>
+			<div class="price-box">
+				<div class="price-label">บริการตรวจสอบ ID ข้อมูลปิด</div>
+				<div class="price-value">ติดต่อเพื่อรับราคา</div>
+				<div style="color: var(--text-secondary); font-size: 12px; margin-top: 8px;">
+					ราคาอาจแตกต่างกันตามประเภท ID และความซับซ้อน
+				</div>
+			</div>
+		</div>
+
+		<!-- Important Notes -->
+		<div class="highlight">
+			<div class="highlight-title">ข้อสำคัญที่ควรทราบ</div>
+			<ul style="margin-left: 20px; color: var(--text-secondary); line-height: 1.8;">
+				<li>ตรวจสอบจากข้อมูลสาธารณะ และวิธีการที่ปลอดภัย</li>
+				<li>ไม่ได้เข้าถึงข้อมูลส่วนตัวหรือระบบ Garena โดยตรง</li>
+				<li>ผลการตรวจสอบเป็นการวิเคราะห์โดยผู้เชี่ยวชาญ ไม่ใช่ข้อมูลทางการ 100%</li>
+				<li>ควรใช้เป็นข้อมูลอ้างอิงก่อนการตัดสินใจ</li>
+			</ul>
+		</div>
+
+		<!-- CTA Section -->
+		<div class="service-card">
+			<div style="text-align: center;">
+				<div style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">
+					พร้อมขอบริการตรวจสอบแล้วหรือ
+				</div>
+				<div style="color: var(--text-secondary); margin-bottom: 20px;">
+					ติดต่อเราผ่าน Linktree เพื่อขอบริการตรวจสอบ ID ข้อมูลปิด
+				</div>
+				<a href="https://linktr.ee/renekankha" target="_blank" class="cta-button">
+					ติดต่อเราผ่าน Linktree
+				</a>
+			</div>
+		</div>
+
+		<!-- Support Info -->
+		<div class="info-box" style="margin-top: 32px; text-align: center;">
+			<strong>มีคำถามหรือต้องการข้อมูลเพิ่มเติม</strong><br><br>
+			ติดต่อเราได้ผ่าน <a href="https://linktr.ee/renekankha" target="_blank" style="color: var(--accent); text-decoration: underline;">Linktree</a> ของเรา<br>
+			เราพร้อมตอบคำถามและให้คำปรึกษาฟรี
+		</div>
+	</div>
+</body>
+</html>
