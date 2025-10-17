@@ -639,6 +639,18 @@ app.get('/pay-success.html', (_req, res) => {
 app.get('/pay-cancel.html', (_req, res) => {
 	res.sendFile(path.join(__dirname, 'pay-cancel.html'));
 });
+app.get('/services-private-id-check.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-private-id-check.html'));
+});
+app.get('/services-scammed-account.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-scammed-account.html'));
+});
+app.get('/services-twitter-checker.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-twitter-checker.html'));
+});
+app.get('/test-2fa.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'test-2fa.html'));
+});
 
 // Fallback: serve home.html for SPA routing on undefined routes
 app.get('*', (req, res) => {
