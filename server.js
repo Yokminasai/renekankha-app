@@ -670,25 +670,19 @@ app.get('/api/ip', async (_req, res) => {
 // Serve static frontend (must be after all API routes)
 app.use(express.static(__dirname));
 
-// Fallback: serve home.html for SPA routing on undefined routes
-app.get('*', (req, res) => {
-	// If path has a file extension, try to serve it as-is
-	if (req.path.includes('.')) {
-		const filePath = path.join(__dirname, req.path);
-		res.sendFile(filePath, (err) => {
-			if (err) {
-				// If file not found, return 404
-				res.status(404).json({ error: 'not found' });
-			}
-		});
+// SPA fallback: serve home.html for routes without file extensions
+app.use((req, res, next) => {
+	// If path has no file extension, serve home.html
+	if (!req.path.includes('.') && req.path !== '/') {
+		res.sendFile(path.join(__dirname, 'home.html'));
 	} else {
-		// No file extension - serve home.html for SPA routing
-		res.sendFile(path.join(__dirname, 'home.html'), (err) => {
-			if (err) {
-				res.status(404).json({ error: 'not found' });
-			}
-		});
+		next();
 	}
+});
+
+// 404 handler for remaining requests
+app.use((req, res) => {
+	res.status(404).json({ error: 'not found' });
 });
 
 // Global error handler
