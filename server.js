@@ -555,6 +555,17 @@ app.get('/api/2fa/:secret', async (req, res) => {
 app.get('/api/ip', async (_req, res) => {
 	res.set('Cache-Control', 'no-store');
 
+	// Get real client IP (from Vercel/proxy headers)
+	function getClientIp(req) {
+		const xForwardedFor = req.headers['x-forwarded-for'];
+		if (xForwardedFor) {
+			return xForwardedFor.split(',')[0].trim();
+		}
+		return req.connection.remoteAddress || req.socket.remoteAddress || '';
+	}
+
+	const clientIp = getClientIp(_req);
+
 	function withTimeout(ms, fetcher) {
 		const controller = new AbortController();
 		const t = setTimeout(() => controller.abort(), ms);
@@ -588,7 +599,25 @@ app.get('/api/ip', async (_req, res) => {
 	}
 
 	try {
-		// Race providers (3s timeout each). Whichever responds first wins.
+		// If we have client IP, get detailed info for that IP
+		if (clientIp && clientIp !== '::1' && clientIp !== '127.0.0.1') {
+			try {
+				const extra = await withTimeout(3000, (s) => ipapiByIp(clientIp, s));
+				let ip = clientIp;
+				let isp = extra.org || extra.org_name || extra.isp || '';
+				let country = extra.country_name || extra.country || '';
+				let region = extra.region || extra.regionName || '';
+				let city = extra.city || '';
+				let latitude = Number(extra.latitude) || null;
+				let longitude = Number(extra.longitude) || null;
+
+				return res.json({ ok: true, source: 'ipapi-client', ip, isp, country, region, city, latitude, longitude });
+			} catch (err) {
+				console.log('Client IP lookup failed, trying fallback:', err.message);
+			}
+		}
+
+		// Fallback: Race providers (3s timeout each)
 		const winner = await Promise.any([
 			withTimeout(3000, (s) => tryIpApi(s)),
 			withTimeout(3000, (s) => tryIpInfo(s)),
