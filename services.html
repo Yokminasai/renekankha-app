@@ -575,6 +575,19 @@
 					<li>ให้คำปรึกษาด้านความปลอดภัย</li>
 				</ul>
 			</div>
+
+			<!-- Scam Reporting -->
+			<div class="service-card" data-service="scam-reporting">
+				<div class="service-icon">⚠️</div>
+				<h3 class="service-title">รายงานไอดีถูกโกง</h3>
+				<p class="service-description">รายงานไอดีที่ถูกโกงหรือละเมิดกฎหมายทางอิเล็กทรอนิกส์</p>
+				<ul class="service-features">
+					<li>รายงานไอดีที่ถูกโกง</li>
+					<li>รายงานการละเมิดกฎหมาย</li>
+					<li>คำแนะนำและวิธีการรายงาน</li>
+					<li>ติดตามสถานะการตรวจสอบ</li>
+				</ul>
+			</div>
 		</div>
 	</main>
 
@@ -636,6 +649,9 @@
 						break;
 					case 'private-id':
 						window.location.href = 'services-private-id-check.html';
+						break;
+					case 'scam-reporting':
+						window.location.href = 'services-scam-reporting.html';
 						break;
 					default:
 						setStatus('ไม่พบบริการที่เลือก', 'error');

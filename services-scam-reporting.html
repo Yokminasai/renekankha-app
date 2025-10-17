@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>รายงานไอดีถูกโกง - RENEKANKHA</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #0c0c0c 0%, #141414 100%);
+			color: #fff;
+			line-height: 1.6;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.header {
+			margin-bottom: 40px;
+			text-align: center;
+			padding-bottom: 20px;
+			border-bottom: 2px solid rgba(255,107,107,.2);
+		}
+
+		.header a {
+			display: inline-block;
+			margin-bottom: 20px;
+			padding: 10px 20px;
+			background: rgba(255,107,107,.1);
+			color: #ff6b6b;
+			text-decoration: none;
+			border-radius: 8px;
+			font-size: 14px;
+			transition: all 0.3s ease;
+		}
+
+		.header a:hover {
+			background: rgba(255,107,107,.2);
+			transform: translateX(-4px);
+		}
+
+		.header h1 {
+			font-size: 32px;
+			margin-bottom: 10px;
+			background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.header p {
+			color: rgba(255,255,255,.6);
+			font-size: 14px;
+		}
+
+		.form-section {
+			background: rgba(255,255,255,.02);
+			border: 1px solid rgba(255,255,255,.08);
+			border-radius: 12px;
+			padding: 32px;
+			margin-bottom: 32px;
+		}
+
+		.form-section h2 {
+			font-size: 18px;
+			margin-bottom: 24px;
+			padding-bottom: 12px;
+			border-bottom: 2px solid rgba(255,107,107,.2);
+		}
+
+		.form-group {
+			margin-bottom: 24px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 8px;
+			font-size: 14px;
+			font-weight: 600;
+			color: rgba(255,255,255,.9);
+		}
+
+		.required {
+			color: #ff6b6b;
+		}
+
+		input, textarea, select {
+			width: 100%;
+			padding: 12px 16px;
+			background: rgba(255,255,255,.05);
+			border: 1px solid rgba(255,255,255,.1);
+			border-radius: 8px;
+			color: white;
+			font-family: inherit;
+			font-size: 14px;
+		}
+
+		input:focus, textarea:focus, select:focus {
+			outline: none;
+			background: rgba(255,255,255,.08);
+			border-color: rgba(255,107,107,.4);
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 120px;
+		}
+
+		.form-row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+		}
+
+		.help-text {
+			font-size: 12px;
+			color: rgba(255,255,255,.5);
+			margin-top: 6px;
+		}
+
+		.info-box {
+			background: rgba(78,205,196,.1);
+			border-left: 4px solid #4ecdc4;
+			padding: 16px;
+			border-radius: 8px;
+			margin-bottom: 24px;
+			font-size: 14px;
+		}
+
+		.button-group {
+			display: flex;
+			gap: 12px;
+			margin-top: 32px;
+			justify-content: center;
+		}
+
+		button {
+			padding: 14px 32px;
+			font-size: 14px;
+			font-weight: 600;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			font-family: inherit;
+		}
+
+		.btn-submit {
+			background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+			color: white;
+			flex: 1;
+			max-width: 300px;
+		}
+
+		.btn-reset {
+			background: rgba(255,255,255,.05);
+			color: rgba(255,255,255,.7);
+			border: 1px solid rgba(255,255,255,.1);
+		}
+
+		.success-message {
+			display: none;
+			background: rgba(34,197,94,.1);
+			border-left: 4px solid #22c55e;
+			padding: 16px;
+			border-radius: 8px;
+			margin-bottom: 24px;
+			color: #22c55e;
+			text-align: center;
+		}
+
+		.success-message.show {
+			display: block;
+		}
+
+		.guidelines {
+			background: rgba(255,255,255,.02);
+			border: 1px solid rgba(255,255,255,.08);
+			border-radius: 12px;
+			padding: 24px;
+			margin-top: 40px;
+		}
+
+		.guidelines h3 {
+			font-size: 16px;
+			margin-bottom: 16px;
+			color: rgba(255,255,255,.9);
+		}
+
+		.guidelines ul {
+			list-style: none;
+		}
+
+		.guidelines li {
+			padding: 8px 0 8px 24px;
+			position: relative;
+			font-size: 14px;
+			color: rgba(255,255,255,.7);
+		}
+
+		.guidelines li:before {
+			content: "✓";
+			position: absolute;
+			left: 0;
+			color: #4ecdc4;
+		}
+
+		@media (max-width: 768px) {
+			.form-row {
+				grid-template-columns: 1fr;
+			}
+
+			.header h1 {
+				font-size: 24px;
+			}
+
+			.button-group {
+				flex-direction: column;
+			}
+
+			.btn-submit {
+				max-width: 100%;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<a href="services.html">← กลับไปเลือกบริการ</a>
+			<h1>รายงานไอดีถูกโกง</h1>
+			<p>แจ้งเรื่องไอดีของคุณที่ถูกโกง</p>
+		</div>
+
+		<div class="success-message" id="successMsg">
+			✓ ส่งรายงานเรียบร้อย! เราจะตรวจสอบและติดต่อคุณ
+		</div>
+
+		<form id="scamReportForm" class="form-section">
+			<h2>ข้อมูลไอดีที่ถูกโกง</h2>
+
+			<div class="info-box">
+				<strong>⚠️ ข้อมูลสำคัญ:</strong> กรอกข้อมูลให้ครบถ้วน
+			</div>
+
+			<div class="form-group">
+				<label for="username">
+					ชื่อบัญชี / Username <span class="required">*</span>
+				</label>
+				<input type="text" id="username" required placeholder="เช่น MyAccount_01">
+				<div class="help-text">ชื่อบัญชี Garena ที่ถูกโกง</div>
+			</div>
+
+			<div class="form-group">
+				<label for="openid">
+					OpenID <span class="required">*</span>
+				</label>
+				<input type="text" id="openid" required placeholder="เช่น 123456789">
+				<div class="help-text">เลขไอดี 9-10 หลัก</div>
+			</div>
+
+			<div class="form-group">
+				<label for="email">
+					อีเมลติดต่อ <span class="required">*</span>
+				</label>
+				<input type="email" id="email" required placeholder="your@email.com">
+				<div class="help-text">ผลการตรวจสอบจะส่งไปที่อีเมลนี้</div>
+			</div>
+
+			<div class="form-group">
+				<label for="phone">เบอร์โทรศัพท์</label>
+				<input type="tel" id="phone" placeholder="08X-XXXX-XXXX">
+				<div class="help-text">ไม่บังคับ</div>
+			</div>
+
+			<h2 style="margin-top: 32px;">รายละเอียดการโกง</h2>
+
+			<div class="form-row">
+				<div class="form-group">
+					<label for="scamDate">วันที่โดนโกง <span class="required">*</span></label>
+					<input type="date" id="scamDate" required>
+				</div>
+
+				<div class="form-group">
+					<label for="scamMethod">วิธีการโกง <span class="required">*</span></label>
+					<select id="scamMethod" required>
+						<option value="">-- เลือก --</option>
+						<option value="phishing">Phishing (เว็บปลอม)</option>
+						<option value="password">ขโมยรหัสผ่าน</option>
+						<option value="malware">โปรแกรมร้าย</option>
+						<option value="social">Social Engineering</option>
+						<option value="hijack">Account Hijacking</option>
+						<option value="other">อื่นๆ</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="details">รายละเอียดเพิ่มเติม <span class="required">*</span></label>
+				<textarea id="details" required placeholder="อธิบายสถานการณ์"></textarea>
+			</div>
+
+			<div class="form-group">
+				<label for="lost">สิ่งของที่สูญเสีย <span class="required">*</span></label>
+				<textarea id="lost" required placeholder="ระบุสิ่งที่สูญเสีย"></textarea>
+			</div>
+
+			<div class="form-group">
+				<label for="evidence">หลักฐานเพิ่มเติม</label>
+				<textarea id="evidence" placeholder="Link, Screenshot, หรือข้อมูลอื่นๆ"></textarea>
+			</div>
+
+			<div class="button-group">
+				<button type="reset" class="btn-reset">ล้างข้อมูล</button>
+				<button type="submit" class="btn-submit">ส่งรายงาน</button>
+			</div>
+		</form>
+
+		<div class="guidelines">
+			<h3>ข้อมูลที่เราต้องการ</h3>
+			<ul>
+				<li>ชื่อบัญชี (Username) และ OpenID</li>
+				<li>วันที่โดนโกง</li>
+				<li>วิธีการโกง</li>
+				<li>สิ่งที่สูญเสีย</li>
+				<li>หลักฐานช่วยสืบสวน</li>
+				<li>ข้อมูลติดต่อ</li>
+			</ul>
+		</div>
+
+		<div class="guidelines" style="margin-top: 24px; background: rgba(255,107,107,.05); border-left-color: #ff6b6b;">
+			<h3 style="color: #ff6b6b;">เราสามารถช่วยได้</h3>
+			<ul>
+				<li>ตรวจสอบสถานะบัญชี</li>
+				<li>ติดต่อ Garena เพื่อฟื้นฟู</li>
+				<li>สืบหาผู้โกง</li>
+				<li>ให้คำแนะนำป้องกัน</li>
+				<li>ช่วยกู้คืนไอดี</li>
+			</ul>
+		</div>
+	</div>
+
+	<script>
+		const form = document.getElementById('scamReportForm');
+		const successMsg = document.getElementById('successMsg');
+
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+
+			const data = {
+				username: document.getElementById('username').value,
+				openid: document.getElementById('openid').value,
+				email: document.getElementById('email').value,
+				phone: document.getElementById('phone').value || 'ไม่ระบุ',
+				scamDate: document.getElementById('scamDate').value,
+				scamMethod: document.getElementById('scamMethod').value,
+				details: document.getElementById('details').value,
+				lost: document.getElementById('lost').value,
+				evidence: document.getElementById('evidence').value || 'ไม่มี',
+				submittedAt: new Date().toLocaleString('th-TH')
+			};
+
+			let reports = JSON.parse(localStorage.getItem('scamReports') || '[]');
+			reports.push(data);
+			localStorage.setItem('scamReports', JSON.stringify(reports));
+
+			successMsg.classList.add('show');
+			form.reset();
+
+			setTimeout(() => {
+				successMsg.classList.remove('show');
+			}, 5000);
+
+			console.log('Report:', data);
+		});
+	</script>
+</body>
+</html>
