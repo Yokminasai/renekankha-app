@@ -268,6 +268,16 @@ app.delete('/api/2fa/keys/:keyId', (req, res) => {
 // Serve static frontend
 app.use(express.static(__dirname));
 
+// Serve index.html on root
+app.get('/', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Catch-all route to serve HTML files for frontend routing
+app.get('*.html', (req, res) => {
+	res.sendFile(path.join(__dirname, req.path));
+});
+
 // Health check
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
