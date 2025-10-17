@@ -23,7 +23,7 @@ const app = express();
 const DEFAULT_PORT = Number(process.env.PORT || 3000);
 const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret';
 
-// Use /tmp for Vercel, local data folder for development
+// Data directory - use /tmp on Vercel, local on dev
 const dataDir = process.env.VERCEL 
 	? path.join('/tmp', 'data')
 	: path.join(__dirname, 'data');
@@ -668,12 +668,28 @@ app.get('/api/ip', async (_req, res) => {
 });
 
 // Serve static frontend (must be after all API routes)
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, {
+	// Serve index.html as fallback for directory requests
+	index: false
+}));
 
-// 404 handler
+// Route handler for root
+app.get('/', (req, res) => {
+	res.sendFile(path.join(__dirname, 'home.html'));
+});
+
+// 404 - Send home.html for SPA navigation or return error for actual missing files
 app.use((req, res) => {
-	console.log('404:', req.method, req.path);
-	res.status(404).send('Not Found');
+	// If it looks like a file request (has extension), return 404
+	if (req.path.includes('.')) {
+		return res.status(404).json({ error: 'not found' });
+	}
+	// Otherwise serve home.html for SPA routing
+	res.sendFile(path.join(__dirname, 'home.html'), (err) => {
+		if (err) {
+			res.status(404).json({ error: 'not found' });
+		}
+	});
 });
 
 // Global error handler
