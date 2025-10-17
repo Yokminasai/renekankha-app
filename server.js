@@ -53,6 +53,7 @@ const servicesFile = path.join(dataDir, 'services.json');
 const usersFile = path.join(dataDir, 'users.json');
 const sessionsFile = path.join(dataDir, 'sessions.json');
 const twofaKeysFile = path.join(dataDir, 'twofa-keys.json');
+const transactionsFile = path.join(dataDir, 'transactions.json');
 
 function ensureDataFiles() {
 	if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
@@ -62,6 +63,7 @@ function ensureDataFiles() {
 	if (!fs.existsSync(servicesFile)) fs.writeFileSync(servicesFile, JSON.stringify({ garena: [], disputes: [], google: [], updatedAt: new Date().toISOString() }, null, 2));
 	if (!fs.existsSync(usersFile)) fs.writeFileSync(usersFile, JSON.stringify({ users: [], updatedAt: new Date().toISOString() }, null, 2));
 	if (!fs.existsSync(sessionsFile)) fs.writeFileSync(sessionsFile, JSON.stringify({ sessions: [], updatedAt: new Date().toISOString() }, null, 2));
+	if (!fs.existsSync(transactionsFile)) fs.writeFileSync(transactionsFile, JSON.stringify({ transactions: [], updatedAt: new Date().toISOString() }, null, 2));
 }
 
 function readJSON(filePath) { try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch { return null; } }
@@ -449,6 +451,65 @@ app.post('/api/pay/checkout', async (req, res) => {
 	} catch (e) {
 		return res.status(500).json({ error: 'stripe_error' });
 	}
+});
+
+// Transaction APIs (Income/Expense tracking)
+app.post('/api/transactions', (req, res) => {
+	const s = getSession(req);
+	if (!s) return res.status(401).json({ error: 'not authenticated' });
+	
+	const { type, amount, description, date } = req.body || {};
+	if (!type || !amount || amount <= 0) return res.status(400).json({ error: 'invalid type or amount' });
+	if (!['income', 'expense'].includes(type)) return res.status(400).json({ error: 'invalid type' });
+	
+	const db = readJSON(transactionsFile) || { transactions: [] };
+	const users = readJSON(usersFile) || { users: [] };
+	const user = users.users.find(u => u.id === s.userId);
+	
+	const transaction = {
+		id: nanoid(12),
+		userId: s.userId,
+		seedPhraseHash: user?.seedPhraseHash || '',
+		type,
+		amount: Number(amount),
+		description: String(description || ''),
+		date: date || new Date().toISOString(),
+		createdAt: new Date().toISOString()
+	};
+	
+	db.transactions.unshift(transaction);
+	db.updatedAt = new Date().toISOString();
+	writeJSON(transactionsFile, db);
+	
+	res.status(201).json({ ok: true, transaction });
+});
+
+app.get('/api/transactions', (req, res) => {
+	const s = getSession(req);
+	if (!s) return res.status(401).json({ error: 'not authenticated' });
+	
+	const db = readJSON(transactionsFile) || { transactions: [] };
+	const userTransactions = db.transactions.filter(t => t.userId === s.userId);
+	const limit = Math.min(parseInt(req.query.limit || '500', 10), 5000);
+	
+	res.json({ count: userTransactions.length, items: userTransactions.slice(0, limit) });
+});
+
+app.delete('/api/transactions/:id', (req, res) => {
+	const s = getSession(req);
+	if (!s) return res.status(401).json({ error: 'not authenticated' });
+	
+	const { id } = req.params;
+	const db = readJSON(transactionsFile) || { transactions: [] };
+	
+	const transactionIndex = db.transactions.findIndex(t => t.id === id && t.userId === s.userId);
+	if (transactionIndex === -1) return res.status(404).json({ error: 'not found' });
+	
+	db.transactions.splice(transactionIndex, 1);
+	db.updatedAt = new Date().toISOString();
+	writeJSON(transactionsFile, db);
+	
+	res.json({ ok: true });
 });
 
 // 2FA Live Proxy API
