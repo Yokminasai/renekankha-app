@@ -453,7 +453,8 @@ app.post('/api/pay/checkout', async (req, res) => {
 	}
 });
 
-// Transaction APIs (Income/Expense tracking)
+// TEMPORARILY DISABLED - Transaction APIs
+/*
 app.post('/api/transactions', (req, res) => {
 	const s = getSession(req);
 	if (!s) return res.status(401).json({ error: 'not authenticated' });
@@ -511,6 +512,7 @@ app.delete('/api/transactions/:id', (req, res) => {
 	
 	res.json({ ok: true });
 });
+*/
 
 // 2FA Live Proxy API
 app.get('/api/2fa/:secret', async (req, res) => {
