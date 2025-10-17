@@ -668,26 +668,13 @@ app.get('/api/ip', async (_req, res) => {
 });
 
 // Serve static frontend (must be after all API routes)
-app.use(express.static(__dirname, {
-	// Serve index.html as fallback for directory requests
-	index: false
-}));
+app.use(express.static(__dirname));
 
-// Route handler for root
-app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname, 'home.html'));
-});
-
-// 404 - Send home.html for SPA navigation or return error for actual missing files
+// Fallback for SPA routing - serve home.html for any remaining requests
 app.use((req, res) => {
-	// If it looks like a file request (has extension), return 404
-	if (req.path.includes('.')) {
-		return res.status(404).json({ error: 'not found' });
-	}
-	// Otherwise serve home.html for SPA routing
 	res.sendFile(path.join(__dirname, 'home.html'), (err) => {
 		if (err) {
-			res.status(404).json({ error: 'not found' });
+			res.status(404).send('Not Found');
 		}
 	});
 });
