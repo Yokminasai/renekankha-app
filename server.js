@@ -555,38 +555,6 @@ app.get('/api/2fa/:secret', async (req, res) => {
 app.get('/api/ip', async (_req, res) => {
 	res.set('Cache-Control', 'no-store');
 
-	// Get real client IP (from Vercel/proxy headers)
-	function getClientIp(req) {
-		try {
-			// Try X-Forwarded-For first (Vercel/proxy)
-			const xForwardedFor = req.headers['x-forwarded-for'];
-			if (xForwardedFor) {
-				return xForwardedFor.split(',')[0].trim();
-			}
-			
-			// Try other headers
-			const ip = req.headers['x-real-ip'] || 
-					   req.headers['cf-connecting-ip'] ||
-					   req.ip;
-			if (ip) return ip;
-			
-			// Fallback - safely check connection/socket
-			if (req.connection && req.connection.remoteAddress) {
-				return req.connection.remoteAddress;
-			}
-			if (req.socket && req.socket.remoteAddress) {
-				return req.socket.remoteAddress;
-			}
-			
-			return '';
-		} catch (err) {
-			console.error('Error getting client IP:', err);
-			return '';
-		}
-	}
-
-	const clientIp = getClientIp(_req);
-
 	function withTimeout(ms, fetcher) {
 		const controller = new AbortController();
 		const t = setTimeout(() => controller.abort(), ms);
@@ -620,25 +588,7 @@ app.get('/api/ip', async (_req, res) => {
 	}
 
 	try {
-		// If we have client IP, get detailed info for that IP
-		if (clientIp && clientIp !== '::1' && clientIp !== '127.0.0.1') {
-			try {
-				const extra = await withTimeout(3000, (s) => ipapiByIp(clientIp, s));
-				let ip = clientIp;
-				let isp = extra.org || extra.org_name || extra.isp || '';
-				let country = extra.country_name || extra.country || '';
-				let region = extra.region || extra.regionName || '';
-				let city = extra.city || '';
-				let latitude = Number(extra.latitude) || null;
-				let longitude = Number(extra.longitude) || null;
-
-				return res.json({ ok: true, source: 'ipapi-client', ip, isp, country, region, city, latitude, longitude });
-			} catch (err) {
-				console.log('Client IP lookup failed, trying fallback:', err.message);
-			}
-		}
-
-		// Fallback: Race providers (3s timeout each)
+		// Race providers (3s timeout each). Whichever responds first wins.
 		const winner = await Promise.any([
 			withTimeout(3000, (s) => tryIpApi(s)),
 			withTimeout(3000, (s) => tryIpInfo(s)),
@@ -674,6 +624,7 @@ app.get('/api/ip', async (_req, res) => {
 
 		return res.json({ ok: true, source, ip, isp, country, region, city, latitude, longitude });
 	} catch (e) {
+		console.error('IP lookup error:', e);
 		return res.status(504).json({ ok: false, error: 'ip_lookup_timeout' });
 	}
 });
