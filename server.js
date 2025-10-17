@@ -557,11 +557,32 @@ app.get('/api/ip', async (_req, res) => {
 
 	// Get real client IP (from Vercel/proxy headers)
 	function getClientIp(req) {
-		const xForwardedFor = req.headers['x-forwarded-for'];
-		if (xForwardedFor) {
-			return xForwardedFor.split(',')[0].trim();
+		try {
+			// Try X-Forwarded-For first (Vercel/proxy)
+			const xForwardedFor = req.headers['x-forwarded-for'];
+			if (xForwardedFor) {
+				return xForwardedFor.split(',')[0].trim();
+			}
+			
+			// Try other headers
+			const ip = req.headers['x-real-ip'] || 
+					   req.headers['cf-connecting-ip'] ||
+					   req.ip;
+			if (ip) return ip;
+			
+			// Fallback - safely check connection/socket
+			if (req.connection && req.connection.remoteAddress) {
+				return req.connection.remoteAddress;
+			}
+			if (req.socket && req.socket.remoteAddress) {
+				return req.socket.remoteAddress;
+			}
+			
+			return '';
+		} catch (err) {
+			console.error('Error getting client IP:', err);
+			return '';
 		}
-		return req.connection.remoteAddress || req.socket.remoteAddress || '';
 	}
 
 	const clientIp = getClientIp(_req);
