@@ -273,9 +273,20 @@ app.get('/', (_req, res) => {
 	res.sendFile(path.join(__dirname, 'home.html'));
 });
 
-// Catch-all route to serve HTML files for frontend routing
-app.get('*.html', (req, res) => {
-	res.sendFile(path.join(__dirname, req.path));
+// Catch-all: serve requested HTML file or index.html
+app.get(/\.(html?)$/i, (req, res) => {
+	const filePath = path.join(__dirname, req.path);
+	res.sendFile(filePath, (err) => {
+		if (err) {
+			// If file not found, serve index.html
+			res.sendFile(path.join(__dirname, 'home.html'));
+		}
+	});
+});
+
+// Fallback: For any other path without .html, serve index.html
+app.get('*', (req, res) => {
+	res.sendFile(path.join(__dirname, 'home.html'));
 });
 
 // Health check
