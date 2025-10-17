@@ -672,15 +672,22 @@ app.use(express.static(__dirname));
 
 // Fallback: serve home.html for SPA routing on undefined routes
 app.get('*', (req, res) => {
-	// Only serve home.html for non-file requests
-	if (!req.path.includes('.')) {
+	// If path has a file extension, try to serve it as-is
+	if (req.path.includes('.')) {
+		const filePath = path.join(__dirname, req.path);
+		res.sendFile(filePath, (err) => {
+			if (err) {
+				// If file not found, return 404
+				res.status(404).json({ error: 'not found' });
+			}
+		});
+	} else {
+		// No file extension - serve home.html for SPA routing
 		res.sendFile(path.join(__dirname, 'home.html'), (err) => {
 			if (err) {
 				res.status(404).json({ error: 'not found' });
 			}
 		});
-	} else {
-		res.status(404).json({ error: 'not found' });
 	}
 });
 
