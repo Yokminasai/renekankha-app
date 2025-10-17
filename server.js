@@ -23,6 +23,11 @@ const app = express();
 const DEFAULT_PORT = Number(process.env.PORT || 3000);
 const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret';
 
+// Use /tmp for Vercel, local data folder for development
+const dataDir = process.env.VERCEL 
+	? path.join('/tmp', 'data')
+	: path.join(__dirname, 'data');
+
 // Security headers + CSP
 app.use(helmet({
 	contentSecurityPolicy: {
@@ -45,7 +50,6 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(morgan('combined'));
 
-const dataDir = path.join(__dirname, 'data');
 const blacklistFile = path.join(dataDir, 'blacklist.json');
 const reportsFile = path.join(dataDir, 'reports.json');
 const ordersFile = path.join(dataDir, 'orders.json');
