@@ -570,6 +570,73 @@ app.get('/api/ip', async (_req, res) => {
 // Serve static frontend (must be after all API routes)
 app.use(express.static(__dirname));
 
+// Serve home on root
+app.get('/', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'home.html'));
+});
+
+// Explicit HTML routes for direct access
+app.get('/index.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'index.html'));
+});
+app.get('/login.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'login.html'));
+});
+app.get('/register.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'register.html'));
+});
+app.get('/dashboard.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+app.get('/home.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'home.html'));
+});
+app.get('/authenticator.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'authenticator.html'));
+});
+app.get('/check.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'check.html'));
+});
+app.get('/orders.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'orders.html'));
+});
+app.get('/reports.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'reports.html'));
+});
+app.get('/services.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services.html'));
+});
+app.get('/services-garena.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-garena.html'));
+});
+app.get('/services-blacklist-dispute.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-blacklist-dispute.html'));
+});
+app.get('/services-google-removal.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-google-removal.html'));
+});
+app.get('/services-email.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-email.html'));
+});
+app.get('/services-email-checker.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-email-checker.html'));
+});
+app.get('/services-scam-reporting.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'services-scam-reporting.html'));
+});
+app.get('/scammed-reports.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'scammed-reports.html'));
+});
+app.get('/profit-calculator.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'profit-calculator.html'));
+});
+app.get('/pay-success.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'pay-success.html'));
+});
+app.get('/pay-cancel.html', (_req, res) => {
+	res.sendFile(path.join(__dirname, 'pay-cancel.html'));
+});
+
 // Fallback: serve home.html for SPA routing on undefined routes
 app.get('*', (req, res) => {
 	res.sendFile(path.join(__dirname, 'home.html'));
