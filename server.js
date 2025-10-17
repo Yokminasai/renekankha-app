@@ -60,18 +60,50 @@ const twofaKeysFile = path.join(dataDir, 'twofa-keys.json');
 const transactionsFile = path.join(dataDir, 'transactions.json');
 
 function ensureDataFiles() {
-	if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
-	if (!fs.existsSync(blacklistFile)) fs.writeFileSync(blacklistFile, JSON.stringify({ ips: [], updatedAt: new Date().toISOString() }, null, 2));
-	if (!fs.existsSync(reportsFile)) fs.writeFileSync(reportsFile, JSON.stringify({ reports: [], updatedAt: new Date().toISOString() }, null, 2));
-	if (!fs.existsSync(ordersFile)) fs.writeFileSync(ordersFile, JSON.stringify({ orders: [], updatedAt: new Date().toISOString() }, null, 2));
-	if (!fs.existsSync(servicesFile)) fs.writeFileSync(servicesFile, JSON.stringify({ garena: [], disputes: [], google: [], updatedAt: new Date().toISOString() }, null, 2));
-	if (!fs.existsSync(usersFile)) fs.writeFileSync(usersFile, JSON.stringify({ users: [], updatedAt: new Date().toISOString() }, null, 2));
-	if (!fs.existsSync(sessionsFile)) fs.writeFileSync(sessionsFile, JSON.stringify({ sessions: [], updatedAt: new Date().toISOString() }, null, 2));
-	if (!fs.existsSync(transactionsFile)) fs.writeFileSync(transactionsFile, JSON.stringify({ transactions: [], updatedAt: new Date().toISOString() }, null, 2));
+	try {
+		if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+	} catch (err) {
+		console.warn('Cannot create data directory:', err.message);
+		return;
+	}
+	
+	const files = [blacklistFile, reportsFile, ordersFile, servicesFile, usersFile, sessionsFile, transactionsFile];
+	const templates = [
+		{ ips: [], updatedAt: new Date().toISOString() },
+		{ reports: [], updatedAt: new Date().toISOString() },
+		{ orders: [], updatedAt: new Date().toISOString() },
+		{ garena: [], disputes: [], google: [], updatedAt: new Date().toISOString() },
+		{ users: [], updatedAt: new Date().toISOString() },
+		{ sessions: [], updatedAt: new Date().toISOString() },
+		{ transactions: [], updatedAt: new Date().toISOString() }
+	];
+	
+	files.forEach((filePath, idx) => {
+		try {
+			if (!fs.existsSync(filePath)) {
+				fs.writeFileSync(filePath, JSON.stringify(templates[idx], null, 2));
+			}
+		} catch (err) {
+			console.warn(`Cannot initialize ${filePath}:`, err.message);
+		}
+	});
 }
 
-function readJSON(filePath) { try { return JSON.parse(fs.readFileSync(filePath, 'utf8')); } catch { return null; } }
-function writeJSON(filePath, data) { fs.writeFileSync(filePath, JSON.stringify(data, null, 2)); }
+function readJSON(filePath) { 
+	try { 
+		return JSON.parse(fs.readFileSync(filePath, 'utf8')); 
+	} catch { 
+		return null; 
+	} 
+}
+
+function writeJSON(filePath, data) { 
+	try {
+		fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+	} catch (err) {
+		console.warn(`Cannot write to ${filePath}:`, err.message);
+	}
+}
 ensureDataFiles();
 
 // Minimal cookie session
