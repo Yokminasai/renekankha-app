@@ -1,5 +1,19 @@
 {
   "projects": {
     "default": "renekankha-32b97"
+  },
+  "emulators": {
+    "hosting": {
+      "port": 5000
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "database": {
+      "port": 9000
+    },
+    "auth": {
+      "port": 9099
+    }
   }
 }
