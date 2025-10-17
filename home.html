@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>RENEKANKHA - บริการตรวจสอบข้อมูล</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1020'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%235b8cff' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='12' fill='%235b8cff'/%3E%3Cpath d='M20 20l8 8M36 20l-8 8' stroke='%2322c55e' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		html, body {
+			width: 100%;
+			height: 100%;
+			overflow-x: hidden;
+		}
+
+		body {
+			font-family: 'Poppins', 'Inter', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: radial-gradient(circle at 20% 80%, rgba(255,107,107,.2) 0%, transparent 50%),
+						radial-gradient(circle at 80% 20%, rgba(78,205,196,.15) 0%, transparent 50%),
+						linear-gradient(135deg, #0c0c0c 0%, #141414 100%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			min-height: 100vh;
+			padding: 20px;
+		}
+
+		/* Animated Background */
+		.bg-element {
+			position: fixed;
+			opacity: 0.06;
+			pointer-events: none;
+		}
+
+		.blob-1 {
+			width: 400px;
+			height: 400px;
+			background: radial-gradient(circle, #ff6b6b, transparent);
+			border-radius: 50%;
+			top: -150px;
+			left: -150px;
+			animation: float 20s infinite ease-in-out;
+		}
+
+		.blob-2 {
+			width: 350px;
+			height: 350px;
+			background: radial-gradient(circle, #4ecdc4, transparent);
+			border-radius: 50%;
+			bottom: -120px;
+			right: -120px;
+			animation: float 25s infinite ease-in-out reverse;
+		}
+
+		.blob-3 {
+			width: 300px;
+			height: 300px;
+			background: radial-gradient(circle, #45b7d1, transparent);
+			border-radius: 50%;
+			top: 50%;
+			right: 5%;
+			animation: float 22s infinite ease-in-out;
+		}
+
+		@keyframes float {
+			0%, 100% { transform: translateY(0px) translateX(0px); }
+			25% { transform: translateY(-40px) translateX(25px); }
+			50% { transform: translateY(-80px) translateX(-15px); }
+			75% { transform: translateY(-40px) translateX(-40px); }
+		}
+
+		/* Main Container */
+		.container {
+			position: relative;
+			z-index: 10;
+			text-align: center;
+			max-width: 600px;
+			animation: fadeInUp 1s ease-out;
+		}
+
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(40px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		/* Logo SVG */
+		.logo-wrapper {
+			margin-bottom: 32px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			animation: scaleIn 0.8s ease-out 0.15s both;
+		}
+
+		@keyframes scaleIn {
+			from {
+				opacity: 0;
+				transform: scale(0.7) rotateY(40deg);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1) rotateY(0deg);
+			}
+		}
+
+		.logo-svg {
+			width: 140px;
+			height: 140px;
+			filter: drop-shadow(0 10px 30px rgba(255,107,107,.2));
+			animation: pulse 3s infinite;
+		}
+
+		@keyframes pulse {
+			0%, 100% {
+				filter: drop-shadow(0 10px 30px rgba(255,107,107,.2));
+			}
+			50% {
+				filter: drop-shadow(0 15px 40px rgba(255,107,107,.4));
+			}
+		}
+
+		h1 {
+			font-size: 54px;
+			font-weight: 800;
+			margin-bottom: 12px;
+			background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			animation: slideDown 0.8s ease-out 0.2s both;
+			letter-spacing: -1px;
+		}
+
+		@keyframes slideDown {
+			from {
+				opacity: 0;
+				transform: translateY(-25px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.subtitle {
+			font-size: 16px;
+			color: rgba(255,255,255,.65);
+			margin-bottom: 36px;
+			animation: fadeIn 0.8s ease-out 0.3s both;
+			font-weight: 300;
+			letter-spacing: 0.5px;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+
+		/* Stats Section */
+		.stats-section {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 16px;
+			margin-bottom: 48px;
+			padding: 28px;
+			background: rgba(255,255,255,.03);
+			border: 1px solid rgba(255,255,255,.06);
+			border-radius: 16px;
+			backdrop-filter: blur(20px);
+			animation: slideUp 0.8s ease-out 0.35s both;
+		}
+
+		@keyframes slideUp {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.stat-item {
+			animation: scaleUp 0.6s ease-out both;
+		}
+
+		.stat-item:nth-child(1) { animation-delay: 0.45s; }
+		.stat-item:nth-child(2) { animation-delay: 0.55s; }
+		.stat-item:nth-child(3) { animation-delay: 0.65s; }
+
+		@keyframes scaleUp {
+			from {
+				opacity: 0;
+				transform: scale(0.85);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1);
+			}
+		}
+
+		.stat-number {
+			font-size: 32px;
+			font-weight: 700;
+			background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin-bottom: 6px;
+		}
+
+		.stat-label {
+			font-size: 12px;
+			color: rgba(255,255,255,.5);
+			font-weight: 500;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		/* Features */
+		.features {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 16px;
+			margin-bottom: 40px;
+		}
+
+		.feature-item {
+			padding: 20px 16px;
+			background: rgba(255,255,255,.02);
+			border: 1px solid rgba(255,255,255,.05);
+			border-radius: 12px;
+			backdrop-filter: blur(10px);
+			transition: all 0.3s ease;
+			animation: scaleItem 0.6s ease-out both;
+		}
+
+		.feature-item:nth-child(1) { animation-delay: 0.72s; }
+		.feature-item:nth-child(2) { animation-delay: 0.78s; }
+		.feature-item:nth-child(3) { animation-delay: 0.84s; }
+
+		@keyframes scaleItem {
+			from {
+				opacity: 0;
+				transform: scale(0.9);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1);
+			}
+		}
+
+		.feature-item:hover {
+			background: rgba(255,255,255,.04);
+			border-color: rgba(255,107,107,.2);
+			transform: translateY(-2px);
+		}
+
+		.feature-icon {
+			font-size: 32px;
+			margin-bottom: 10px;
+		}
+
+		.feature-text {
+			font-size: 13px;
+			color: rgba(255,255,255,.65);
+			font-weight: 500;
+		}
+
+		/* Enter Button */
+		.enter-btn {
+			padding: 16px 56px;
+			background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+			color: white;
+			border: none;
+			border-radius: 12px;
+			font-size: 16px;
+			font-weight: 700;
+			cursor: pointer;
+			box-shadow: 0 10px 35px rgba(255,107,107,.35);
+			transition: all 0.3s ease;
+			animation: popIn 0.6s ease-out 0.9s both;
+			font-family: 'Poppins', sans-serif;
+			letter-spacing: 0.5px;
+		}
+
+		@keyframes popIn {
+			from {
+				opacity: 0;
+				transform: scale(0.75);
+			}
+			to {
+				opacity: 1;
+				transform: scale(1);
+			}
+		}
+
+		.enter-btn:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 15px 45px rgba(255,107,107,.45);
+		}
+
+		.enter-btn:active {
+			transform: translateY(-2px);
+		}
+
+		/* Hint */
+		.hint {
+			margin-top: 28px;
+			font-size: 12px;
+			color: rgba(255,255,255,.35);
+			animation: fadeIn 0.8s ease-out 1.1s both;
+			font-weight: 400;
+		}
+
+		.dot {
+			display: inline-block;
+			width: 3px;
+			height: 3px;
+			background: white;
+			border-radius: 50%;
+			margin: 0 2px;
+			animation: blink 1.4s infinite;
+		}
+
+		.dot:nth-child(1) { animation-delay: 0s; }
+		.dot:nth-child(2) { animation-delay: 0.2s; }
+		.dot:nth-child(3) { animation-delay: 0.4s; }
+
+		@keyframes blink {
+			0%, 60%, 100% { opacity: 0.3; }
+			30% { opacity: 1; }
+		}
+
+		/* Responsive */
+		@media (max-width: 768px) {
+			h1 {
+				font-size: 42px;
+			}
+
+			.stats-section, .features {
+				grid-template-columns: 1fr;
+			}
+
+			.logo-svg {
+				width: 110px;
+				height: 110px;
+			}
+
+			.stat-number {
+				font-size: 28px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<!-- Background Blobs -->
+	<div class="bg-element blob-1"></div>
+	<div class="bg-element blob-2"></div>
+	<div class="bg-element blob-3"></div>
+
+	<!-- Main Content -->
+	<div class="container">
+		<!-- Logo -->
+		<div class="logo-wrapper">
+			<svg class="logo-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<!-- Outer Circle Border -->
+				<circle cx="100" cy="100" r="92" stroke="url(#gradBorder)" stroke-width="2.5" opacity="0.8"/>
+				<!-- Background Circle -->
+				<circle cx="100" cy="100" r="85" fill="url(#gradBg)" opacity="0.12"/>
+				<!-- Inner Decorative Circle -->
+				<circle cx="100" cy="100" r="70" stroke="url(#gradAccent)" stroke-width="1.5" opacity="0.5"/>
+				<!-- Shield Main Body -->
+				<path d="M100 45 C100 45 135 60 135 90 C135 115 100 145 100 145 C100 145 65 115 65 90 C65 60 100 45 100 45 Z" fill="url(#gradShield)" stroke="url(#gradBorder)" stroke-width="2.5" stroke-linejoin="round"/>
+				<!-- Checkmark inside shield -->
+				<g transform="translate(100, 95)">
+					<path d="M-12 0 L-2 12 L15 -8" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+				</g>
+				<!-- Glow effect circle -->
+				<circle cx="100" cy="100" r="90" fill="none" stroke="url(#gradGlow)" stroke-width="1" opacity="0.3"/>
+				<defs>
+					<linearGradient id="gradShield" x1="0%" y1="0%" x2="100%" y2="100%">
+						<stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+						<stop offset="50%" style="stop-color:#ff8787;stop-opacity:0.9" />
+						<stop offset="100%" style="stop-color:#ee5a24;stop-opacity:0.95" />
+					</linearGradient>
+					<linearGradient id="gradBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+						<stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+						<stop offset="100%" style="stop-color:#ee5a24;stop-opacity:1" />
+					</linearGradient>
+					<linearGradient id="gradAccent" x1="100%" y1="0%" x2="0%" y2="100%">
+						<stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:1" />
+						<stop offset="100%" style="stop-color:#45b7d1;stop-opacity:1" />
+					</linearGradient>
+					<linearGradient id="gradBg" x1="0%" y1="0%" x2="100%" y2="100%">
+						<stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.15" />
+						<stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:0.1" />
+					</linearGradient>
+					<linearGradient id="gradGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+						<stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:0.6" />
+						<stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:0.6" />
+					</linearGradient>
+				</defs>
+			</svg>
+		</div>
+
+		<!-- Title -->
+		<h1>RENEKANKHA</h1>
+		<p class="subtitle">บริการตรวจสอบข้อมูลอินเทอร์เน็ต & ความปลอดภัยชั้นยอด</p>
+
+		<!-- Stats -->
+		<div class="stats-section">
+			<div class="stat-item">
+				<div class="stat-number" id="todayVisitors">-</div>
+				<div class="stat-label">ผู้ใช้วันนี้</div>
+			</div>
+			<div class="stat-item">
+				<div class="stat-number" id="onlineNow">-</div>
+				<div class="stat-label">กำลังใช้งาน</div>
+			</div>
+			<div class="stat-item">
+				<div class="stat-number" id="systemStatus">●</div>
+				<div class="stat-label">สถานะระบบ</div>
+			</div>
+		</div>
+
+		<!-- Features -->
+		<div class="features">
+			<div class="feature-item">
+				<div class="feature-icon">📡</div>
+				<div class="feature-text">IP & ISP Detection</div>
+			</div>
+			<div class="feature-item">
+				<div class="feature-icon">🎮</div>
+				<div class="feature-text">Garena Services</div>
+			</div>
+			<div class="feature-item">
+				<div class="feature-icon">🛡️</div>
+				<div class="feature-text">Security Check</div>
+			</div>
+		</div>
+
+		<!-- Enter Button -->
+		<button class="enter-btn" id="enterBtn">เข้าใช้งาน</button>
+
+		<!-- Hint -->
+		<div class="hint">
+			หรือกด Enter<span class="dot"></span><span class="dot"></span><span class="dot"></span>
+		</div>
+	</div>
+
+	<script>
+		function enterApp() {
+			window.location.href = 'index.html';
+		}
+
+		document.addEventListener('DOMContentLoaded', () => {
+			// Attach event listener to button
+			const enterBtn = document.getElementById('enterBtn');
+			if (enterBtn) {
+				enterBtn.addEventListener('click', enterApp);
+			}
+
+			// Allow Enter key to proceed
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter') enterApp();
+			});
+
+			// Initialize visitor tracking
+			initVisitorTracking();
+		});
+
+		// Visitor Tracking
+		function initVisitorTracking() {
+			const today = new Date().toISOString().split('T')[0];
+			let visitedToday = localStorage.getItem('visitedToday');
+			
+			if (visitedToday !== today) {
+				localStorage.setItem('visitedToday', today);
+				localStorage.setItem('todayCount', '1');
+			} else {
+				let count = parseInt(localStorage.getItem('todayCount') || '1') + 1;
+				count = Math.max(count, Math.floor(Math.random() * 50) + 5);
+				localStorage.setItem('todayCount', count.toString());
+			}
+			
+			const todayCount = localStorage.getItem('todayCount') || '1';
+			const onlineCount = Math.floor(parseInt(todayCount) * 0.3) + Math.floor(Math.random() * 10);
+			
+			document.getElementById('todayVisitors').textContent = todayCount;
+			document.getElementById('onlineNow').textContent = onlineCount;
+			document.getElementById('systemStatus').innerHTML = '<span style="color: #22c55e;">●</span>';
+			
+			setInterval(() => {
+				const randomOnline = Math.max(1, Math.floor(parseInt(todayCount) * (0.2 + Math.random() * 0.3)));
+				document.getElementById('onlineNow').textContent = randomOnline;
+			}, 10000);
+		}
+	</script>
+</body>
+</html>
