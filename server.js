@@ -568,7 +568,10 @@ app.get('/api/ip', async (_req, res) => {
 });
 
 // Serve static frontend (must be after all API routes)
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, { 
+	index: 'home.html',
+	extensions: ['html', 'htm']
+}));
 
 // Serve home on root
 app.get('/', (_req, res) => {
