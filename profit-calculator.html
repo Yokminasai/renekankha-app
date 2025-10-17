@@ -541,32 +541,18 @@
 				timestamp: new Date(date).getTime()
 			};
 
-			// Determine transaction type for API (income or expense)
-			let apiType = 'expense';
-			if (['id-sale', 'rental-income'].includes(type)) {
-				apiType = 'income';
-			}
+			transactions.push(transaction);
+			saveTransactions();
+			renderTransactions();
+			alert('บันทึกธุรกรรมสำเร็จ!');
 
-			// Save to backend
-			saveTransaction(apiType, amount, description, new Date(date).toISOString())
-				.then(result => {
-					if (result.ok) {
-						transactions.push(transaction);
-						saveTransactions();
-						renderTransactions();
-						alert('บันทึกธุรกรรมสำเร็จ!');
-
-						// Clear form
-						$('transactionType').value = '';
-						$('transactionAmount').value = '';
-						$('transactionDescription').value = '';
-						$('idSalePrice').value = '';
-						$('transactionDate').value = new Date().toISOString().split('T')[0];
-						$('idPriceGroup').style.display = 'none';
-					} else {
-						alert('เกิดข้อผิดพลาด: ' + result.error);
-					}
-				});
+			// Clear form
+			$('transactionType').value = '';
+			$('transactionAmount').value = '';
+			$('transactionDescription').value = '';
+			$('idSalePrice').value = '';
+			$('transactionDate').value = new Date().toISOString().split('T')[0];
+			$('idPriceGroup').style.display = 'none';
 		}
 
 		function renderTransactions() {
@@ -809,6 +795,5 @@
 			}
 		}
 	</script>
-	<script src="transaction-manager.js"></script>
 </body>
 </html>
