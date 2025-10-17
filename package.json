@@ -4,6 +4,10 @@
 	"description": "Thai IP checker with ISP, device info, map, and blacklist backend",
 	"main": "server.js",
 	"type": "module",
+	"engines": {
+		"node": ">=18.0.0",
+		"npm": ">=9.0.0"
+	},
 	"scripts": {
 		"start": "node server.js",
 		"dev": "node server.js"
