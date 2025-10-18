@@ -1332,6 +1332,45 @@
 			}
 		}
 		
+		// Get real client IP from external service
+		async function getRealClientIP() {
+			try {
+				// Try multiple CORS-enabled IP services
+				try {
+					// ipinfo.io is CORS-enabled
+					const res = await fetch('https://ipinfo.io/json', { 
+						signal: AbortSignal.timeout(5000)
+					});
+					if (res.ok) {
+						const data = await res.json();
+						console.log('[IP] Got from ipinfo.io:', data.ip);
+						return data.ip;
+					}
+				} catch (e1) {
+					console.error('[IP] ipinfo.io failed:', e1.message);
+				}
+				
+				try {
+					// api64.ipify.org is CORS-enabled
+					const res = await fetch('https://api64.ipify.org?format=json', {
+						signal: AbortSignal.timeout(5000)
+					});
+					if (res.ok) {
+						const data = await res.json();
+						console.log('[IP] Got from api64.ipify.org:', data.ip);
+						return data.ip;
+					}
+				} catch (e2) {
+					console.error('[IP] api64.ipify.org failed:', e2.message);
+				}
+				
+				throw new Error('Could not determine real client IP');
+			} catch (error) {
+				console.error('[IP] Error getting real client IP:', error);
+				return null;
+			}
+		}
+		
 		function fetchWithTimeout(url,ms=6000){ const controller=new AbortController(); const t=setTimeout(()=>controller.abort(),ms); return fetch(url,{ signal:controller.signal }).finally(()=>clearTimeout(t)); }
 		async function fetchFromBackend(){ const res=await fetchWithTimeout('/api/ip',6000); if(!res.ok) throw new Error('backend ip failed'); return res.json(); }
 
@@ -1361,33 +1400,55 @@
 			setStatus('กำลังดึงข้อมูล...','loading'); 
 			let via=null; 
 			try{ 
-				const r=await fetchFromBackend(); 
-				if(r&&r.ok&&r.ip) {
-					// Got IP from backend, now lookup geolocation using new endpoint
+				// First get real client IP from external service
+				const realIP = await getRealClientIP();
+				if (realIP) {
+					console.log('[IP] Using real client IP:', realIP);
 					try {
-						const geoData = await backendIPLookup(r.ip);
+						// Now lookup geolocation using backend
+						const geoData = await backendIPLookup(realIP);
 						via = {
-							ip: geoData.ip || r.ip,
-							isp: geoData.isp || r.isp || '-',
+							ip: geoData.ip || realIP,
+							isp: geoData.isp || '-',
 							country: geoData.country || '-',
 							region: geoData.region || '-',
 							city: geoData.city || '-',
 							latitude: geoData.latitude || null,
 							longitude: geoData.longitude || null
 						};
+						console.log('[IP] Got geolocation:', via);
 					} catch (geoErr) {
-						console.error('Geolocation lookup failed, using fallback:', geoErr);
-						// Use data from /api/ip as fallback
-						via = r;
+						console.error('[IP] Geolocation lookup failed:', geoErr);
+						// Fallback: use ipinfo.io directly
+						try {
+							const infoRes = await fetch(`https://ipinfo.io/${realIP}/json`, {
+								signal: AbortSignal.timeout(5000)
+							});
+							if (infoRes.ok) {
+								const info = await infoRes.json();
+								via = {
+									ip: info.ip || realIP,
+									isp: info.org || '-',
+									country: info.country || '-',
+									region: info.region || '-',
+									city: info.city || '-',
+									latitude: info.loc ? Number(info.loc.split(',')[0]) : null,
+									longitude: info.loc ? Number(info.loc.split(',')[1]) : null
+								};
+								console.log('[IP] Fallback from ipinfo.io:', via);
+							}
+						} catch (fallbackErr) {
+							console.error('[IP] Fallback failed:', fallbackErr);
+						}
 					}
 				}
 			}catch(e){
-				// Backend fetch failed
-				console.error('Backend fetch failed:', e);
+				// External IP fetch failed
+				console.error('[IP] Real client IP fetch failed:', e);
 			} 
 			if(!via){ 
 				try{ 
-					// Use ipinfo.io directly (more reliable)
+					// Last resort: Use ipinfo.io directly (more reliable)
 					const a=await ipinfoLookupByIP(''); 
 					via={ 
 						ip:a.ip||'-', 
