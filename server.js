@@ -805,6 +805,10 @@ app.get('/scammed-reports.html', (req, res) => {
 	res.sendFile(path.join(__dirname, 'scammed-reports.html'));
 });
 
+app.get('/dashboard.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
 app.get('/home.html', (req, res) => {
 	res.sendFile(path.join(__dirname, 'home.html'));
 });
