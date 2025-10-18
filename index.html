@@ -1308,6 +1308,30 @@
 				throw error;
 			}
 		}
+		
+		// Lookup IP geolocation via backend (more reliable for client IP)
+		async function backendIPLookup(ip, signal) {
+			try {
+				const res = await fetch('/api/ip-lookup', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ ip }),
+					signal
+				});
+				if (!res.ok) {
+					throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+				}
+				const data = await res.json();
+				if (!data.ok) {
+					throw new Error(data.error || 'Backend error');
+				}
+				return data;
+			} catch (error) {
+				console.error('Backend IP lookup error:', error);
+				throw error;
+			}
+		}
+		
 		function fetchWithTimeout(url,ms=6000){ const controller=new AbortController(); const t=setTimeout(()=>controller.abort(),ms); return fetch(url,{ signal:controller.signal }).finally(()=>clearTimeout(t)); }
 		async function fetchFromBackend(){ const res=await fetchWithTimeout('/api/ip',6000); if(!res.ok) throw new Error('backend ip failed'); return res.json(); }
 
@@ -1338,9 +1362,28 @@
 			let via=null; 
 			try{ 
 				const r=await fetchFromBackend(); 
-				if(r&&r.ok) via=r; 
+				if(r&&r.ok&&r.ip) {
+					// Got IP from backend, now lookup geolocation using new endpoint
+					try {
+						const geoData = await backendIPLookup(r.ip);
+						via = {
+							ip: geoData.ip || r.ip,
+							isp: geoData.isp || r.isp || '-',
+							country: geoData.country || '-',
+							region: geoData.region || '-',
+							city: geoData.city || '-',
+							latitude: geoData.latitude || null,
+							longitude: geoData.longitude || null
+						};
+					} catch (geoErr) {
+						console.error('Geolocation lookup failed, using fallback:', geoErr);
+						// Use data from /api/ip as fallback
+						via = r;
+					}
+				}
 			}catch(e){
 				// Backend fetch failed
+				console.error('Backend fetch failed:', e);
 			} 
 			if(!via){ 
 				try{ 

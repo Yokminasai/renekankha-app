@@ -688,6 +688,53 @@ app.get('/api/ip', async (req, res) => {
 	}
 });
 
+// Lookup geolocation for a specific IP (called from client)
+app.post('/api/ip-lookup', async (req, res) => {
+	res.set('Cache-Control', 'no-store');
+	const { ip } = req.body || {};
+	
+	if (!ip || typeof ip !== 'string') {
+		return res.status(400).json({ ok: false, error: 'IP address required' });
+	}
+
+	function withTimeout(ms, fetcher) {
+		const controller = new AbortController();
+		const t = setTimeout(() => controller.abort(), ms);
+		return fetcher(controller.signal)
+			.finally(() => clearTimeout(t));
+	}
+
+	async function ipapiByIp(ipAddr, signal) {
+		const r = await _fetch(`https://ipapi.co/${encodeURIComponent(ipAddr)}/json/`, { signal });
+		if (!r.ok) throw new Error('ipapiByIp');
+		return r.json();
+	}
+
+	try {
+		console.log(`[IP-Lookup] Getting geolocation for: ${ip}`);
+		const data = await withTimeout(5000, (s) => ipapiByIp(ip, s));
+		
+		const result = {
+			ok: true,
+			ip: data.ip || ip,
+			isp: data.org || data.isp || '',
+			country: data.country_name || data.country || '',
+			region: data.region || data.region_name || '',
+			city: data.city || '',
+			latitude: Number(data.latitude) || null,
+			longitude: Number(data.longitude) || null,
+			organization: data.organization || '',
+			postal: data.postal || '',
+			timezone: data.timezone || ''
+		};
+		
+		return res.json(result);
+	} catch (e) {
+		console.error('IP lookup error:', e);
+		return res.status(504).json({ ok: false, error: 'ip_lookup_timeout', details: e.message });
+	}
+});
+
 // Serve static frontend (must be after all API routes)
 
 // Explicitly serve each HTML file
