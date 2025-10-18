@@ -809,6 +809,62 @@ app.get('/dashboard.html', (req, res) => {
 	res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
+app.get('/services.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services.html'));
+});
+
+app.get('/services-garena.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-garena.html'));
+});
+
+app.get('/services-blacklist-dispute.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-blacklist-dispute.html'));
+});
+
+app.get('/services-google-removal.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-google-removal.html'));
+});
+
+app.get('/services-email.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-email.html'));
+});
+
+app.get('/services-email-checker.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-email-checker.html'));
+});
+
+app.get('/services-twitter-checker.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-twitter-checker.html'));
+});
+
+app.get('/services-private-id-check.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-private-id-check.html'));
+});
+
+app.get('/services-scammed-account.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-scammed-account.html'));
+});
+
+app.get('/services-scam-reporting.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'services-scam-reporting.html'));
+});
+
+app.get('/profit-calculator.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'profit-calculator.html'));
+});
+
+app.get('/pay-success.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'pay-success.html'));
+});
+
+app.get('/pay-cancel.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'pay-cancel.html'));
+});
+
+app.get('/test-2fa.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'test-2fa.html'));
+});
+
 app.get('/home.html', (req, res) => {
 	res.sendFile(path.join(__dirname, 'home.html'));
 });
