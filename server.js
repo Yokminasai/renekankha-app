@@ -670,13 +670,18 @@ app.get('/api/ip', async (_req, res) => {
 // Serve static frontend (must be after all API routes)
 app.use(express.static(__dirname));
 
-// Fallback for SPA routing - serve home.html for any remaining requests
-app.use((req, res) => {
+// Fallback for root path (/) only - serve home.html for root
+app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'home.html'), (err) => {
 		if (err) {
 			res.status(404).send('Not Found');
 		}
 	});
+});
+
+// Catch-all for any remaining requests - try to send as static file, otherwise 404
+app.use((req, res) => {
+	res.status(404).send('Not Found');
 });
 
 // Global error handler
