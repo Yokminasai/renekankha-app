@@ -679,12 +679,10 @@ app.get('/', (req, res) => {
 	});
 });
 
-// Catch-all for any remaining requests - try to send as static file, otherwise 404
-app.use((req, res) => {
-	res.status(404).send('Not Found');
-});
+// DO NOT add catch-all 404 here - let express.static handle missing files
+// This allows express.static to serve all .html files correctly
 
-// Global error handler
+// Global error handler (this comes after all routes)
 app.use((err, req, res, next) => {
 	console.error('Error:', err);
 	res.status(500).json({ error: 'internal server error', message: err.message });
