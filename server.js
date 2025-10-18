@@ -668,27 +668,51 @@ app.get('/api/ip', async (_req, res) => {
 });
 
 // Serve static frontend (must be after all API routes)
-// First, explicitly handle HTML files to ensure they work on Vercel
-app.get(/\.html$/, (req, res) => {
-	const filePath = path.join(__dirname, req.path);
-	res.sendFile(filePath, (err) => {
-		if (err) {
-			res.status(404).json({ error: 'File not found' });
-		}
-	});
+
+// Explicitly serve each HTML file
+app.get('/index.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Then use express.static for other static files (CSS, JS, etc)
-app.use(express.static(__dirname));
+app.get('/login.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+app.get('/register.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'register.html'));
+});
+
+app.get('/authenticator.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'authenticator.html'));
+});
+
+app.get('/reports.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'reports.html'));
+});
+
+app.get('/orders.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'orders.html'));
+});
+
+app.get('/check.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'check.html'));
+});
+
+app.get('/scammed-reports.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'scammed-reports.html'));
+});
+
+app.get('/home.html', (req, res) => {
+	res.sendFile(path.join(__dirname, 'home.html'));
+});
 
 // Handle root path - serve home.html
 app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname, 'home.html'), (err) => {
-		if (err) {
-			res.status(500).send('Error loading home page');
-		}
-	});
+	res.sendFile(path.join(__dirname, 'home.html'));
 });
+
+// Then use express.static for other static files (CSS, JS, images, etc)
+app.use(express.static(__dirname));
 
 // Fallback 404 handler
 app.use((req, res) => {
