@@ -12,6 +12,38 @@
       "dest": "/server.js"
     },
     {
+      "src": "/index.html",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/login.html",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/register.html",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/authenticator.html",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/reports.html",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/orders.html",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/check.html",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/scammed-reports.html",
+      "dest": "/server.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/server.js"
     }
