@@ -1583,19 +1583,17 @@
 				localStorage.setItem('todayCount', count.toString());
 			}
 			
-			// Update UI
+			// Update UI - with null checks
 			const todayCount = localStorage.getItem('todayCount') || '1';
 			const onlineCount = Math.floor(parseInt(todayCount) * 0.3) + Math.floor(Math.random() * 10);
 			
-			document.getElementById('todayVisitors').textContent = todayCount;
-			document.getElementById('onlineNow').textContent = onlineCount;
-			document.getElementById('systemStatus').innerHTML = '<span style="color: var(--success); font-size: 14px;">●</span>';
+			const todayEl = document.getElementById('todayVisitors');
+			const onlineEl = document.getElementById('onlineNow');
+			const statusEl = document.getElementById('systemStatus');
 			
-			// Update every 10 seconds for realistic online count
-			setInterval(() => {
-				const randomOnline = Math.max(1, Math.floor(parseInt(todayCount) * (0.2 + Math.random() * 0.3)));
-				document.getElementById('onlineNow').textContent = randomOnline;
-			}, 10000);
+			if (todayEl) todayEl.textContent = todayCount;
+			if (onlineEl) onlineEl.textContent = onlineCount;
+			if (statusEl) statusEl.innerHTML = '<span style="color: var(--success); font-size: 14px;">●</span>';
 		}
 
 		document.addEventListener('DOMContentLoaded', () => {

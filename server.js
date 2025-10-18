@@ -38,7 +38,7 @@ app.use(helmet({
 			styleSrc: ["'self'", "'unsafe-inline'", 'https://unpkg.com', 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
 			fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
 			imgSrc: ["'self'", 'data:', 'blob:', 'https://*.tile.openstreetmap.org'],
-			connectSrc: ["'self'", 'https://ipapi.co', 'https://ipinfo.io', 'https://api64.ipify.org', 'https://api.stripe.com'],
+			connectSrc: ["'self'", 'https://ipapi.co', 'https://ipinfo.io', 'https://api64.ipify.org', 'https://api.stripe.com', 'https://unpkg.com'],
 			workerSrc: ["'self'", 'blob:'],
 			objectSrc: ["'none'"],
 			upgradeInsecureRequests: null
@@ -712,14 +712,49 @@ app.post('/api/ip-lookup', async (req, res) => {
 
 	try {
 		console.log(`[IP-Lookup] Getting geolocation for: ${ip}`);
-		const data = await withTimeout(5000, (s) => ipapiByIp(ip, s));
+		// Try multiple providers for better reliability
+		let data = null;
+		let error = null;
+		
+		try {
+			// Try ipapi.co with 8s timeout
+			data = await withTimeout(8000, (s) => ipapiByIp(ip, s));
+		} catch (e1) {
+			console.error('[IP-Lookup] ipapi.co failed:', e1.message);
+			error = e1;
+		}
+		
+		if (!data) {
+			// Fallback: try ipinfo.io
+			try {
+				const r = await withTimeout(8000, (s) => _fetch(`https://ipinfo.io/${encodeURIComponent(ip)}/json`, { signal: s }));
+				if (r.ok) {
+					const info = await r.json();
+					data = {
+						ip: info.ip,
+						org: info.org,
+						country_name: info.country,
+						region_name: info.region,
+						city: info.city,
+						latitude: info.loc?.split(',')[0],
+						longitude: info.loc?.split(',')[1]
+					};
+				}
+			} catch (e2) {
+				console.error('[IP-Lookup] ipinfo.io failed:', e2.message);
+			}
+		}
+		
+		if (!data) {
+			throw error || new Error('All IP lookup providers failed');
+		}
 		
 		const result = {
 			ok: true,
 			ip: data.ip || ip,
 			isp: data.org || data.isp || '',
 			country: data.country_name || data.country || '',
-			region: data.region || data.region_name || '',
+			region: data.region_name || data.region || '',
 			city: data.city || '',
 			latitude: Number(data.latitude) || null,
 			longitude: Number(data.longitude) || null,
@@ -730,7 +765,7 @@ app.post('/api/ip-lookup', async (req, res) => {
 		
 		return res.json(result);
 	} catch (e) {
-		console.error('IP lookup error:', e);
+		console.error('[IP-Lookup] Error:', e);
 		return res.status(504).json({ ok: false, error: 'ip_lookup_timeout', details: e.message });
 	}
 });
