@@ -1070,6 +1070,7 @@
 					rentalId: rental.id
 				};
 				allTransactions.push(transaction);
+		saveTransactionToBackend(transaction); // FIXED: Save to backend (per userId)
 				saveTransactions();
 				updateSummary();
 				updateCharts();
@@ -1346,6 +1347,7 @@
 			};
 
 			allTransactions.push(transaction);
+		saveTransactionToBackend(transaction); // FIXED: Save to backend (per userId)
 			saveTransactions();
 			renderTransactions();
 			updateSummary();
@@ -1411,6 +1413,8 @@
 				btn.addEventListener('click', (e) => {
 					const id = parseInt(e.target.getAttribute('data-id'));
 					allTransactions = allTransactions.filter(t => t.id !== id);
+				// FIXED: Delete from backend
+				fetch('/api/transactions/' + id, { method: 'DELETE', credentials: 'include' }).catch(e => console.error('Delete error:', e));
 					saveTransactions();
 					renderTransactions();
 					updateSummary();
@@ -1482,21 +1486,70 @@
 			updateMonthlyChart(monthlyIncome, monthlyExpense); // Update monthly chart
 		}
 
-		function saveTransactions() {
-			localStorage.setItem('allTransactions', JSON.stringify(allTransactions));
+		async function saveTransactionToBackend(transaction) {
+			try {
+				let backendType = 'expense';
+				if (['id-sale', 'rental', 'other-income'].includes(transaction.type)) {
+					backendType = 'income';
+				}
+				
+				const res = await fetch('/api/transactions', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({
+						type: backendType,
+						amount: transaction.amount,
+						description: transaction.description,
+						date: new Date(transaction.date).toISOString()
+					})
+				});
+				
+				if (!res.ok) throw new Error('API error');
+				console.log('✅ Transaction saved');
+				return true;
+			} catch (e) {
+				console.error('Save error:', e);
+				return false;
+			}
 		}
 
-		function loadTransactions() {
-			const saved = localStorage.getItem('allTransactions');
-			if (saved) {
-				try {
-					allTransactions = JSON.parse(saved);
-					renderTransactions();
-					updateSummary();
-					updateCharts(); // Initial chart update after loading transactions
-				} catch (e) {
-					console.error('Error loading transactions:', e);
-				}
+		function saveTransactions() {
+			// FIXED: No longer uses localStorage (shared between all users)
+			// Use saveTransactionToBackend() to save per userId
+		}
+
+		async function loadTransactions() {
+			try {
+				const res = await fetch('/api/transactions', {
+					method: 'GET',
+					credentials: 'include'
+				});
+				
+				if (!res.ok) throw new Error('Load failed');
+				const data = await res.json();
+				
+				allTransactions = (data.items || []).map(t => ({
+					id: t.id,
+					type: t.type === 'income' ? 'other-income' : 'expense',
+					date: new Date(t.date).toISOString().split('T')[0],
+					amount: t.amount,
+					description: t.description || '',
+					idName: '',
+					profit: 0,
+					timestamp: new Date(t.date).getTime()
+				})).sort((a, b) => b.timestamp - a.timestamp);
+				
+				console.log('✅ Loaded transactions (per user)');
+				renderTransactions();
+				updateSummary();
+				updateCharts();
+			} catch (e) {
+				console.error('Load error:', e);
+				allTransactions = [];
+				renderTransactions();
+				updateSummary();
+				updateCharts();
 			}
 		}
 
@@ -1936,3 +1989,5 @@
 	</script>
 </body>
 </html>
+
+
