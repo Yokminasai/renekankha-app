@@ -176,17 +176,23 @@ app.post('/api/auth/anonymous-register', (req, res) => {
 	const { name, seedPhrase, hash, anonymous } = req.body || {};
 	if (!seedPhrase || !hash || !anonymous) return res.status(400).json({ error: 'missing required fields' });
 	
-	const users = readJSON(usersFile) || { users: [] };
+	const words = seedPhrase.split(' ').filter(w => w.trim().length > 0);
+	if (words.length !== 12) return res.status(400).json({ error: 'invalid seed phrase format' });
 	
-	// Check if seed phrase hash already exists
+	const users = readJSON(usersFile) || { users: [] };
 	if (users.users.some(u => u.seedPhraseHash === hash)) {
 		return res.status(409).json({ error: 'seed phrase already registered' });
 	}
+	
+	const seedSalt = crypto.randomBytes(16).toString('base64url');
+	const seedHashVerify = crypto.pbkdf2Sync(seedPhrase, seedSalt, 100000, 32, 'sha256').toString('base64url');
 	
 	const user = { 
 		id: nanoid(10), 
 		name: String(name || ''), 
 		seedPhraseHash: hash,
+		seedSalt: seedSalt,
+		seedHashVerify: seedHashVerify,
 		role: 'user', 
 		anonymous: true,
 		createdAt: new Date().toISOString() 
@@ -196,15 +202,56 @@ app.post('/api/auth/anonymous-register', (req, res) => {
 	users.updatedAt = new Date().toISOString();
 	writeJSON(usersFile, users);
 	
-	// Create session
 	const sessions = readJSON(sessionsFile) || { sessions: [] };
 	const sessionId = nanoid(32);
-	sessions.sessions.push({ id: sessionId, userId: user.id, createdAt: new Date().toISOString() });
+	const expiresAt = new Date(Date.now() + 1000*60*60*24*7).toISOString();
+	sessions.sessions.push({ id: sessionId, userId: user.id, createdAt: new Date().toISOString(), expiresAt: expiresAt });
 	sessions.updatedAt = new Date().toISOString();
 	writeJSON(sessionsFile, sessions);
 	setSessionCookie(res, sessionId);
 	
+	console.log('✅ New user registered: ' + user.id);
 	res.status(201).json({ ok: true, user: { id: user.id, name: user.name, role: user.role, anonymous: true } });
+});
+
+app.post('/api/auth/anonymous-login', (req, res) => {
+	const { seedPhrase, hash, anonymous } = req.body || {};
+	if (!seedPhrase || !hash || !anonymous) return res.status(400).json({ error: 'missing required fields' });
+	
+	const words = seedPhrase.split(' ').filter(w => w.trim().length > 0);
+	if (words.length !== 12) return res.status(400).json({ error: 'invalid seed phrase format' });
+	
+	const users = readJSON(usersFile) || { users: [] };
+	const user = users.users.find(u => u.seedPhraseHash === hash && u.anonymous === true);
+	
+	if (!user) {
+		console.warn('❌ Failed login attempt with hash: ' + hash.substring(0, 8) + '...');
+		return res.status(401).json({ error: 'invalid seed phrase' });
+	}
+	
+	if (user.seedSalt && user.seedHashVerify) {
+		try {
+			const verifyHash = crypto.pbkdf2Sync(seedPhrase, user.seedSalt, 100000, 32, 'sha256').toString('base64url');
+			if (!crypto.timingSafeEqual(Buffer.from(verifyHash), Buffer.from(user.seedHashVerify))) {
+				console.warn('❌ Seed phrase verification failed for user: ' + user.id);
+				return res.status(401).json({ error: 'invalid seed phrase' });
+			}
+		} catch (e) {
+			console.warn('❌ Verification error for user: ' + user.id);
+			return res.status(401).json({ error: 'invalid seed phrase' });
+		}
+	}
+	
+	const sessions = readJSON(sessionsFile) || { sessions: [] };
+	const sessionId = nanoid(32);
+	const expiresAt = new Date(Date.now() + 1000*60*60*24*7).toISOString();
+	sessions.sessions.push({ id: sessionId, userId: user.id, createdAt: new Date().toISOString(), expiresAt: expiresAt });
+	sessions.updatedAt = new Date().toISOString();
+	writeJSON(sessionsFile, sessions);
+	setSessionCookie(res, sessionId);
+	
+	console.log('✅ User logged in: ' + user.id);
+	res.json({ ok: true, user: { id: user.id, name: user.name, role: user.role, anonymous: true } });
 });
 
 app.post('/api/auth/anonymous-login', (req, res) => {
