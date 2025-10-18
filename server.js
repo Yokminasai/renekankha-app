@@ -668,6 +668,17 @@ app.get('/api/ip', async (_req, res) => {
 });
 
 // Serve static frontend (must be after all API routes)
+// First, explicitly handle HTML files to ensure they work on Vercel
+app.get(/\.html$/, (req, res) => {
+	const filePath = path.join(__dirname, req.path);
+	res.sendFile(filePath, (err) => {
+		if (err) {
+			res.status(404).json({ error: 'File not found' });
+		}
+	});
+});
+
+// Then use express.static for other static files (CSS, JS, etc)
 app.use(express.static(__dirname));
 
 // Handle root path - serve home.html
@@ -679,16 +690,9 @@ app.get('/', (req, res) => {
 	});
 });
 
-// 404 handler for missing routes - but express.static should handle .html files
+// Fallback 404 handler
 app.use((req, res) => {
-	// If we get here, it means express.static couldn't find the file
-	// Try to serve it as a file one more time
-	const filePath = path.join(__dirname, req.path);
-	if (fs.existsSync(filePath) && filePath.endsWith('.html')) {
-		res.sendFile(filePath);
-	} else {
-		res.status(404).json({ error: 'Not Found' });
-	}
+	res.status(404).json({ error: 'Not Found' });
 });
 
 // Global error handler (this comes after all routes)
