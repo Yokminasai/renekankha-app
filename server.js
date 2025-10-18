@@ -670,17 +670,26 @@ app.get('/api/ip', async (_req, res) => {
 // Serve static frontend (must be after all API routes)
 app.use(express.static(__dirname));
 
-// Fallback for root path (/) only - serve home.html for root
+// Handle root path - serve home.html
 app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'home.html'), (err) => {
 		if (err) {
-			res.status(404).send('Not Found');
+			res.status(500).send('Error loading home page');
 		}
 	});
 });
 
-// DO NOT add catch-all 404 here - let express.static handle missing files
-// This allows express.static to serve all .html files correctly
+// 404 handler for missing routes - but express.static should handle .html files
+app.use((req, res) => {
+	// If we get here, it means express.static couldn't find the file
+	// Try to serve it as a file one more time
+	const filePath = path.join(__dirname, req.path);
+	if (fs.existsSync(filePath) && filePath.endsWith('.html')) {
+		res.sendFile(filePath);
+	} else {
+		res.status(404).json({ error: 'Not Found' });
+	}
+});
 
 // Global error handler (this comes after all routes)
 app.use((err, req, res, next) => {
