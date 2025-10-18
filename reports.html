@@ -870,27 +870,37 @@
 			}
 		});
 
-		// Event Listeners
-		document.getElementById('refresh').addEventListener('click', loadReports);
-		document.getElementById('limit').addEventListener('change', loadReports);
-		document.getElementById('q').addEventListener('input', () => { 
+		// Event Listeners with null checks
+		const refreshBtn = document.getElementById('refresh');
+		if (refreshBtn) refreshBtn.addEventListener('click', loadReports);
+		
+		const limitSelect = document.getElementById('limit');
+		if (limitSelect) limitSelect.addEventListener('change', loadReports);
+		
+		const searchInput = document.getElementById('q');
+		if (searchInput) searchInput.addEventListener('input', () => { 
 			clearTimeout(window._t); 
 			window._t = setTimeout(loadReports, 250); 
 		});
 		
 		// Show/Hide Report Section
-		document.getElementById('showReportBtn').addEventListener('click', toggleReportSection);
+		const showReportBtn = document.getElementById('showReportBtn');
+		if (showReportBtn) showReportBtn.addEventListener('click', toggleReportSection);
 		
 		// IP Search and Blacklist Event Listeners
-		document.getElementById('searchBtn').addEventListener('click', searchIpFlow);
-		document.getElementById('searchIp').addEventListener('keydown', (e) => { 
+		const searchBtn = document.getElementById('searchBtn');
+		if (searchBtn) searchBtn.addEventListener('click', searchIpFlow);
+		
+		const searchIp = document.getElementById('searchIp');
+		if (searchIp) searchIp.addEventListener('keydown', (e) => { 
 			if(e.key === 'Enter'){ 
 				e.preventDefault(); 
 				searchIpFlow(); 
 			} 
 		});
 		
-		document.getElementById('blacklistAddBtn').addEventListener('click', async () => { 
+		const blacklistAddBtn = document.getElementById('blacklistAddBtn');
+		if (blacklistAddBtn) blacklistAddBtn.addEventListener('click', async () => { 
 			const ip = $('ipDisplay').textContent.trim(); 
 			if(!ip || ip === '-') {
 				alert('กรุณาค้นหา IP ก่อน');
@@ -908,7 +918,8 @@
 			} 
 		});
 		
-		document.getElementById('blacklistRemoveBtn').addEventListener('click', async () => { 
+		const blacklistRemoveBtn = document.getElementById('blacklistRemoveBtn');
+		if (blacklistRemoveBtn) blacklistRemoveBtn.addEventListener('click', async () => { 
 			const ip = $('ipDisplay').textContent.trim(); 
 			if(!ip || ip === '-') {
 				alert('กรุณาค้นหา IP ก่อน');
@@ -924,7 +935,8 @@
 			} 
 		});
 		
-		document.getElementById('reportSubmitBtn').addEventListener('click', async () => { 
+		const reportSubmitBtn = document.getElementById('reportSubmitBtn');
+		if (reportSubmitBtn) reportSubmitBtn.addEventListener('click', async () => { 
 			const ip = $('ipDisplay').textContent.trim(); 
 			if(!ip || ip === '-') {
 				alert('กรุณาค้นหา IP ก่อน');

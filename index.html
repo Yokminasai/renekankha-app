@@ -550,7 +550,7 @@
 			.trustIcon{ width:48px; height:48px }
 			.card{ padding:28px; border-radius:20px }
 			.searchBar{ grid-template-columns:1fr; gap:16px }
-			.btn{ padding:12px 20px; font-size:14px }
+			.btn{ padding:12px 20px; font-size:14px; min-height: 44px; }
 			#map{ width:100%; height:400px }
 			.location-info{ 
 				grid-template-columns:1fr 1fr; gap:16px; 
@@ -562,24 +562,32 @@
 				padding:20px; margin-bottom:20px;
 			}
 			.ip-value{ font-size:20px; padding:12px 16px; }
+			.trustTitle{ font-size:18px; }
+			.badge{ font-size:11px; padding:6px 12px; }
 		}
 		
 		@media(max-width:480px){
 			body{ padding:16px }
 			.brand{ font-size:20px; gap:12px }
-			.card{ padding:24px; margin-bottom:20px }
-			.trustItem{ padding:20px; gap:16px }
-			.trustTitle{ font-size:18px }
-			.trustDesc{ font-size:13px }
-			.btn{ padding:10px 16px; font-size:13px }
+			.card{ padding:20px; margin-bottom:16px; border-radius: 16px; }
+			.trustItem{ padding:16px; gap:12px; }
+			.trustTitle{ font-size:16px; }
+			.trustDesc{ font-size:13px; line-height: 1.5; }
+			.trustIcon{ width:40px; height:40px; }
+			.btn{ padding:10px 16px; font-size:13px; min-height: 42px; }
 			#map{ width:100%; height:300px }
 			.location-info{ 
-				grid-template-columns:1fr 1fr; gap:12px; 
+				grid-template-columns:1fr; gap:12px; 
 				padding:16px; 
 			}
 			.location-item{ padding:12px; }
 			.ip-indicator{ padding:16px; }
-			.ip-value{ font-size:18px; padding:8px 12px; }
+			.ip-value{ font-size:16px; padding:8px 12px; }
+			.topbar{ margin-bottom: 24px; }
+			.sectionTitle{ flex-direction: column; align-items: flex-start; }
+			.small{ font-size: 12px; }
+			.kv { grid-template-columns: 1fr; }
+			.input, textarea { padding: 12px 16px; font-size: 16px; }
 		}
 		
 		/* Enhanced Animations */
@@ -873,6 +881,8 @@
 			const overlay = $('mobileNavOverlay');
 			const menu = $('mobileNavMenu');
 			
+			if (!toggle || !overlay || !menu) return;
+			
 			toggle.addEventListener('click', () => {
 				overlay.style.display = 'block';
 				setTimeout(() => menu.classList.add('active'), 10);
@@ -886,11 +896,14 @@
 			});
 			
 			// Mobile refresh button
-			$('mobileRefreshBtn').addEventListener('click', () => {
-				fetchIPData().then(()=>ensureMapVisible()).catch(()=>setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error'));
-				menu.classList.remove('active');
-				setTimeout(() => overlay.style.display = 'none', 300);
-			});
+			const mobileRefreshBtn = $('mobileRefreshBtn');
+			if (mobileRefreshBtn) {
+				mobileRefreshBtn.addEventListener('click', () => {
+					fetchIPData().then(()=>ensureMapVisible()).catch(()=>setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error'));
+					menu.classList.remove('active');
+					setTimeout(() => overlay.style.display = 'none', 300);
+				});
+			}
 		}
 		
 		function initMap(){ if(map) return; map = L.map('map',{ zoomControl:true, attributionControl:true }); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ maxZoom:19, attribution:'&copy; OpenStreetMap contributors' }).addTo(map); }
@@ -1547,10 +1560,28 @@
 			renderUA();
 			checkLoginStatus(); // Check login status on page load
 			fetchIPData().then(()=>ensureMapVisible()).catch(()=>setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error'));
-			$('refreshBtn').addEventListener('click', ()=> fetchIPData().then(()=>ensureMapVisible()).catch(()=>setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error')));
-			$('searchBtn').addEventListener('click', searchIpFlow);
-			$('searchIp').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); searchIpFlow(); } });
-			$('backToUserIP').addEventListener('click', backToUserIP);
+			
+			// Add null checks for button event listeners
+			const refreshBtn = $('refreshBtn');
+			if (refreshBtn) {
+				refreshBtn.addEventListener('click', ()=> fetchIPData().then(()=>ensureMapVisible()).catch(()=>setStatus('เกิดข้อผิดพลาดระหว่างดึงข้อมูล','error')));
+			}
+			
+			const searchBtn = $('searchBtn');
+			if (searchBtn) {
+				searchBtn.addEventListener('click', searchIpFlow);
+			}
+			
+			const searchIp = $('searchIp');
+			if (searchIp) {
+				searchIp.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); searchIpFlow(); } });
+			}
+			
+			const backToUserIPBtn = $('backToUserIP');
+			if (backToUserIPBtn) {
+				backToUserIPBtn.addEventListener('click', backToUserIP);
+			}
+			
 			initVisitorTracking();
 		});
 	</script>

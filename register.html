@@ -544,6 +544,89 @@
 				padding: 0 16px;
 			}
 		}
+
+		@media (max-width: 480px) {
+			.register-card {
+				max-width: 100%;
+				padding: 16px;
+				border-radius: 16px;
+			}
+
+			h3 {
+				font-size: 24px;
+				margin-bottom: 16px;
+			}
+
+			.warning-box {
+				padding: 12px;
+				margin-bottom: 16px;
+				border-radius: 10px;
+				font-size: 12px;
+			}
+
+			.warning-title {
+				font-size: 14px;
+				margin-bottom: 8px;
+			}
+
+			.warning-text {
+				font-size: 12px;
+				line-height: 1.4;
+			}
+
+			.form-group {
+				margin-bottom: 16px;
+			}
+
+			.form-label {
+				font-size: 13px;
+				margin-bottom: 6px;
+			}
+
+			.form-input,
+			textarea {
+				padding: 12px 14px;
+				font-size: 16px;
+				min-height: 44px;
+				border-radius: 10px;
+			}
+
+			textarea {
+				min-height: 80px;
+			}
+
+			.seed-phrase {
+				padding: 12px;
+				font-size: 13px;
+				line-height: 1.6;
+				border-radius: 10px;
+				word-break: break-word;
+			}
+
+			.copy-btn {
+				width: 100%;
+				padding: 10px 16px;
+				font-size: 12px;
+				min-height: 42px;
+				border-radius: 10px;
+				margin-bottom: 8px;
+			}
+
+			.register-btn {
+				width: 100%;
+				padding: 12px 20px;
+				font-size: 15px;
+				min-height: 44px;
+				border-radius: 10px;
+			}
+
+			.status-message {
+				font-size: 12px;
+				padding: 12px;
+				margin-top: 12px;
+				border-radius: 8px;
+			}
+		}
 	</style>
 </head>
 <body>
@@ -762,163 +845,10 @@
 		}
 
 		// Generate new seed phrase
-		document.getElementById('generateNewBtn').addEventListener('click', () => {
-			const newSeedPhrase = generateSeedPhrase();
-			$('generatedSeedPhrase').textContent = newSeedPhrase;
-			$('confirmSeedPhrase').value = '';
-
-			// Show success message
-			setStatus('สร้าง Seed Phrase ใหม่เรียบร้อยแล้ว', 'success');
-			setTimeout(() => {
-				hideStatus();
-			}, 3000);
-		});
-
 		// Copy seed phrase
-		document.getElementById('copySeedBtn').addEventListener('click', async () => {
-			const seedPhrase = $('generatedSeedPhrase').textContent.trim();
-
-			try {
-				// Try modern clipboard API first
-				if (navigator.clipboard && navigator.clipboard.writeText) {
-					await navigator.clipboard.writeText(seedPhrase);
-				} else {
-					// Fallback for older browsers and mobile
-					throw new Error('Clipboard API not available');
-				}
-				
-				const btn = $('copySeedBtn');
-				const originalText = btn.textContent;
-				btn.textContent = 'คัดลอกแล้ว!';
-				btn.style.background = 'var(--gradient-success)';
-
-				setTimeout(() => {
-					btn.textContent = originalText;
-					btn.style.background = 'var(--gradient-accent)';
-				}, 2000);
-			} catch (error) {
-				// Fallback: Use textarea selection method
-				try {
-					const textArea = document.createElement('textarea');
-					textArea.value = seedPhrase;
-					textArea.style.position = 'fixed';
-					textArea.style.left = '-999999px';
-					textArea.style.top = '-999999px';
-					document.body.appendChild(textArea);
-					
-					textArea.select();
-					textArea.setSelectionRange(0, 99999); // For mobile
-					document.execCommand('copy');
-					document.body.removeChild(textArea);
-					
-					const btn = $('copySeedBtn');
-					const originalText = btn.textContent;
-					btn.textContent = 'คัดลอกแล้ว!';
-					btn.style.background = 'var(--gradient-success)';
-
-					setTimeout(() => {
-						btn.textContent = originalText;
-						btn.style.background = 'var(--gradient-accent)';
-					}, 2000);
-				} catch (err) {
-					setStatus('ไม่สามารถคัดลอกได้', 'error');
-				}
-			}
-		});
-
 		// Export seed phrase as TXT
-		document.getElementById('exportSeedBtn').addEventListener('click', () => {
-			const seedPhrase = $('generatedSeedPhrase').textContent.trim();
-			
-			if (!seedPhrase || seedPhrase === 'กำลังสร้าง Seed Phrase...') {
-				setStatus('กรุณาสร้าง Seed Phrase ก่อน', 'error');
-				return;
-			}
-
-			const timestamp = new Date().toLocaleString('th-TH');
-			const content = `RENEKANKHA - Seed Phrase Backup
-=====================================
-สร้างเมื่อ: ${timestamp}
-
-Seed Phrase ของคุณ (BACKUP SECURELY):
-${seedPhrase}
-
-⚠️ คำเตือน:
-- อย่าแชร์ Seed Phrase นี้กับผู้อื่น
-- เก็บไฟล์นี้ไว้ในที่ปลอดภัย
-- หากสูญหายจะไม่สามารถกู้คืนได้
-
-=====================================`;
-
-			const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-			const link = document.createElement('a');
-			link.href = URL.createObjectURL(blob);
-			link.download = `RENEKANKHA_SeedPhrase_${new Date().toISOString().split('T')[0]}.txt`;
-			link.click();
-			URL.revokeObjectURL(link.href);
-
-			const btn = $('exportSeedBtn');
-			const originalText = btn.textContent;
-			btn.textContent = 'ดาวน์โหลดแล้ว!';
-			btn.style.background = 'var(--gradient-success)';
-
-			setTimeout(() => {
-				btn.textContent = originalText;
-				btn.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
-			}, 2000);
-		});
-
 		// Register with seed phrase
-		document.getElementById('registerBtn').addEventListener('click', async () => {
-			const name = $('name').value.trim();
-			const seedPhrase = $('generatedSeedPhrase').textContent.trim();
-			const confirmSeedPhrase = $('confirmSeedPhrase').value.trim();
-
-			if (!seedPhrase) {
-				setStatus('กรุณาสร้าง Seed Phrase ก่อน', 'error');
-				return;
-			}
-
-			if (!confirmSeedPhrase) {
-				setStatus('กรุณายืนยัน Seed Phrase', 'error');
-				return;
-			}
-
-			if (seedPhrase !== confirmSeedPhrase) {
-				setStatus('Seed Phrase ไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง', 'error');
-				return;
-			}
-
-			setLoading(true);
-			setStatus('กำลังสร้างบัญชี...', 'loading');
-
-			try {
-				const hash = await generateHash(seedPhrase);
-				const payload = { name, seedPhrase, hash, anonymous: true };
-
-				const res = await fetch('/api/auth/anonymous-register', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(payload),
-					credentials: 'include'
-				});
-
-				if (!res.ok) {
-					const error = await res.json().catch(() => ({}));
-					throw new Error(error.error || 'สร้างบัญชีไม่สำเร็จ');
-				}
-
-				setStatus('สร้างบัญชีสำเร็จ! กำลังเปลี่ยนหน้า...', 'success');
-				setTimeout(() => {
-					location.href = 'login.html';
-				}, 1500);
-
-			} catch (error) {
-				setStatus(error.message || 'สร้างบัญชีไม่สำเร็จ', 'error');
-			} finally {
-				setLoading(false);
-			}
-		});
+		// All moved to DOMContentLoaded
 
 		// Initialize
 		document.addEventListener('DOMContentLoaded', () => {
@@ -929,7 +859,153 @@ ${seedPhrase}
 			$('copySeedBtn').style.display = 'block';
 			
 			// Auto-focus on name input
-			$('name').focus();
+			const nameInput = $('name');
+			if (nameInput) nameInput.focus();
+			
+			// Generate new seed phrase
+			const generateNewBtn = document.getElementById('generateNewBtn');
+			if (generateNewBtn) {
+				generateNewBtn.addEventListener('click', () => {
+					const newSeedPhrase = generateSeedPhrase();
+					$('generatedSeedPhrase').textContent = newSeedPhrase;
+					$('confirmSeedPhrase').value = '';
+
+					// Show success message
+					setStatus('สร้าง Seed Phrase ใหม่เรียบร้อยแล้ว', 'success');
+					setTimeout(() => {
+						hideStatus();
+					}, 3000);
+				});
+			}
+
+			// Copy seed phrase
+			const copySeedBtn = document.getElementById('copySeedBtn');
+			if (copySeedBtn) {
+				copySeedBtn.addEventListener('click', async () => {
+					const seedPhrase = $('generatedSeedPhrase').textContent.trim();
+					try {
+						// Try modern clipboard API first
+						if (navigator.clipboard && navigator.clipboard.writeText) {
+							await navigator.clipboard.writeText(seedPhrase);
+						} else {
+							// Fallback for older browsers and mobile
+							throw new Error('Clipboard API not available');
+						}
+						
+						const btn = $('copySeedBtn');
+						const originalText = btn.textContent;
+						btn.textContent = 'คัดลอกแล้ว!';
+						btn.style.background = 'var(--gradient-success)';
+
+						setTimeout(() => {
+							btn.textContent = originalText;
+							btn.style.background = 'var(--gradient-accent)';
+						}, 2000);
+					} catch (error) {
+						// Fallback: Use textarea selection method
+						try {
+							const textArea = document.createElement('textarea');
+							textArea.value = seedPhrase;
+							textArea.style.position = 'fixed';
+							textArea.style.left = '-999999px';
+							textArea.style.top = '-999999px';
+							document.body.appendChild(textArea);
+							
+							textArea.select();
+							textArea.setSelectionRange(0, 99999); // For mobile
+							document.execCommand('copy');
+							document.body.removeChild(textArea);
+							
+							const btn = $('copySeedBtn');
+							const originalText = btn.textContent;
+							btn.textContent = 'คัดลอกแล้ว!';
+							btn.style.background = 'var(--gradient-success)';
+
+							setTimeout(() => {
+								btn.textContent = originalText;
+								btn.style.background = 'var(--gradient-accent)';
+							}, 2000);
+						} catch (err) {
+							setStatus('ไม่สามารถคัดลอกได้', 'error');
+						}
+					}
+				});
+			}
+
+			// Export seed phrase as TXT
+			const exportSeedBtn = document.getElementById('exportSeedBtn');
+			if (exportSeedBtn) {
+				exportSeedBtn.addEventListener('click', () => {
+					const seedPhraseText = $('generatedSeedPhrase').textContent;
+					const element = document.createElement('a');
+					element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(seedPhraseText));
+					element.setAttribute('download', 'seed-phrase.txt');
+					element.style.display = 'none';
+					document.body.appendChild(element);
+					element.click();
+					document.body.removeChild(element);
+
+					setStatus('ดาวน์โหลด Seed Phrase สำเร็จ', 'success');
+					setTimeout(() => {
+						hideStatus();
+					}, 2000);
+				});
+			}
+
+			// Register with seed phrase
+			const registerBtn = document.getElementById('registerBtn');
+			if (registerBtn) {
+				registerBtn.addEventListener('click', async () => {
+					const name = $('name').value.trim();
+					const seedPhrase = $('generatedSeedPhrase').textContent.trim();
+					const confirmSeedPhrase = $('confirmSeedPhrase').value.trim();
+
+					if (!seedPhrase) {
+						setStatus('กรุณาสร้าง Seed Phrase ก่อน', 'error');
+						return;
+					}
+
+					if (!confirmSeedPhrase) {
+						setStatus('กรุณายืนยัน Seed Phrase', 'error');
+						return;
+					}
+
+					if (seedPhrase !== confirmSeedPhrase) {
+						setStatus('Seed Phrase ไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง', 'error');
+						return;
+					}
+
+					setLoading(true);
+					setStatus('กำลังสร้างบัญชี...', 'loading');
+
+					try {
+						const hash = await generateHash(seedPhrase);
+						const payload = { name, seedPhrase, hash, anonymous: true };
+
+						const res = await fetch('/api/auth/anonymous-register', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(payload),
+							credentials: 'include'
+						});
+
+						if (!res.ok) {
+							const error = await res.json().catch(() => ({}));
+							throw new Error(error.error || 'สร้างบัญชีไม่สำเร็จ');
+						}
+
+						setStatus('สร้างบัญชีสำเร็จ! กำลังเปลี่ยนหน้า...', 'success');
+						setTimeout(() => {
+							location.href = 'login.html';
+						}, 1500);
+
+					} catch (error) {
+						setStatus(error.message || 'สร้างบัญชีไม่สำเร็จ', 'error');
+					} finally {
+						setLoading(false);
+					}
+				});
+			}
 			
 			// Initialize mobile navigation
 			initMobileNav();

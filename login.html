@@ -572,6 +572,84 @@
 				padding: 0 16px;
 			}
 		}
+
+		@media (max-width: 480px) {
+			.login-container {
+				width: 100%;
+				max-width: 100%;
+				padding: 12px;
+			}
+
+			h2 {
+				font-size: 28px;
+				margin-bottom: 20px;
+			}
+
+			.form-group {
+				margin-bottom: 16px;
+			}
+
+			.form-label {
+				font-size: 13px;
+				margin-bottom: 6px;
+			}
+
+			.form-input,
+			textarea {
+				padding: 12px 14px;
+				font-size: 16px;
+				min-height: 44px;
+				border-radius: 10px;
+			}
+
+			textarea {
+				min-height: 100px;
+			}
+
+			.form-row {
+				flex-direction: column;
+				gap: 12px;
+			}
+
+			.login-btn {
+				padding: 12px 20px;
+				font-size: 15px;
+				min-height: 44px;
+				border-radius: 10px;
+				width: 100%;
+			}
+
+			.status-message {
+				font-size: 12px;
+				padding: 10px;
+				margin: 12px 0;
+			}
+
+			.divider-text {
+				font-size: 12px;
+				margin: 16px 0;
+			}
+
+			.alternative-auth-buttons {
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.alt-btn {
+				padding: 10px 16px;
+				font-size: 13px;
+				min-height: 42px;
+			}
+
+			.footer-text {
+				font-size: 11px;
+			}
+
+			.footer-link {
+				font-size: 11px;
+				text-decoration: underline;
+			}
+		}
 	</style>
 </head>
 <body>
@@ -772,57 +850,64 @@
 		}
 		
 		
-		// Login with seed phrase
-		document.getElementById('loginBtn').addEventListener('click', async () => {
-			const seedPhrase = $('seedPhraseInput').value.trim();
-			
-			if (!seedPhrase) {
-				setStatus('กรุณากรอก Seed Phrase', 'error');
-				return;
-			}
-			
-			// Validate seed phrase format (should have 12 words)
-			const words = seedPhrase.split(' ').filter(word => word.trim().length > 0);
-			if (words.length !== 12) {
-				setStatus('Seed Phrase ต้องมี 12 คำ กรุณาตรวจสอบอีกครั้ง', 'error');
-				return;
-			}
-			
-			setLoading(true);
-			setStatus('กำลังเข้าสู่ระบบ...', 'loading');
-			
-			try {
-				const hash = await generateHash(seedPhrase);
-				const payload = { seedPhrase, hash, anonymous: true };
-				
-				const res = await fetch('/api/auth/anonymous-login', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(payload),
-					credentials: 'include'
-				});
-				
-				if (!res.ok) {
-					const error = await res.json().catch(() => ({}));
-					throw new Error(error.error || 'เข้าสู่ระบบไม่สำเร็จ');
-				}
-				
-				setStatus('เข้าสู่ระบบสำเร็จ! กำลังเปลี่ยนหน้า...', 'success');
-				setTimeout(() => {
-					location.href = 'index.html';
-				}, 1500);
-				
-			} catch (error) {
-				setStatus(error.message || 'เข้าสู่ระบบไม่สำเร็จ', 'error');
-			} finally {
-				setLoading(false);
-			}
-		});
-		
+		// Login with seed phrase - Moved inside DOMContentLoaded
 		// Initialize
 		document.addEventListener('DOMContentLoaded', () => {
 			// Auto-focus on seed phrase input
-			$('seedPhraseInput').focus();
+			const seedPhraseInput = document.getElementById('seedPhraseInput');
+			if (seedPhraseInput) {
+				seedPhraseInput.focus();
+			}
+			
+			// Add login button event listener with null check
+			const loginBtn = document.getElementById('loginBtn');
+			if (loginBtn) {
+				loginBtn.addEventListener('click', async () => {
+					const seedPhrase = $('seedPhraseInput').value.trim();
+					
+					if (!seedPhrase) {
+						setStatus('กรุณากรอก Seed Phrase', 'error');
+						return;
+					}
+					
+					// Validate seed phrase format (should have 12 words)
+					const words = seedPhrase.split(' ').filter(word => word.trim().length > 0);
+					if (words.length !== 12) {
+						setStatus('Seed Phrase ต้องมี 12 คำ กรุณาตรวจสอบอีกครั้ง', 'error');
+						return;
+					}
+					
+					setLoading(true);
+					setStatus('กำลังเข้าสู่ระบบ...', 'loading');
+					
+					try {
+						const hash = await generateHash(seedPhrase);
+						const payload = { seedPhrase, hash, anonymous: true };
+						
+						const res = await fetch('/api/auth/anonymous-login', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(payload),
+							credentials: 'include'
+						});
+						
+						if (!res.ok) {
+							const error = await res.json().catch(() => ({}));
+							throw new Error(error.error || 'เข้าสู่ระบบไม่สำเร็จ');
+						}
+						
+						setStatus('เข้าสู่ระบบสำเร็จ! กำลังเปลี่ยนหน้า...', 'success');
+						setTimeout(() => {
+							location.href = 'index.html';
+						}, 1500);
+						
+					} catch (error) {
+						setStatus(error.message || 'เข้าสู่ระบบไม่สำเร็จ', 'error');
+					} finally {
+						setLoading(false);
+					}
+				});
+			}
 			
 			// Initialize mobile navigation
 			initMobileNav();

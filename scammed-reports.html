@@ -655,24 +655,27 @@
 		function renderReports() {
 			let filtered = allReports;
 
-			const typeFilter = document.getElementById('typeFilter').value;
-			if (typeFilter) filtered = filtered.filter(r => r.type === typeFilter);
+			const typeFilter = document.getElementById('typeFilter');
+			if (typeFilter && typeFilter.value) filtered = filtered.filter(r => r.type === typeFilter.value);
 
-			const methodFilter = document.getElementById('methodFilter').value;
-			if (methodFilter) filtered = filtered.filter(r => r.howScammed === methodFilter);
+			const methodFilter = document.getElementById('methodFilter');
+			if (methodFilter && methodFilter.value) filtered = filtered.filter(r => r.howScammed === methodFilter.value);
 
-			const sortFilter = document.getElementById('sortFilter').value;
-			if (sortFilter === 'newest') {
-				filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-			} else if (sortFilter === 'oldest') {
-				filtered.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-			} else if (sortFilter === 'loss-high') {
-				filtered.sort((a, b) => (b.lossAmount || 0) - (a.lossAmount || 0));
-			} else if (sortFilter === 'loss-low') {
-				filtered.sort((a, b) => (a.lossAmount || 0) - (b.lossAmount || 0));
+			const sortFilter = document.getElementById('sortFilter');
+			if (sortFilter && sortFilter.value) {
+				if (sortFilter.value === 'newest') {
+					filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+				} else if (sortFilter.value === 'oldest') {
+					filtered.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+				} else if (sortFilter.value === 'loss-high') {
+					filtered.sort((a, b) => (b.lossAmount || 0) - (a.lossAmount || 0));
+				} else if (sortFilter.value === 'loss-low') {
+					filtered.sort((a, b) => (a.lossAmount || 0) - (b.lossAmount || 0));
+				}
 			}
 
 			const grid = document.getElementById('reportsGrid');
+			if (!grid) return;
 
 			if (filtered.length === 0) {
 				grid.innerHTML = `
@@ -734,6 +737,7 @@
 
 			const modal = document.getElementById('detailModal');
 			const body = document.getElementById('modalBody');
+			if (!modal || !body) return;
 
 			body.innerHTML = `
 				<div class="modal-header">📋 รายละเอียดเต็ม</div>
@@ -762,15 +766,35 @@
 			}
 		}
 
-		document.getElementById('closeModal').addEventListener('click', () => {
-			document.getElementById('detailModal').classList.remove('active');
+		// Event listeners with null checks
+		document.addEventListener('DOMContentLoaded', () => {
+			const closeBtn = document.getElementById('closeModal');
+			if (closeBtn) {
+				closeBtn.addEventListener('click', () => {
+					const modal = document.getElementById('detailModal');
+					if (modal) {
+						modal.classList.remove('active');
+					}
+				});
+			}
+
+			const typeFilter = document.getElementById('typeFilter');
+			if (typeFilter) {
+				typeFilter.addEventListener('change', renderReports);
+			}
+
+			const methodFilter = document.getElementById('methodFilter');
+			if (methodFilter) {
+				methodFilter.addEventListener('change', renderReports);
+			}
+
+			const sortFilter = document.getElementById('sortFilter');
+			if (sortFilter) {
+				sortFilter.addEventListener('change', renderReports);
+			}
+
+			loadReports();
 		});
-
-		document.getElementById('typeFilter').addEventListener('change', renderReports);
-		document.getElementById('methodFilter').addEventListener('change', renderReports);
-		document.getElementById('sortFilter').addEventListener('change', renderReports);
-
-		loadReports();
 	</script>
 </body>
 </html>

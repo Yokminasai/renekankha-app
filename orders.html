@@ -95,9 +95,17 @@
 			</td>
 		</tr>`; }
 		async function load(){ const limit=parseInt($('limit').value,10)||200; const res=await fetch('/api/orders?limit='+limit); if(!res.ok) return; const j=await res.json(); tbody.innerHTML=(j.items||[]).map(rowHtml).join(''); }
-		document.getElementById('create').addEventListener('click', createOrder);
-		document.getElementById('refresh').addEventListener('click', load);
-		document.getElementById('limit').addEventListener('change', load);
+		
+		// Add null checks before addEventListener
+		const createBtn = document.getElementById('create');
+		if (createBtn) createBtn.addEventListener('click', createOrder);
+		
+		const refreshBtn = document.getElementById('refresh');
+		if (refreshBtn) refreshBtn.addEventListener('click', load);
+		
+		const limitSelect = document.getElementById('limit');
+		if (limitSelect) limitSelect.addEventListener('change', load);
+		
 		document.addEventListener('click', async (e)=>{ const t=e.target; if(!(t instanceof HTMLElement)) return; const action=t.getAttribute('data-action'); if(action==='copy'){ copy(t.getAttribute('data-url')); t.textContent='คัดลอกแล้ว'; setTimeout(()=>t.textContent='คัดลอกลิงก์',800); }
 			if(action==='status'){ const id=t.getAttribute('data-id'); const next=t.getAttribute('data-next'); const r=await fetch('/api/orders/'+id+'/status',{ method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ status: next }) }); if(!r.ok) return alert('อัปเดตสถานะไม่สำเร็จ'); load(); }
 		});
@@ -105,6 +113,7 @@
 	</script>
 </body>
 </html>
+
 
 
 

@@ -876,6 +876,8 @@
 			const toggle = document.getElementById('mobileNavToggle');
 			const overlay = document.getElementById('mobileNavOverlay');
 			const menu = document.getElementById('mobileNavMenu');
+			
+			if (!toggle || !overlay || !menu) return;
 
 			toggle.addEventListener('click', () => {
 				menu.classList.toggle('active');
@@ -1124,109 +1126,6 @@
 		}
 
 
-		// Form Submission
-		document.getElementById('generateForm').addEventListener('submit', async (e) => {
-			e.preventDefault();
-			
-			const secretKey = document.getElementById('secretKey').value.trim();
-			
-			if (!secretKey) {
-				setStatus('กรุณาป้อน Secret Key', 'error');
-				return;
-			}
-
-			setStatus('กำลังสร้างรหัส 2FA...', 'loading');
-			
-			try {
-				// Clear previous interval
-				if (window.codeUpdateInterval) {
-					clearInterval(window.codeUpdateInterval);
-				}
-				
-				// Reset success shown flag
-				window.successShown = false;
-				
-				// Update code display using 2fa.live API with fallback
-				await updateCodeDisplayFromAPI(secretKey);
-				
-				setStatus('สร้างรหัส 2FA สำเร็จ!', 'success');
-			} catch (error) {
-				console.error('Generation error:', error);
-				setStatus(`เกิดข้อผิดพลาด: ${error.message}`, 'error');
-			}
-		});
-
-		// Test API Button
-		document.getElementById('testApiBtn').addEventListener('click', async () => {
-			const secretKey = document.getElementById('secretKey').value.trim();
-			
-			if (!secretKey) {
-				setStatus('กรุณาป้อน Secret Key ก่อนทดสอบ', 'error');
-				return;
-			}
-
-			setStatus('กำลังทดสอบ API...', 'loading');
-			
-			try {
-				const data = await fetchOTPFrom2FALive(secretKey);
-				
-				if (data.success && data.otp) {
-					// Calculate real time left
-					const now = Math.floor(Date.now() / 1000);
-					const timeLeft = 30 - (now % 30);
-					
-					setStatus(`ทดสอบสำเร็จ! รหัส: ${data.otp} (เหลือเวลา: ${timeLeft}s)`, 'success');
-				} else {
-					setStatus('ทดสอบไม่สำเร็จ - ไม่ได้รับข้อมูล OTP', 'error');
-				}
-			} catch (error) {
-				console.error('Test API error:', error);
-				setStatus(`ทดสอบไม่สำเร็จ: ${error.message}`, 'error');
-			}
-		});
-
-		// Save 2FA Key Button
-		document.getElementById('saveKeyBtn').addEventListener('click', async () => {
-			const secretKey = document.getElementById('secretKey').value.trim();
-			const accountName = document.getElementById('accountName').value.trim() || 'Account';
-			
-			if (!secretKey) {
-				setStatus('กรุณาป้อน Secret Key ก่อนบันทึก', 'error');
-				return;
-			}
-
-			setStatus('กำลังบันทึกคีย์...', 'loading');
-			
-			try {
-				const payload = {
-					secretKey: secretKey,
-					accountName: accountName,
-					timestamp: new Date().toISOString()
-				};
-
-				const res = await fetch('/api/2fa/save', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(payload),
-					credentials: 'include'
-				});
-
-				if (!res.ok) {
-					const error = await res.json().catch(() => ({}));
-					throw new Error(error.error || 'บันทึกไม่สำเร็จ');
-				}
-
-				setStatus('บันทึกคีย์สำเร็จ!', 'success');
-				
-				// Update saved keys list
-				loadSavedKeys();
-				
-			} catch (error) {
-				console.error('Save key error:', error);
-				setStatus(`บันทึกไม่สำเร็จ: ${error.message}`, 'error');
-			}
-		});
-
 		// Load Saved Keys
 		async function loadSavedKeys() {
 			try {
@@ -1311,14 +1210,6 @@
 				setStatus(`ลบไม่สำเร็จ: ${error.message}`, 'error');
 			}
 		};
-
-		// Copy Button
-		document.getElementById('copyBtn').addEventListener('click', async () => {
-			const codeValue = document.getElementById('codeValue').textContent;
-			if (codeValue && codeValue !== '------' && codeValue !== 'ERROR') {
-				await copyToClipboard(codeValue);
-			}
-		});
 
 		// Check user login status and update navigation
 		async function checkUserStatus() {
@@ -1515,6 +1406,129 @@
 			initMobileNav();
 			checkUserStatus(); // Check user status on page load
 			loadSavedKeys(); // Load saved keys on page load
+			
+			// Form Submission
+			const generateForm = document.getElementById('generateForm');
+			if (generateForm) {
+				generateForm.addEventListener('submit', async (e) => {
+					e.preventDefault();
+					
+					const secretKey = document.getElementById('secretKey').value.trim();
+					
+					if (!secretKey) {
+						setStatus('กรุณาป้อน Secret Key', 'error');
+						return;
+					}
+
+					setStatus('กำลังสร้างรหัส 2FA...', 'loading');
+					
+					try {
+						// Clear previous interval
+						if (window.codeUpdateInterval) {
+							clearInterval(window.codeUpdateInterval);
+						}
+						
+						// Reset success shown flag
+						window.successShown = false;
+						
+						// Update code display using 2fa.live API with fallback
+						await updateCodeDisplayFromAPI(secretKey);
+						
+						setStatus('สร้างรหัส 2FA สำเร็จ!', 'success');
+					} catch (error) {
+						console.error('Generation error:', error);
+						setStatus(`เกิดข้อผิดพลาด: ${error.message}`, 'error');
+					}
+				});
+			}
+
+			// Test API Button
+			const testApiBtn = document.getElementById('testApiBtn');
+			if (testApiBtn) {
+				testApiBtn.addEventListener('click', async () => {
+					const secretKey = document.getElementById('secretKey').value.trim();
+					
+					if (!secretKey) {
+						setStatus('กรุณาป้อน Secret Key ก่อนทดสอบ', 'error');
+						return;
+					}
+
+					setStatus('กำลังทดสอบ API...', 'loading');
+					
+					try {
+						const data = await fetchOTPFrom2FALive(secretKey);
+						
+						if (data.success && data.otp) {
+							// Calculate real time left
+							const now = Math.floor(Date.now() / 1000);
+							const timeLeft = 30 - (now % 30);
+							
+							setStatus(`ทดสอบสำเร็จ! รหัส: ${data.otp} (เหลือเวลา: ${timeLeft}s)`, 'success');
+						} else {
+							setStatus('ทดสอบไม่สำเร็จ - ไม่ได้รับข้อมูล OTP', 'error');
+						}
+					} catch (error) {
+						console.error('Test API error:', error);
+						setStatus(`ทดสอบไม่สำเร็จ: ${error.message}`, 'error');
+					}
+				});
+			}
+
+			// Save 2FA Key Button
+			const saveKeyBtn = document.getElementById('saveKeyBtn');
+			if (saveKeyBtn) {
+				saveKeyBtn.addEventListener('click', async () => {
+					const secretKey = document.getElementById('secretKey').value.trim();
+					const accountName = document.getElementById('accountName').value.trim() || 'Account';
+					
+					if (!secretKey) {
+						setStatus('กรุณาป้อน Secret Key ก่อนบันทึก', 'error');
+						return;
+					}
+
+					setStatus('กำลังบันทึกคีย์...', 'loading');
+					
+					try {
+						const payload = {
+							secretKey: secretKey,
+							accountName: accountName,
+							timestamp: new Date().toISOString()
+						};
+
+						const res = await fetch('/api/2fa/save', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(payload),
+							credentials: 'include'
+						});
+
+						if (!res.ok) {
+							const error = await res.json().catch(() => ({}));
+							throw new Error(error.error || 'บันทึกไม่สำเร็จ');
+						}
+
+						setStatus('บันทึกคีย์สำเร็จ!', 'success');
+						
+						// Update saved keys list
+						loadSavedKeys();
+						
+					} catch (error) {
+						console.error('Save key error:', error);
+						setStatus(`บันทึกไม่สำเร็จ: ${error.message}`, 'error');
+					}
+				});
+			}
+			
+			// Copy Button
+			const copyBtn = document.getElementById('copyBtn');
+			if (copyBtn) {
+				copyBtn.addEventListener('click', async () => {
+					const codeValue = document.getElementById('codeValue').textContent;
+					if (codeValue && codeValue !== '------' && codeValue !== 'ERROR') {
+						await copyToClipboard(codeValue);
+					}
+				});
+			}
 		});
 	</script>
 </body>

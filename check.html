@@ -56,11 +56,17 @@
 				setStatus('ยืนยันเรียบร้อย ขอบคุณครับ');
 			}catch(e){ setStatus('ดึงข้อมูลไม่สำเร็จ โปรดลองใหม่'); }
 		}
-		document.getElementById('refresh').addEventListener('click', run);
+		
+		// Add null check before addEventListener
+		const refreshBtn = document.getElementById('refresh');
+		if (refreshBtn) {
+			refreshBtn.addEventListener('click', run);
+		}
 		document.addEventListener('DOMContentLoaded', run);
 	</script>
 </body>
 </html>
+
 
 
 
