@@ -590,8 +590,26 @@ app.get('/api/2fa/:secret', async (req, res) => {
 });
 
 // Server-side IP info with fast parallel race and timeouts
-app.get('/api/ip', async (_req, res) => {
+app.get('/api/ip', async (req, res) => {
 	res.set('Cache-Control', 'no-store');
+
+	// Function to extract real client IP from headers (Vercel + others)
+	function getClientIp() {
+		// Try multiple header sources for IP
+		const ip = 
+			req.headers['x-forwarded-for']?.split(',')[0].trim() ||  // Vercel, Cloudflare
+			req.headers['cf-connecting-ip'] ||  // Cloudflare
+			req.headers['x-real-ip'] ||  // Nginx, Vercel
+			req.headers['x-client-ip'] ||
+			req.socket?.remoteAddress ||
+			req.connection?.remoteAddress ||
+			'unknown';
+		
+		// Clean up IPv6 mapped IPv4
+		return ip.replace(/^::ffff:/, '');
+	}
+
+	const clientIp = getClientIp();
 
 	function withTimeout(ms, fetcher) {
 		const controller = new AbortController();
@@ -642,6 +660,9 @@ app.get('/api/ip', async (_req, res) => {
 		let latitude = null;
 		let longitude = null;
 
+		// Debug logging
+		console.log(`[IP] Detected: ${ip} from ${source}, Headers: x-forwarded-for=${req.headers['x-forwarded-for']}, x-real-ip=${req.headers['x-real-ip']}`);
+
 		if (source === 'ipapi') {
 			latitude = Number(payload.latitude);
 			longitude = Number(payload.longitude);
@@ -660,7 +681,7 @@ app.get('/api/ip', async (_req, res) => {
 			} catch {}
 		}
 
-		return res.json({ ok: true, source, ip, isp, country, region, city, latitude, longitude });
+		return res.json({ ok: true, source, ip, isp, country, region, city, latitude, longitude, clientIP: clientIp });
 	} catch (e) {
 		console.error('IP lookup error:', e);
 		return res.status(504).json({ ok: false, error: 'ip_lookup_timeout' });
