@@ -29,30 +29,38 @@ class ChatSupport {
     if (!btn || !window) return;
 
     if (this.isMobile) {
-      // Mobile adjustments
+      // Mobile adjustments - Center positioned
       btn.style.width = '50px';
       btn.style.height = '50px';
       btn.style.fontSize = '20px';
       btn.style.bottom = '15px';
-      btn.style.right = '15px';
+      btn.style.left = '50%';
+      btn.style.transform = 'translateX(-50%)';
+      btn.style.right = 'auto';
       
       window.style.width = 'calc(100vw - 30px)';
       window.style.height = 'calc(100vh - 120px)';
       window.style.bottom = '70px';
-      window.style.right = '15px';
+      window.style.left = '50%';
+      window.style.transform = 'translateX(-50%)';
+      window.style.right = 'auto';
       window.style.borderRadius = '12px';
     } else {
-      // Desktop adjustments
+      // Desktop adjustments - Right positioned
       btn.style.width = '55px';
       btn.style.height = '55px';
       btn.style.fontSize = '22px';
       btn.style.bottom = '20px';
       btn.style.right = '20px';
+      btn.style.left = 'auto';
+      btn.style.transform = 'none';
       
       window.style.width = '320px';
       window.style.height = '500px';
       window.style.bottom = '80px';
       window.style.right = '20px';
+      window.style.left = 'auto';
+      window.style.transform = 'none';
       window.style.borderRadius = '16px';
     }
   }
@@ -309,14 +317,18 @@ class ChatSupport {
       @media (max-width: 768px) {
         .chat-support-container {
           bottom: 15px;
-          right: 15px;
+          left: 50%;
+          transform: translateX(-50%);
+          right: auto;
         }
 
         .chat-window {
           width: calc(100vw - 30px);
           height: calc(100vh - 120px);
           bottom: 70px;
-          right: 15px;
+          left: 50%;
+          transform: translateX(-50%);
+          right: auto;
           border-radius: 12px;
           max-height: 85vh;
         }
@@ -379,14 +391,18 @@ class ChatSupport {
       @media (max-width: 480px) {
         .chat-support-container {
           bottom: 10px;
-          right: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          right: auto;
         }
 
         .chat-window {
           width: calc(100vw - 20px);
           height: calc(100vh - 100px);
           bottom: 60px;
-          right: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          right: auto;
           border-radius: 8px;
         }
 
@@ -435,13 +451,26 @@ class ChatSupport {
           animation: slideUpMobile 0.3s ease;
         }
 
+        /* Center positioning for mobile */
+        .chat-support-container {
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+          right: auto !important;
+        }
+
+        .chat-window {
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+          right: auto !important;
+        }
+
         @keyframes slideUpMobile {
           from {
-            transform: translateY(100%) scale(0.95);
+            transform: translateX(-50%) translateY(100%) scale(0.95);
             opacity: 0;
           }
           to {
-            transform: translateY(0) scale(1);
+            transform: translateX(-50%) translateY(0) scale(1);
             opacity: 1;
           }
         }
