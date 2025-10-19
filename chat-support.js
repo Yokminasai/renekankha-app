@@ -294,30 +294,238 @@ class ChatSupport {
         transform: scale(1.05);
       }
 
+      /* Touch feedback */
+      .chat-support-btn:active,
       .chat-send-btn:active {
         transform: scale(0.95);
+        transition: transform 0.1s ease;
+      }
+
+      /* Mobile-specific improvements */
+      @media (max-width: 768px) {
+        .chat-input {
+          -webkit-appearance: none;
+          border-radius: 20px;
+        }
+
+        .chat-send-btn {
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+        }
+
+        .chat-support-btn {
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+        }
+
+        .chat-messages {
+          -webkit-overflow-scrolling: touch;
+          scroll-behavior: smooth;
+        }
+
+        .chat-window.active {
+          animation: slideUpMobile 0.3s ease-out;
+        }
+
+        @keyframes slideUpMobile {
+          from {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
       }
 
       /* Mobile Responsive */
-      @media (max-width: 480px) {
+      @media (max-width: 768px) {
+        .chat-support-container {
+          bottom: 16px;
+          right: 16px;
+        }
+
         .chat-window {
-          width: 100vw;
-          height: 100vh;
+          width: calc(100vw - 32px);
+          height: calc(100vh - 100px);
           max-width: 100%;
-          bottom: 0;
-          right: 0;
-          border-radius: 0;
+          bottom: 80px;
+          right: 16px;
+          border-radius: 12px;
+          max-height: 80vh;
         }
 
         .chat-support-btn {
           width: 56px;
           height: 56px;
-          bottom: 24px;
-          right: 16px;
+          font-size: 24px;
+        }
+
+        .chat-message-content {
+          max-width: 85%;
+          font-size: 14px;
+          padding: 8px 12px;
+        }
+
+        .chat-input {
+          padding: 12px 16px;
+          font-size: 16px;
+        }
+
+        .chat-send-btn {
+          width: 40px;
+          height: 40px;
+          font-size: 18px;
+        }
+
+        .chat-header {
+          padding: 12px 16px;
+          font-size: 16px;
+        }
+
+        .chat-header h3 {
+          font-size: 16px;
+        }
+
+        .chat-header .chat-close {
+          width: 32px;
+          height: 32px;
+          font-size: 18px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .chat-support-container {
+          bottom: 12px;
+          right: 12px;
+        }
+
+        .chat-window {
+          width: calc(100vw - 24px);
+          height: calc(100vh - 80px);
+          max-width: 100%;
+          bottom: 70px;
+          right: 12px;
+          border-radius: 8px;
+          max-height: 85vh;
+        }
+
+        .chat-support-btn {
+          width: 52px;
+          height: 52px;
+          font-size: 22px;
+          bottom: 12px;
+          right: 12px;
         }
 
         .chat-message-content {
           max-width: 90%;
+          font-size: 13px;
+          padding: 6px 10px;
+          line-height: 1.4;
+        }
+
+        .chat-input {
+          padding: 10px 14px;
+          font-size: 16px;
+          border-radius: 20px;
+        }
+
+        .chat-send-btn {
+          width: 36px;
+          height: 36px;
+          font-size: 16px;
+          border-radius: 18px;
+        }
+
+        .chat-header {
+          padding: 10px 14px;
+          font-size: 15px;
+        }
+
+        .chat-header h3 {
+          font-size: 15px;
+        }
+
+        .chat-header .chat-close {
+          width: 28px;
+          height: 28px;
+          font-size: 16px;
+        }
+
+        .chat-badge {
+          width: 20px;
+          height: 20px;
+          font-size: 10px;
+          top: -6px;
+          right: -6px;
+        }
+      }
+
+      /* iPhone X and smaller */
+      @media (max-width: 375px) {
+        .chat-window {
+          width: calc(100vw - 16px);
+          height: calc(100vh - 60px);
+          bottom: 60px;
+          right: 8px;
+          border-radius: 6px;
+        }
+
+        .chat-support-btn {
+          width: 48px;
+          height: 48px;
+          font-size: 20px;
+          bottom: 8px;
+          right: 8px;
+        }
+
+        .chat-message-content {
+          font-size: 12px;
+          padding: 5px 8px;
+        }
+
+        .chat-input {
+          padding: 8px 12px;
+          font-size: 15px;
+        }
+
+        .chat-send-btn {
+          width: 32px;
+          height: 32px;
+          font-size: 14px;
+        }
+      }
+
+      /* iPhone X and newer (safe area support) */
+      @supports (padding: max(0px)) {
+        @media (max-width: 768px) {
+          .chat-support-container {
+            bottom: max(16px, env(safe-area-inset-bottom));
+            right: max(16px, env(safe-area-inset-right));
+          }
+
+          .chat-window {
+            bottom: max(80px, calc(env(safe-area-inset-bottom) + 60px));
+            right: max(16px, env(safe-area-inset-right));
+          }
+
+          .chat-input-area {
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+          }
+        }
+
+        @media (max-width: 480px) {
+          .chat-support-container {
+            bottom: max(12px, env(safe-area-inset-bottom));
+            right: max(12px, env(safe-area-inset-right));
+          }
+
+          .chat-window {
+            bottom: max(70px, calc(env(safe-area-inset-bottom) + 50px));
+            right: max(12px, env(safe-area-inset-right));
+          }
         }
       }
 
@@ -408,6 +616,75 @@ class ChatSupport {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         this.sendMessage();
+      }
+    });
+
+    // Touch events for mobile
+    chatBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      chatBtn.style.transform = 'scale(0.95)';
+    });
+
+    chatBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      chatBtn.style.transform = 'scale(1)';
+      this.toggleChat();
+    });
+
+    chatSendBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      chatSendBtn.style.transform = 'scale(0.95)';
+    });
+
+    chatSendBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      chatSendBtn.style.transform = 'scale(1)';
+      this.sendMessage();
+    });
+
+    // Prevent zoom on input focus (iOS)
+    chatInput.addEventListener('focus', () => {
+      if (window.innerWidth <= 768) {
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+        }
+      }
+    });
+
+    chatInput.addEventListener('blur', () => {
+      if (window.innerWidth <= 768) {
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.content = 'width=device-width, initial-scale=1';
+        }
+      }
+    });
+
+    // Close chat when clicking outside (desktop only)
+    document.addEventListener('click', (e) => {
+      if (this.isOpen && window.innerWidth > 768) {
+        const chatContainer = document.querySelector('.chat-support-container');
+        if (!chatContainer.contains(e.target)) {
+          this.closeChat();
+        }
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      if (this.isOpen && window.innerWidth <= 768) {
+        // Adjust chat window for mobile
+        chatWindow.style.width = 'calc(100vw - 24px)';
+        chatWindow.style.height = 'calc(100vh - 80px)';
+        chatWindow.style.right = '12px';
+        chatWindow.style.bottom = '70px';
+      } else if (this.isOpen && window.innerWidth > 768) {
+        // Reset to desktop size
+        chatWindow.style.width = '380px';
+        chatWindow.style.height = '600px';
+        chatWindow.style.right = '0';
+        chatWindow.style.bottom = '80px';
       }
     });
 
