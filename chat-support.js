@@ -19,133 +19,16 @@ class ChatSupport {
 
   detectDevice() {
     this.isMobile = window.innerWidth <= 768;
-    this.adjustForDevice();
-  }
-
-  adjustForDevice() {
-    const btn = document.getElementById('chatBtn');
-    const window = document.getElementById('chatWindow');
-    
-    if (!btn || !window) return;
-
-    if (this.isMobile) {
-      // Mobile adjustments - Center positioned
-      btn.style.width = '50px';
-      btn.style.height = '50px';
-      btn.style.fontSize = '20px';
-      btn.style.bottom = '15px';
-      btn.style.left = '50%';
-      btn.style.transform = 'translateX(-50%)';
-      btn.style.right = 'auto';
-      
-      window.style.width = 'calc(100vw - 30px)';
-      window.style.height = 'calc(100vh - 120px)';
-      window.style.bottom = '70px';
-      window.style.left = '50%';
-      window.style.transform = 'translateX(-50%)';
-      window.style.right = 'auto';
-      window.style.borderRadius = '12px';
-    } else {
-      // Desktop adjustments - Right positioned
-      btn.style.width = '55px';
-      btn.style.height = '55px';
-      btn.style.fontSize = '22px';
-      btn.style.bottom = '20px';
-      btn.style.right = '20px';
-      btn.style.left = 'auto';
-      btn.style.transform = 'none';
-      
-      window.style.width = '320px';
-      window.style.height = '500px';
-      window.style.bottom = '80px';
-      window.style.right = '20px';
-      window.style.left = 'auto';
-      window.style.transform = 'none';
-      window.style.borderRadius = '16px';
-    }
   }
 
   createStyles() {
     const style = document.createElement('style');
     style.textContent = `
       /* Professional Chat Support Widget */
-      .chat-support-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 9999;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        pointer-events: none;
-      }
-
-      .chat-support-container * {
-        pointer-events: auto;
-      }
-
-      /* Floating Button - Perfect Size */
-      .chat-support-btn {
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        transition: all 0.3s ease;
-        color: white;
-        position: relative;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      .chat-support-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
-      }
-
-      .chat-support-btn:active {
-        transform: scale(0.95);
-      }
-
-      /* Notification Badge */
-      .chat-badge {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        width: 18px;
-        height: 18px;
-        background: #ff4757;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        font-weight: bold;
-        color: white;
-        animation: pulse 2s infinite;
-        border: 2px solid white;
-      }
-
-      @keyframes pulse {
-        0%, 100% {
-          transform: scale(1);
-          opacity: 1;
-        }
-        50% {
-          transform: scale(1.1);
-          opacity: 0.8;
-        }
-      }
-
       /* Chat Window - Perfect Size */
       .chat-window {
-        position: absolute;
-        bottom: 80px;
+        position: fixed;
+        bottom: 20px;
         right: 20px;
         width: 320px;
         height: 500px;
@@ -315,17 +198,10 @@ class ChatSupport {
 
       /* Mobile Responsive */
       @media (max-width: 768px) {
-        .chat-support-container {
-          bottom: 15px;
-          left: 50%;
-          transform: translateX(-50%);
-          right: auto;
-        }
-
         .chat-window {
           width: calc(100vw - 30px);
           height: calc(100vh - 120px);
-          bottom: 70px;
+          bottom: 20px;
           left: 50%;
           transform: translateX(-50%);
           right: auto;
@@ -333,11 +209,6 @@ class ChatSupport {
           max-height: 85vh;
         }
 
-        .chat-support-btn {
-          width: 50px;
-          height: 50px;
-          font-size: 20px;
-        }
 
         .chat-message-content {
           max-width: 85%;
@@ -377,39 +248,18 @@ class ChatSupport {
         .chat-input-area {
           padding: 10px 12px;
         }
-
-        .chat-badge {
-          width: 16px;
-          height: 16px;
-          font-size: 9px;
-          top: -4px;
-          right: -4px;
-        }
       }
 
       /* Small Mobile */
       @media (max-width: 480px) {
-        .chat-support-container {
-          bottom: 10px;
-          left: 50%;
-          transform: translateX(-50%);
-          right: auto;
-        }
-
         .chat-window {
           width: calc(100vw - 20px);
           height: calc(100vh - 100px);
-          bottom: 60px;
+          bottom: 20px;
           left: 50%;
           transform: translateX(-50%);
           right: auto;
           border-radius: 8px;
-        }
-
-        .chat-support-btn {
-          width: 45px;
-          height: 45px;
-          font-size: 18px;
         }
 
         .chat-message-content {
@@ -436,8 +286,7 @@ class ChatSupport {
           border-radius: 20px;
         }
 
-        .chat-send-btn,
-        .chat-support-btn {
+        .chat-send-btn {
           -webkit-tap-highlight-color: transparent;
           touch-action: manipulation;
         }
@@ -452,12 +301,6 @@ class ChatSupport {
         }
 
         /* Center positioning for mobile */
-        .chat-support-container {
-          left: 50% !important;
-          transform: translateX(-50%) !important;
-          right: auto !important;
-        }
-
         .chat-window {
           left: 50% !important;
           transform: translateX(-50%) !important;
@@ -552,12 +395,6 @@ class ChatSupport {
     const container = document.createElement('div');
     container.className = 'chat-support-container';
     container.innerHTML = `
-      <!-- Floating Button -->
-      <button class="chat-support-btn" id="chatBtn">
-        💬
-        <div class="chat-badge" id="chatBadge" style="display: none;">1</div>
-      </button>
-
       <!-- Chat Window -->
       <div class="chat-window" id="chatWindow">
         <!-- Header -->
@@ -594,14 +431,12 @@ class ChatSupport {
   }
 
   attachEventListeners() {
-    const chatBtn = document.getElementById('chatBtn');
     const chatCloseBtn = document.getElementById('chatCloseBtn');
     const chatSendBtn = document.getElementById('chatSendBtn');
     const chatInput = document.getElementById('chatInput');
     const chatWindow = document.getElementById('chatWindow');
 
-    // Open/Close Chat
-    chatBtn.addEventListener('click', () => this.toggleChat());
+    // Close Chat
     chatCloseBtn.addEventListener('click', () => this.closeChat());
 
     // Send Message
@@ -611,18 +446,6 @@ class ChatSupport {
         e.preventDefault();
         this.sendMessage();
       }
-    });
-
-    // Touch events for mobile
-    chatBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      chatBtn.style.transform = 'scale(0.95)';
-    });
-
-    chatBtn.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      chatBtn.style.transform = 'scale(1)';
-      this.toggleChat();
     });
 
     chatSendBtn.addEventListener('touchstart', (e) => {
@@ -689,7 +512,6 @@ class ChatSupport {
     this.isOpen = true;
     const chatWindow = document.getElementById('chatWindow');
     chatWindow.classList.add('active');
-    document.getElementById('chatBadge').style.display = 'none';
     
     // Focus input after animation
     setTimeout(() => {
