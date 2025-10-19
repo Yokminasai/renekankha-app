@@ -244,3 +244,4 @@ Could track:
 4. ✅ Monitor user feedback ← Ongoing
 
 **You're almost there! Just add the `<script>` tag to all pages!** 🎉
+

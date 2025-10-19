@@ -1422,11 +1422,39 @@
 							credentials: 'include'
 						});
 						
+						console.log('Login response status:', res.status);
+						
 						if (!res.ok) {
 							const error = await res.json().catch(() => ({}));
+							console.log('Login error details:', error);
+							console.log('Seed phrase hash sent:', payload.hash.substring(0, 16) + '...');
+							
+							// Handle legacy account error
+							if (error.error === 'legacy_account') {
+								setStatus(
+									error.message || 'บัญชีของคุณเป็นบัญชีเก่า กรุณาลงทะเบียนบัญชีใหม่',
+									'error'
+								);
+								// Show button to create new account
+								setTimeout(() => {
+									if (confirm('ต้องการสร้างบัญชีใหม่ใช่หรือไม่?')) {
+										location.href = 'register.html';
+									}
+								}, 1000);
+								return;
+							}
+							
+							// Handle invalid seed phrase
+							if (error.error === 'invalid seed phrase') {
+								setStatus('Seed Phrase ไม่ถูกต้อง กรุณาตรวจสอบและลองใหม่', 'error');
+								console.warn('Invalid seed phrase - check spelling and word count');
+								return;
+							}
+							
 							throw new Error(error.error || 'เข้าสู่ระบบไม่สำเร็จ');
 						}
 						
+						console.log('✅ Login successful');
 						setStatus('เข้าสู่ระบบสำเร็จ! กำลังเปลี่ยนหน้า...', 'success');
 						setTimeout(() => {
 							location.href = 'index.html';
@@ -1477,7 +1505,7 @@
 		}
 	</script>
   <!-- Chat Support Widget -->
-  <script src="chat-support.js"></script>
+  <script src="./chat-support.js"></script>
 </body>
 </html>
 

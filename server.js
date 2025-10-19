@@ -50,6 +50,20 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(morgan('combined'));
 
+// Set correct MIME types for static files
+app.use((req, res, next) => {
+	if (req.path.endsWith('.js')) {
+		res.type('application/javascript');
+	} else if (req.path.endsWith('.css')) {
+		res.type('text/css');
+	} else if (req.path.endsWith('.html')) {
+		res.type('text/html');
+	} else if (req.path.endsWith('.json')) {
+		res.type('application/json');
+	}
+	next();
+});
+
 const blacklistFile = path.join(dataDir, 'blacklist.json');
 const reportsFile = path.join(dataDir, 'reports.json');
 const ordersFile = path.join(dataDir, 'orders.json');
@@ -216,19 +230,53 @@ app.post('/api/auth/anonymous-register', (req, res) => {
 
 app.post('/api/auth/anonymous-login', (req, res) => {
 	const { seedPhrase, hash, anonymous } = req.body || {};
-	if (!seedPhrase || !hash || !anonymous) return res.status(400).json({ error: 'missing required fields' });
+	
+	console.log('🔐 Login attempt received');
+	console.log('  - seedPhrase length:', seedPhrase?.length);
+	console.log('  - hash:', hash?.substring(0, 12) + '...');
+	console.log('  - anonymous:', anonymous);
+	
+	if (!seedPhrase || !hash || !anonymous) {
+		console.log('  ❌ Missing required fields');
+		return res.status(400).json({ error: 'missing required fields' });
+	}
 	
 	const words = seedPhrase.split(' ').filter(w => w.trim().length > 0);
-	if (words.length !== 12) return res.status(400).json({ error: 'invalid seed phrase format' });
+	console.log('  - word count:', words.length);
+	
+	if (words.length !== 12) {
+		console.log('  ❌ Invalid word count (expected 12)');
+		return res.status(400).json({ error: 'invalid seed phrase format' });
+	}
 	
 	const users = readJSON(usersFile) || { users: [] };
+	console.log('  - total users in database:', users.users.length);
+	
 	const user = users.users.find(u => u.seedPhraseHash === hash && u.anonymous === true);
 	
 	if (!user) {
-		console.warn('❌ Failed login attempt with hash: ' + hash.substring(0, 8) + '...');
+		console.warn('  ❌ No user found with hash: ' + hash.substring(0, 8) + '...');
+		const availableHashes = users.users
+			.filter(u => u.anonymous)
+			.map(u => u.seedPhraseHash?.substring(0, 8) + '...')
+			.join(', ');
+		console.warn('  Available hashes:', availableHashes || 'none');
 		return res.status(401).json({ error: 'invalid seed phrase' });
 	}
 	
+	console.log('  ✓ User found:', user.id, '(' + user.name + ')');
+	
+	// Handle legacy users (no seedSalt or seedHashVerify)
+	if (user.legacy) {
+		console.warn('  ⚠️  Legacy user attempting login: ' + user.id);
+		return res.status(401).json({ 
+			error: 'legacy_account',
+			message: 'บัญชีของคุณเป็นบัญชีเก่า กรุณาลงทะเบียนบัญชีใหม่เพื่อใช้ Seed Phrase Verification ที่ปลอดภัย',
+			requiresReregister: true
+		});
+	}
+	
+	// Verify seed phrase with salt
 	if (user.seedSalt && user.seedHashVerify) {
 		try {
 			const verifyHash = crypto.pbkdf2Sync(seedPhrase, user.seedSalt, 100000, 32, 'sha256').toString('base64url');
@@ -254,25 +302,6 @@ app.post('/api/auth/anonymous-login', (req, res) => {
 	res.json({ ok: true, user: { id: user.id, name: user.name, role: user.role, anonymous: true } });
 });
 
-app.post('/api/auth/anonymous-login', (req, res) => {
-	const { seedPhrase, hash, anonymous } = req.body || {};
-	if (!seedPhrase || !hash || !anonymous) return res.status(400).json({ error: 'missing required fields' });
-	
-	const users = readJSON(usersFile) || { users: [] };
-	const user = users.users.find(u => u.seedPhraseHash === hash && u.anonymous === true);
-	
-	if (!user) return res.status(401).json({ error: 'invalid seed phrase' });
-	
-	// Create session
-	const sessions = readJSON(sessionsFile) || { sessions: [] };
-	const sessionId = nanoid(32);
-	sessions.sessions.push({ id: sessionId, userId: user.id, createdAt: new Date().toISOString() });
-	sessions.updatedAt = new Date().toISOString();
-	writeJSON(sessionsFile, sessions);
-	setSessionCookie(res, sessionId);
-	
-	res.json({ ok: true, user: { id: user.id, name: user.name, role: user.role, anonymous: true } });
-});
 
 app.get('/api/auth/me', (req, res) => {
 	const s = getSession(req);
