@@ -65,7 +65,18 @@
       "legacy": true,
       "seedSalt": "LEGACY_NO_SALT",
       "seedHashVerify": "LEGACY_NO_VERIFY"
+    },
+    {
+      "id": "CbofsW5jBk",
+      "name": "User",
+      "seedPhraseHash": "01784972264d6d39813782c0bced2a2eb774899715ec526a02b98510a0c75611",
+      "seedSalt": "HDBXElOLbr5nkfroCsNiPA",
+      "seedHashVerify": "TbyWgd0XurgL-OVphOb52BTyWjMzzA4NATW8GRd1fSI",
+      "role": "user",
+      "anonymous": true,
+      "createdAt": "2025-10-19T05:46:32.815Z",
+      "legacy": false
     }
   ],
-  "updatedAt": "2025-10-17T13:19:45.726Z"
+  "updatedAt": "2025-10-19T05:46:32.832Z"
 }
