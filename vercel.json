@@ -17,7 +17,7 @@
     },
     {
       "src": "/chat-support.js",
-      "dest": "/public/chat-support.js"
+      "dest": "/chat-support.js"
     },
     {
       "src": "/(.*\\.js)$",
