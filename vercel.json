@@ -12,6 +12,22 @@
       "dest": "/server.js"
     },
     {
+      "src": "/chat-support.js",
+      "dest": "/chat-support.js"
+    },
+    {
+      "src": "/(.*\\.js)$",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*\\.css)$",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*\\.html)$",
+      "dest": "/$1"
+    },
+    {
       "src": "/index.html",
       "dest": "/server.js"
     },

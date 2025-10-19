@@ -948,8 +948,36 @@ app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'home.html'));
 });
 
+// Explicit routes for critical static files
+app.get('/chat-support.js', (req, res) => {
+	res.type('application/javascript');
+	res.sendFile(path.join(__dirname, 'chat-support.js'));
+});
+
+app.get('/validate-db.js', (req, res) => {
+	res.type('application/javascript');
+	res.sendFile(path.join(__dirname, 'validate-db.js'));
+});
+
 // Then use express.static for other static files (CSS, JS, images, etc)
-app.use(express.static(__dirname));
+// Configure static file serving with proper caching and MIME types
+app.use(express.static(__dirname, {
+	setHeaders: (res, path) => {
+		if (path.endsWith('.js')) {
+			res.setHeader('Content-Type', 'application/javascript');
+			res.setHeader('Cache-Control', 'public, max-age=3600');
+		} else if (path.endsWith('.css')) {
+			res.setHeader('Content-Type', 'text/css');
+			res.setHeader('Cache-Control', 'public, max-age=3600');
+		} else if (path.endsWith('.html')) {
+			res.setHeader('Content-Type', 'text/html');
+			res.setHeader('Cache-Control', 'public, max-age=300');
+		} else if (path.endsWith('.json')) {
+			res.setHeader('Content-Type', 'application/json');
+			res.setHeader('Cache-Control', 'public, max-age=3600');
+		}
+	}
+}));
 
 // Fallback 404 handler
 app.use((req, res) => {
