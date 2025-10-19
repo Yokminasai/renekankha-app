@@ -4,6 +4,10 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -13,19 +17,15 @@
     },
     {
       "src": "/chat-support.js",
-      "dest": "/chat-support.js"
+      "dest": "/public/chat-support.js"
     },
     {
       "src": "/(.*\\.js)$",
-      "dest": "/$1"
+      "dest": "/public/$1"
     },
     {
       "src": "/(.*\\.css)$",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*\\.html)$",
-      "dest": "/$1"
+      "dest": "/public/$1"
     },
     {
       "src": "/index.html",
